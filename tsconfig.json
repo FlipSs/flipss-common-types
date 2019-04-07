@@ -1,0 +1,13 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
+    "moduleResolution": "classic",
+    "module": "commonjs",
+    "target": "es5"
+  },
+  "include": [
+    "lib/**/*"
+  ]
+}
