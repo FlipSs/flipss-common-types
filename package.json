@@ -1,5 +1,5 @@
 {
-  "name": "common-types",
+  "name": "flipss-common-types",
   "version": "1.0.0",
   "description": "Common types for FlipSs projects",
   "main": "dist/index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FlipSs/common-types.git"
+    "url": "git+https://github.com/FlipSs/flipss-common-types.git"
   },
   "keywords": [
     "flipss",
@@ -17,9 +17,9 @@
   "author": "Pavel Eroshkin",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/FlipSs/common-types/issues"
+    "url": "https://github.com/FlipSs/flipss-common-types/issues"
   },
-  "homepage": "https://github.com/FlipSs/common-types#readme",
+  "homepage": "https://github.com/FlipSs/flipss-common-types#readme",
   "devDependencies": {
     "typescript": "^3.4.2"
   }
