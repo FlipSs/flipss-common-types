@@ -1,6 +1,6 @@
 {
   "name": "flipss-common-types",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Common types for FlipSs projects",
   "main": "index.d.ts",
   "types": "index.js",
