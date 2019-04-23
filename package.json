@@ -1,6 +1,6 @@
 {
   "name": "flipss-common-types",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Common types for FlipSs projects",
   "scripts": {
     "npm-publish": "npm version patch && tsc && npm publish"
