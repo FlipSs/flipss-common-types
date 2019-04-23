@@ -3,11 +3,15 @@
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,
-    "moduleResolution": "classic",
+    "moduleResolution": "node",
+    "lib": [
+      "es2015"
+    ],
     "module": "commonjs",
     "target": "es5"
   },
-  "include": [
-    "lib/**/*"
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
