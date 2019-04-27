@@ -1,6 +1,6 @@
 {
   "name": "flipss-common-types",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Common types for FlipSs projects",
   "scripts": {
     "build": "tsc && node ./build/after-build.js",
