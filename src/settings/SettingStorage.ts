@@ -1,7 +1,7 @@
 import {ISettingStorage} from './ISettingStorage';
 import {ISettingLoader} from './ISettingLoader';
 import {ReplaySubject, Subject} from "rxjs";
-import {Argument} from "../utils/Argument";
+import {Argument} from "../utils";
 
 export class SettingStorage<TSettings> implements ISettingStorage<TSettings> {
   public readonly value: Subject<TSettings>;

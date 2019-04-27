@@ -2,7 +2,7 @@ import {ISettingObject} from './ISettingObject';
 import {ISettingStorage} from './ISettingStorage';
 import {ISettingObjectErrorListener} from './ISettingObjectErrorListener';
 import {ReplaySubject, Subject} from "rxjs";
-import {Argument} from "../utils/Argument";
+import {Argument} from "../utils";
 
 export abstract class DynamicSettingObject<TSettings, TStorageSettings> implements ISettingObject<TSettings> {
   public readonly valueUpdated: Subject<void>;
