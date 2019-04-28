@@ -3,7 +3,8 @@
   "version": "1.0.16",
   "description": "Common types for FlipSs projects",
   "scripts": {
-    "build": "tsc && node ./build/after-build.js",
+    "test": "npm run build && jasmine",
+    "build": "node ./build/before-build.js && tsc && node ./build/after-build.js",
     "update-package-version": "npm version patch",
     "npm-publish": "npm run update-package-version && npm run build && cd dist && npm publish"
   },
@@ -22,9 +23,14 @@
   },
   "homepage": "https://github.com/FlipSs/flipss-common-types#readme",
   "dependencies": {
-    "rxjs": "^6.4.0"
+    "rxjs": "^6.4.0",
+    "tslib": "^1.9.3"
   },
   "devDependencies": {
+    "@types/node": "^11.13.8",
+    "@types/jasmine": "^3.3.12",
+    "jasmine": "^3.4.0",
+    "jasmine-spec-reporter": "^4.2.1",
     "typescript": "^3.4.2"
   }
 }

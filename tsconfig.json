@@ -4,6 +4,9 @@
     "outDir": "./dist",
     "declaration": true,
     "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
     "lib": [
       "es2015"
     ],
@@ -12,6 +15,7 @@
   },
   "exclude": [
     "node_modules",
+    "tests",
     "dist"
   ]
 }
