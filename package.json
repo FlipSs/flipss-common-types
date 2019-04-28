@@ -1,6 +1,6 @@
 {
   "name": "flipss-common-types",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Common types for FlipSs projects",
   "scripts": {
     "test": "npm run build && jasmine",
