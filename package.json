@@ -6,7 +6,7 @@
     "test": "npm run build && jasmine",
     "build": "node ./build/before-build.js && tsc && node ./build/after-build.js",
     "update-package-version": "npm version patch",
-    "npm-publish": "npm run test && npm run update-package-version && npm run build && cd dist && npm publish"
+    "npm-publish": "npm run test && npm run update-package-version && npm run build && cd dist/src && npm publish"
   },
   "repository": {
     "type": "git",

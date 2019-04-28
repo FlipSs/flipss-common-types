@@ -4,10 +4,9 @@ const fs = require('fs');
 const files = [
   'LICENSE',
   'README.md',
-  'package.json',
-  '.npmignore'
+  'package.json'
 ];
 
 files.forEach(f => {
-  fs.copyFileSync(f, `dist/${f}`);
+  fs.copyFileSync(f, `dist/src/${f}`);
 });
