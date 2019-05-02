@@ -17,11 +17,11 @@ describe('SettingStorage tests', () => {
 
   beforeEach(() => settingStorage.refreshAsync());
 
-  it('Must update value', () => {
+  it('Should update value', () => {
     expect(value).toEqual(settings[0]);
   });
 
-  it('Must be undefined', () => {
+  it('Should be undefined', () => {
     expect(value).toBeFalsy();
   });
 });
