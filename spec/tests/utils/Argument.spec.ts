@@ -35,4 +35,28 @@ describe('Argument tests', () => {
           .not.toThrow()
     });
   });
+
+  describe('isNotNullOrEmpty', () => {
+    const parameterName = 'test';
+
+    it('Should throw error on null', () => {
+      expect(() => Argument.isNotNullOrEmpty(null, parameterName))
+          .toThrow()
+    });
+
+    it('Should throw error on undefined', () => {
+      expect(() => Argument.isNotNullOrEmpty(undefined, parameterName))
+          .toThrow()
+    });
+
+    it('Should throw error on ""', () => {
+      expect(() => Argument.isNotNullOrEmpty('', parameterName))
+          .toThrow()
+    });
+
+    it('Should not throw error on string', () => {
+      expect(() => Argument.isNotNullOrEmpty(parameterName, parameterName))
+          .not.toThrow()
+    });
+  });
 });
