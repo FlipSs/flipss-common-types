@@ -13,6 +13,11 @@ import {Collection} from "./Collection";
 import {DeferredEnumerable} from "./DeferredEnumerable";
 import {IHashSet} from "./IHashSet";
 import {HashSet} from "./HashSet";
+import {IReadOnlyHashSet} from "./IReadOnlyHashSet";
+import {IDictionary} from "./IDictionary";
+import {IReadOnlyDictionary} from "./IReadOnlyDictionary";
+import {Dictionary} from "./Dictionary";
+import {IKeyValuePair} from "./IKeyValuePair";
 
 export function asEnumerable<T>(items: T[]): IEnumerable<T> {
     return new ArrayAsEnumerable(items);
@@ -254,6 +259,28 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
 
     public toHashSet(): IHashSet<T> {
         return new HashSet(this.value);
+    }
+
+    public toReadOnlyHashSet(): IReadOnlyHashSet<T> {
+        return this.toHashSet();
+    }
+
+    public toDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>): IDictionary<TKey, TValue> {
+        Argument.isNotNullOrUndefined(keySelector, 'keySelector');
+        Argument.isNotNullOrUndefined(valueSelector, 'valueSelector');
+
+        const keyValuePairs: IKeyValuePair<TKey, TValue>[] = this.value.map(v => {
+            return {
+                key: keySelector(v),
+                value: valueSelector(v)
+            };
+        });
+
+        return new Dictionary(keyValuePairs);
+    }
+
+    public toReadOnlyDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>): IReadOnlyDictionary<TKey, TValue> {
+        return this.toDictionary(keySelector, valueSelector);
     }
 
     protected abstract getValue(): T[];

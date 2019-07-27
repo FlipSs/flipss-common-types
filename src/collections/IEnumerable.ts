@@ -4,6 +4,9 @@ import {IGrouping} from "./grouping/IGrouping";
 import {ICollection} from "./ICollection";
 import {IReadOnlyCollection} from "./IReadOnlyCollection";
 import {IHashSet} from "./IHashSet";
+import {IReadOnlyHashSet} from "./IReadOnlyHashSet";
+import {IDictionary} from "./IDictionary";
+import {IReadOnlyDictionary} from "./IReadOnlyDictionary";
 
 export interface IEnumerable<T> extends Iterable<T> {
     getElementAt(index: number): T;
@@ -57,4 +60,10 @@ export interface IEnumerable<T> extends Iterable<T> {
     toReadOnlyCollection(): IReadOnlyCollection<T>;
 
     toHashSet(): IHashSet<T>;
+
+    toReadOnlyHashSet(): IReadOnlyHashSet<T>;
+
+    toDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>): IDictionary<TKey, TValue>;
+
+    toReadOnlyDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>): IReadOnlyDictionary<TKey, TValue>;
 }
