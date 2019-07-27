@@ -3,5 +3,5 @@ import {ILogger} from "./ILogger";
 import {Logger} from "./Logger";
 
 export function createLogger(sender: ILogSender): ILogger {
-  return new Logger(sender);
+    return new Logger(sender);
 }

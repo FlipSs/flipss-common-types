@@ -3,25 +3,25 @@ import {ITestSettings} from "./models/ITestSettings";
 import {TestSettingLoader} from "./models/TestSettingLoader";
 
 describe('SettingStorage tests', () => {
-  const settings: ITestSettings[] = [
-    {value: 'first'}
-  ];
+    const settings: ITestSettings[] = [
+        {value: 'first'}
+    ];
 
-  let settingStorage: ISettingStorage<ITestSettings>;
-  let value: ITestSettings;
+    let settingStorage: ISettingStorage<ITestSettings>;
+    let value: ITestSettings;
 
-  beforeAll(() => {
-    settingStorage = new SettingStorage<ITestSettings>(new TestSettingLoader(Array.from(settings)));
-    settingStorage.value.subscribe(v => value = v);
-  });
+    beforeAll(() => {
+        settingStorage = new SettingStorage<ITestSettings>(new TestSettingLoader(Array.from(settings)));
+        settingStorage.value.subscribe(v => value = v);
+    });
 
-  beforeEach(() => settingStorage.refreshAsync());
+    beforeEach(() => settingStorage.refreshAsync());
 
-  it('Should update value', () => {
-    expect(value).toEqual(settings[0]);
-  });
+    it('Should update value', () => {
+        expect(value).toEqual(settings[0]);
+    });
 
-  it('Should be undefined', () => {
-    expect(value).toBeFalsy();
-  });
+    it('Should be undefined', () => {
+        expect(value).toBeFalsy();
+    });
 });

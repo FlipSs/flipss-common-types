@@ -1,3 +1,3 @@
 export interface ITestSettings {
-  value: string;
+    value: string;
 }

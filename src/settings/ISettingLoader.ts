@@ -1,3 +1,3 @@
 export interface ISettingLoader<TSettings> {
-  loadAsync(): Promise<TSettings>;
+    loadAsync(): Promise<TSettings>;
 }

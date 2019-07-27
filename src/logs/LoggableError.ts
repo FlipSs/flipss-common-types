@@ -1,15 +1,15 @@
 import {ILogMessage} from "./ILogMessage";
 
 export class LoggableError extends Error {
-  public constructor(private readonly logMessage: ILogMessage) {
-    super(logMessage && logMessage.message);
+    public constructor(private readonly logMessage: ILogMessage) {
+        super(logMessage && logMessage.message);
 
-    Object.setPrototypeOf(this, new.target.prototype);
+        Object.setPrototypeOf(this, new.target.prototype);
 
-    this.name = 'LoggableError';
-  }
+        this.name = 'LoggableError';
+    }
 
-  public get log(): ILogMessage {
-    return this.logMessage;
-  }
+    public get log(): ILogMessage {
+        return this.logMessage;
+    }
 }

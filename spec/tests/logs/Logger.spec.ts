@@ -1,56 +1,55 @@
-import {ILogger, ILogMessage, ILogSender, LogLevel} from "../../../src/logs";
-import {createLogger} from "../../../src/logs/CreateLogger";
+import {createLogger, ILogger, ILogMessage, ILogSender, LogLevel} from "../../../src/logs";
 import {Action} from "../../../src/types";
 import {LogMessageFactory} from "../../../src/logs/LogMessageFactory";
 import Spy = jasmine.Spy;
 
 describe('Logger', () => {
-  let spy: Spy;
-  let logger: ILogger;
-  beforeEach(() => {
-    const sender = new LogSender();
-    spy = spyOn(sender, 'enqueue');
-    logger = createLogger(sender);
-  });
-
-  function shouldBeMessage(message: ILogMessage) {
-    expect(spy).toHaveBeenCalledWith(message);
-  }
-
-  function shouldBeRaw(rawMessage: string | Error, logLevel: LogLevel, action: Action<ILogMessage>): void {
-    it(`Should be ${LogLevel[logLevel]} message`, () => {
-      const logMessage = LogMessageFactory.create(rawMessage, 'test', logLevel, {test: 'test'});
-      action(logMessage);
-      shouldBeMessage(logMessage);
+    let spy: Spy;
+    let logger: ILogger;
+    beforeEach(() => {
+        const sender = new LogSender();
+        spy = spyOn(sender, 'enqueue');
+        logger = createLogger(sender);
     });
-  }
 
-  shouldBeRaw('test', LogLevel.debug, m => logger.debug(m.message, m.category, m.data));
-  shouldBeRaw('test', LogLevel.info, m => logger.info(m.message, m.category, m.data));
-  shouldBeRaw(new Error('test'), LogLevel.warn, m => logger.warn(m.message, m.category, m.data));
-  shouldBeRaw(new Error('test'), LogLevel.error, m => logger.error(m.message, m.category, m.data));
-  shouldBeRaw(new Error('test'), LogLevel.fatal, m => logger.fatal(m.message, m.category, m.data));
+    function shouldBeMessage(message: ILogMessage) {
+        expect(spy).toHaveBeenCalledWith(message);
+    }
 
-  it('Should equals passed message', () => {
-    const message: ILogMessage = {
-      message: 'test',
-      category: 'category',
-      level: LogLevel.debug
-    };
+    function shouldBeRaw(rawMessage: string | Error, logLevel: LogLevel, action: Action<ILogMessage>): void {
+        it(`Should be ${LogLevel[logLevel]} message`, () => {
+            const logMessage = LogMessageFactory.create(rawMessage, 'test', logLevel, {test: 'test'});
+            action(logMessage);
+            shouldBeMessage(logMessage);
+        });
+    }
 
-    logger.handle(message);
-    shouldBeMessage(message);
-  });
+    shouldBeRaw('test', LogLevel.debug, m => logger.debug(m.message, m.category, m.data));
+    shouldBeRaw('test', LogLevel.info, m => logger.info(m.message, m.category, m.data));
+    shouldBeRaw(new Error('test'), LogLevel.warn, m => logger.warn(m.message, m.category, m.data));
+    shouldBeRaw(new Error('test'), LogLevel.error, m => logger.error(m.message, m.category, m.data));
+    shouldBeRaw(new Error('test'), LogLevel.fatal, m => logger.fatal(m.message, m.category, m.data));
 
-  it('Raw parameters should equals', () => {
-    const error = new Error('test');
-    const message: ILogMessage = LogMessageFactory.create(error, 'test', LogLevel.fatal);
-    logger.raw(error, message.category, message.level);
-    shouldBeMessage(message);
-  });
+    it('Should equals passed message', () => {
+        const message: ILogMessage = {
+            message: 'test',
+            category: 'category',
+            level: LogLevel.debug
+        };
+
+        logger.handle(message);
+        shouldBeMessage(message);
+    });
+
+    it('Raw parameters should equals', () => {
+        const error = new Error('test');
+        const message: ILogMessage = LogMessageFactory.create(error, 'test', LogLevel.fatal);
+        logger.raw(error, message.category, message.level);
+        shouldBeMessage(message);
+    });
 });
 
 class LogSender implements ILogSender {
-  public enqueue(logMessage: ILogMessage): void {
-  }
+    public enqueue(logMessage: ILogMessage): void {
+    }
 }

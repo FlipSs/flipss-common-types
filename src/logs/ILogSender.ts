@@ -1,5 +1,5 @@
 import {ILogMessage} from "./ILogMessage";
 
 export interface ILogSender {
-  enqueue(logMessage: ILogMessage): void;
+    enqueue(logMessage: ILogMessage): void;
 }
