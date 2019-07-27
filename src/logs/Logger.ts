@@ -1,9 +1,10 @@
 import {ILogSender} from "./ILogSender";
-import {Argument} from "../utils";
+import {Argument, TypeUtils} from "../utils";
 import {LogLevel} from "./LogLevel";
 import {ILogMessage} from "./ILogMessage";
 import {LogMessageFactory} from "./LogMessageFactory";
 import {ILogger} from "./ILogger";
+import {LoggableError} from "./LoggableError";
 
 export class Logger implements ILogger {
     public constructor(private readonly sender: ILogSender) {
@@ -35,7 +36,12 @@ export class Logger implements ILogger {
     }
 
     public raw(rawMessage: string | Error, category: string, level: LogLevel, data?: any) {
-        const logMessage = LogMessageFactory.create(rawMessage, category, level, data);
+        let logMessage: ILogMessage;
+        if (TypeUtils.is(rawMessage, LoggableError)) {
+            logMessage = rawMessage.log;
+        } else {
+            logMessage = LogMessageFactory.create(rawMessage, category, level, data);
+        }
 
         this.handle(logMessage);
     }
