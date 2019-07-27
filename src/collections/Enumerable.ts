@@ -60,7 +60,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public contains(value: T): boolean {
-        return this.value.includes(value);
+        return this.value.indexOf(value) >= 0;
     }
 
     public getCount(predicate?: Predicate<T>): number {
@@ -80,7 +80,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return value[index];
     }
 
-    public getElementAtOrDefault(index: number, defaultValue?: T): T {
+    public getElementAtOrDefault(index: number, defaultValue?: T): T | undefined {
         const value = this.value;
         if (isIndexOutOfRange(value, index)) {
             return defaultValue;
@@ -112,7 +112,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return getFirst(value);
     }
 
-    public getFirstOrDefault(predicate?: Predicate<T>, defaultValue?: T): T {
+    public getFirstOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined {
         const value = this.value;
 
         if (isEmpty(value)) {
@@ -165,7 +165,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return getLast(value);
     }
 
-    public getLastOrDefault(predicate?: Predicate<T>, defaultValue?: T): T {
+    public getLastOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined {
         const value = this.value;
 
         if (isEmpty(value)) {

@@ -1,12 +1,12 @@
-import {Enumerable} from "./Enumerable";
 import {IKeyValuePair} from "./IKeyValuePair";
 import {IDictionary} from "./IDictionary";
 import {IReadOnlyCollection} from "./IReadOnlyCollection";
 import {Collection} from "./Collection";
 import {Func} from "../types";
 import {Argument} from "../utils";
+import {ReadOnlyCollection} from "./ReadOnlyCollection";
 
-export class Dictionary<TKey, TValue> extends Enumerable<IKeyValuePair<TKey, TValue>> implements IDictionary<TKey, TValue> {
+export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<TKey, TValue>> implements IDictionary<TKey, TValue> {
     private readonly map: Map<TKey, TValue>;
 
     public constructor(items?: IKeyValuePair<TKey, TValue>[]) {
@@ -49,7 +49,7 @@ export class Dictionary<TKey, TValue> extends Enumerable<IKeyValuePair<TKey, TVa
         return this.map.get(key);
     }
 
-    public getValueOrDefault(key: TKey, defaultValue?: TValue): TValue {
+    public getValueOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
         if (!this.containsKey(key)) {
             return defaultValue;
         }

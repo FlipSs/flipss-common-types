@@ -11,7 +11,7 @@ import {IReadOnlyDictionary} from "./IReadOnlyDictionary";
 export interface IEnumerable<T> extends Iterable<T> {
     getElementAt(index: number): T;
 
-    getElementAtOrDefault(index: number, defaultValue?: T): T;
+    getElementAtOrDefault(index: number, defaultValue?: T): T | undefined;
 
     getCount(predicate?: Predicate<T>): number;
 
@@ -23,9 +23,9 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     getLast(): T;
 
-    getLastOrDefault(predicate?: Predicate<T>, defaultValue?: T): T;
+    getLastOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined;
 
-    getFirstOrDefault(predicate?: Predicate<T>, defaultValue?: T): T;
+    getFirstOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined;
 
     where(predicate: Predicate<T>): IEnumerable<T>;
 

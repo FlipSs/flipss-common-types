@@ -1,9 +1,9 @@
-import {Enumerable} from "./Enumerable";
 import {IEnumerable} from "./IEnumerable";
 import {Argument, TypeUtils} from "../utils";
 import {IHashSet} from "./IHashSet";
+import {ReadOnlyCollection} from "./ReadOnlyCollection";
 
-export class HashSet<T> extends Enumerable<T> implements IHashSet<T> {
+export class HashSet<T> extends ReadOnlyCollection<T> implements IHashSet<T> {
     private set: Set<T>;
 
     public constructor(items?: T[]) {

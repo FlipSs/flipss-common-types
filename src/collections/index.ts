@@ -17,3 +17,4 @@ export * from './Dictionary';
 
 // functions
 export {asEnumerable} from './Enumerable';
+export {ReadOnlyCollection} from "./ReadOnlyCollection";

@@ -1,8 +1,8 @@
 import {ICollection} from "./ICollection";
-import {Enumerable} from "./Enumerable";
 import {TypeUtils} from "../utils";
+import {ReadOnlyCollection} from "./ReadOnlyCollection";
 
-export class Collection<T> extends Enumerable<T> implements ICollection<T> {
+export class Collection<T> extends ReadOnlyCollection<T> implements ICollection<T> {
     private items: T[];
 
     public constructor(items?: T[]) {

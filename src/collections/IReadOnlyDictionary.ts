@@ -7,5 +7,5 @@ export interface IReadOnlyDictionary<TKey, TValue> extends IReadOnlyCollection<I
 
     containsKey(key: TKey): boolean;
 
-    getValueOrDefault(key: TKey, defaultValue?: TValue): TValue;
+    getValueOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined;
 }
