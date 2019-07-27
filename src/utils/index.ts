@@ -1,4 +1,4 @@
-export * from './arguments/Argument';
+export * from './Argument';
+export * from './TypeUtils';
 export * from './lazy/Lazy';
-export * from "./types/TypeUtils";
-export * from "./lazy/ILazy";
+export * from './lazy/ILazy';

@@ -1,6 +1,6 @@
-import {ISettingStorage} from './ISettingStorage';
-import {ISettingLoader} from './ISettingLoader';
 import {ReplaySubject, Subject} from "rxjs";
+import {ISettingStorage} from "./ISettingStorage";
+import {ISettingLoader} from "./ISettingLoader";
 import {Argument} from "../utils";
 
 export class SettingStorage<TSettings> implements ISettingStorage<TSettings> {

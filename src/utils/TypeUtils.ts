@@ -1,4 +1,4 @@
-import {Constructor} from "../../types/Constructor";
+import {Constructor} from "../types";
 
 export class TypeUtils {
     public static isNullOrUndefined(arg: any): boolean {

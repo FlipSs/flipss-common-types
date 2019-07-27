@@ -1,5 +1,6 @@
-import {ClassLogInfo, DisableMethodLogInfo, LoggableError, LogLevel, MethodLogInfo} from "../../../src/logs";
+import {ClassLogInfo, DisableMethodLogInfo, LogLevel, MethodLogInfo} from "../../../src/logs";
 import {TypeUtils} from "../../../src/utils";
+import {LoggableError} from "../../../src/logs/LoggableError";
 
 describe('LogInfo', () => {
     it('Should ignore getters', function () {

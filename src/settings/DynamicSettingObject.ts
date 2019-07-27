@@ -1,7 +1,7 @@
-import {ISettingObject} from './ISettingObject';
-import {ISettingStorage} from './ISettingStorage';
-import {ISettingObjectErrorListener} from './ISettingObjectErrorListener';
 import {ReplaySubject, Subject} from "rxjs";
+import {ISettingObject} from "./ISettingObject";
+import {ISettingObjectErrorListener} from "./ISettingObjectErrorListener";
+import {ISettingStorage} from "./ISettingStorage";
 import {Argument, TypeUtils} from "../utils";
 
 export abstract class DynamicSettingObject<TSettings, TStorageSettings> implements ISettingObject<TSettings> {

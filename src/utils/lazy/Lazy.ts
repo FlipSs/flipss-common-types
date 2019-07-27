@@ -1,6 +1,6 @@
 import {Func} from "../../types";
-import {Argument} from "..";
 import {ILazy} from "./ILazy";
+import {Argument} from "../Argument";
 
 export class Lazy<T> implements ILazy<T> {
     private initialized: boolean;

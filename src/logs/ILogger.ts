@@ -1,5 +1,5 @@
-import {ILogMessage} from "./ILogMessage";
 import {LogLevel} from "./LogLevel";
+import {ILogMessage} from "./ILogMessage";
 
 export interface ILogger {
     raw(rawMessage: string | Error, category: string, level: LogLevel, data?: any);
