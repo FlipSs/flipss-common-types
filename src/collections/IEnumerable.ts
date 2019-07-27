@@ -3,6 +3,7 @@ import {IOrderedEnumerable} from "./sorting/IOrderedEnumerable";
 import {IGrouping} from "./grouping/IGrouping";
 import {ICollection} from "./ICollection";
 import {IReadOnlyCollection} from "./IReadOnlyCollection";
+import {IHashSet} from "./IHashSet";
 
 export interface IEnumerable<T> extends Iterable<T> {
     getElementAt(index: number): T;
@@ -54,4 +55,6 @@ export interface IEnumerable<T> extends Iterable<T> {
     toCollection(): ICollection<T>;
 
     toReadOnlyCollection(): IReadOnlyCollection<T>;
+
+    toHashSet(): IHashSet<T>;
 }

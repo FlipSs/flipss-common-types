@@ -11,6 +11,8 @@ import {ICollection} from "./ICollection";
 import {IReadOnlyCollection} from "./IReadOnlyCollection";
 import {Collection} from "./Collection";
 import {DeferredEnumerable} from "./DeferredEnumerable";
+import {IHashSet} from "./IHashSet";
+import {HashSet} from "./HashSet";
 
 export function asEnumerable<T>(items: T[]): IEnumerable<T> {
     return new ArrayAsEnumerable(items);
@@ -248,6 +250,10 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
 
     public toReadOnlyCollection(): IReadOnlyCollection<T> {
         return this.toCollection();
+    }
+
+    public toHashSet(): IHashSet<T> {
+        return new HashSet(this.value);
     }
 
     protected abstract getValue(): T[];
