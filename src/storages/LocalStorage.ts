@@ -3,12 +3,15 @@ import {Argument, TypeUtils} from "../utils";
 import {JsonSerializer} from "../json/JsonSerializer";
 import {IValueStorage} from "./IValueStorage";
 import {IStorageValue} from "./IStorageValue";
+import {Collection, ICollection, IEnumerable} from "../collections";
 
 export function isLocalStorageSupported(): boolean {
     return !TypeUtils.isNullOrUndefined(localStorage);
 }
 
 export class LocalStorage<T> implements IValueStorage<T> {
+    private static readonly storageCollection: ICollection<LocalStorage<any>> = new Collection<LocalStorage<any>>();
+
     private readonly serializer: IJsonSerializer<IStorageValue<T>>;
 
     public constructor(private readonly key: string, valueSerializer?: IJsonSerializer<T>) {
@@ -19,6 +22,23 @@ export class LocalStorage<T> implements IValueStorage<T> {
         Argument.isNotNullOrEmpty(key, 'key');
 
         this.serializer = new LocalStorageJsonSerializer<T>(valueSerializer || new JsonSerializer<T>());
+
+        LocalStorage.storageCollection.add(this);
+    }
+
+    public static clearAll(till?: Date): void {
+        let toClear: IEnumerable<LocalStorage<any>>;
+        if (TypeUtils.isNullOrUndefined(till)) {
+            toClear = this.storageCollection;
+        } else {
+            toClear = this.storageCollection.where(s => {
+                const value = s.load();
+
+                return value && value.createdOn <= till;
+            });
+        }
+
+        toClear.forEach(s => s.clear());
     }
 
     public load(): IStorageValue<T> | null {
