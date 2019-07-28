@@ -6,6 +6,7 @@ import {ICachedValueBuilder} from "./sync/ICachedValueBuilder";
 import {CachedValueBuilder} from "./sync/CachedValueBuilder";
 import {IAsyncCachedValueBuilder} from "./async/IAsyncCachedValueBuilder";
 import {AsyncCachedValueBuilder} from "./async/AsyncCachedValueBuilder";
+import {toFactory} from "../../internal/functions";
 
 export function getValueFromStorageOrDefault<T>(valueStorage: IValueStorage<T>, minValueCreatedOn?: Date): T | null {
     const storageValue = valueStorage.get();
@@ -20,21 +21,18 @@ export function getValueFromStorageOrDefault<T>(valueStorage: IValueStorage<T>, 
 
 export function buildCachedValue<T>(valueFactory: Func<T>, expirationPeriod: TimeSpan | Func<TimeSpan>): ICachedValueBuilder<T> {
     Argument.isNotNullOrUndefined(valueFactory, 'valueFactory');
-    Argument.isNotNullOrUndefined(expirationPeriod, 'expirationPeriod');
 
     return new CachedValueBuilder(valueFactory, getExpirationPeriodFactory(expirationPeriod));
 }
 
 export function buildAsyncCachedValue<T>(valueFactory: Func<Promise<T>>, expirationPeriod: TimeSpan | Func<TimeSpan>): IAsyncCachedValueBuilder<T> {
     Argument.isNotNullOrUndefined(valueFactory, 'valueFactory');
-    Argument.isNotNullOrUndefined(expirationPeriod, 'expirationPeriod');
 
     return new AsyncCachedValueBuilder(valueFactory, getExpirationPeriodFactory(expirationPeriod));
 }
 
 function getExpirationPeriodFactory(expirationPeriod: TimeSpan | Func<TimeSpan>): Func<TimeSpan> {
-    return TypeUtils.is(expirationPeriod, TimeSpan)
-        ? () => expirationPeriod
-        : expirationPeriod;
+    Argument.isNotNullOrUndefined(expirationPeriod, 'expirationPeriod');
 
+    return toFactory(expirationPeriod, TimeSpan);
 }

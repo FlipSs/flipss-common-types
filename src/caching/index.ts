@@ -9,3 +9,6 @@ export {buildAsyncCachedValue} from './cached-value/helpers';
 
 // cache
 export * from './cache/ICache';
+export {ICacheBuilder} from "./cache/ICacheBuilder";
+export {IStoredValue} from "./cache/IStoredValue";
+export {SlidingExpirationCache} from "./cache/SlidingExpirationCache";

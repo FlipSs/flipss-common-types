@@ -1,4 +1,4 @@
-import {createContinuousTimer, ITimer, TimeSpan} from "../../time";
+import {createCountdownTimer, ITimer, TimeSpan} from "../../time";
 import {IValueWrapper} from "./IValueWrapper";
 import {Func} from "../../types";
 import {ICachedValueProvider} from "./ICachedValueProvider";
@@ -8,9 +8,10 @@ export class AbsoluteExpirationCachedValueProvider<T> implements ICachedValuePro
 
     public constructor(private readonly valueWrapper: IValueWrapper<T>,
                        private readonly expirationPeriodFactory: Func<TimeSpan>) {
-        this.expirationPeriodTimer = createContinuousTimer(() => valueWrapper.updateValue());
-
-        this.timer.start(this.expirationPeriod);
+        this.expirationPeriodTimer = createCountdownTimer(() => {
+            valueWrapper.updateValue();
+            this.startTimer();
+        });
     }
 
     protected get expirationPeriod(): TimeSpan {
@@ -27,6 +28,10 @@ export class AbsoluteExpirationCachedValueProvider<T> implements ICachedValuePro
 
     public dispose(): void {
         this.timer.dispose();
+    }
+
+    private startTimer(): void {
+        this.timer.start(this.expirationPeriod);
     }
 }
 

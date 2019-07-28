@@ -67,6 +67,14 @@ export class TimeSpan {
 
         return this.value === other.value;
     }
+
+    public addToDate(date: Date): Date {
+        return new Date(date.getMilliseconds() + this.value);
+    }
+
+    public subtractFromDate(date: Date): Date {
+        return new Date(date.getMilliseconds() - this.value);
+    }
 }
 
 function getMillisecondsFromSeconds(seconds: number): number {
