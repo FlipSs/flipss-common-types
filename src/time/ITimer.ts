@@ -1,7 +1,16 @@
+import {TimeSpan} from "./TimeSpan";
+import {TimerState} from "./TimerState";
+
 export interface ITimer {
-    start(): void;
+    getState(): TimerState;
+
+    start(period: TimeSpan): void;
 
     stop(): void;
 
-    reset(): void;
+    restart(period: TimeSpan): void;
+
+    suspend(): void;
+
+    resume(): void;
 }

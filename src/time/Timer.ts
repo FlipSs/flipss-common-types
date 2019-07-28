@@ -3,6 +3,7 @@ import {TimeSpan} from "./TimeSpan";
 import {ITimer} from "./ITimer";
 import {Argument, TypeUtils} from "../utils";
 import {Collection, ICollection} from "../collections";
+import {TimerState} from "./TimerState";
 
 const intervalPeriod = 250;
 
@@ -53,60 +54,136 @@ class TimerManager {
 
 const manager = new TimerManager();
 
-class Timer implements ITimer {
-    private isStarted: boolean;
-    private timeLeft: TimeSpan;
+abstract class Timer implements ITimer {
+    private state: TimerState;
+    private timeLeft: TimeSpan | undefined;
+    private period: TimeSpan | undefined;
 
-    public constructor(private readonly period: TimeSpan,
-                       private readonly callback: TimerCallback) {
-        this.timeLeft = this.period;
-        this.isStarted = false;
+    protected constructor() {
+        this.state = TimerState.stopped;
     }
 
     public update(period: TimeSpan): void {
         const timeLeft = this.timeLeft.subtract(period);
 
-        this.callback(timeLeft);
-
         this.timeLeft = timeLeft;
+
+        this.onUpdate(timeLeft);
     }
 
-    public reset(): void {
-        if (this.isStarted) {
-            manager.remove(this);
+    public start(period: TimeSpan): void {
+        Argument.isNotNullOrUndefined(period, 'period');
 
-            this.isStarted = false;
+        if (this.state !== TimerState.stopped) {
+            throw new Error('Timer is in progress.');
         }
 
-        this.timeLeft = this.period;
-    }
-
-    public start(): void {
-        if (this.isStarted) {
-            throw new Error('Timer already started.');
-        }
-
-        manager.add(this);
-
-        this.isStarted = true;
+        this.startInternal(period);
     }
 
     public stop(): void {
-        if (!this.isStarted) {
+        if (this.state === TimerState.stopped) {
+            throw new Error('Timer already stopped.');
+        }
+
+        this.stopInternal();
+    }
+
+    public getState(): TimerState {
+        return this.state;
+    }
+
+    public restart(period: TimeSpan): void {
+        Argument.isNotNullOrUndefined(period, 'period');
+
+        this.tryStop();
+        this.startInternal(period);
+    }
+
+    public resume(): void {
+        if (this.state !== TimerState.suspended) {
+            throw new Error('Timer is not suspended.');
+        }
+
+        manager.add(this);
+        this.state = TimerState.started;
+    }
+
+    public suspend(): void {
+        if (this.state !== TimerState.started) {
             throw new Error('Timer is not started.');
         }
 
         manager.remove(this);
+        this.state = TimerState.suspended;
+    }
 
-        this.isStarted = false;
+    protected tryStop(): void {
+        if (this.state !== TimerState.stopped) {
+            this.stopInternal();
+        }
+    }
+
+    protected abstract onUpdate(timeLeft: TimeSpan): void;
+
+    private stopInternal(): void {
+        if (this.state === TimerState.started) {
+            manager.remove(this);
+        }
+
+        this.timeLeft = undefined;
+        this.period = undefined;
+        this.state = TimerState.stopped;
+    }
+
+    private startInternal(period: TimeSpan): void {
+        this.period = period;
+        this.timeLeft = period;
+
+        manager.add(this);
+
+        this.state = TimerState.started;
     }
 }
 
-export type TimerCallback = Action<TimeSpan>;
+class CountdownTimer extends Timer {
+    public constructor(private readonly onEnd: Action,
+                       private readonly onTick?: Action<TimeSpan>) {
+        super();
+    }
 
-export function createTimer(period: TimeSpan, callback: TimerCallback): ITimer {
-    Argument.isNotNullOrUndefined(this.period, 'period');
-    Argument.isNotNullOrUndefined(this.callback, 'callback');
+    protected onUpdate(timeLeft: TimeSpan): void {
+        if (!TypeUtils.isNullOrUndefined(this.onTick)) {
+            this.onTick(timeLeft);
+        }
 
-    return new Timer(period, callback);
+        if (timeLeft.milliseconds <= 0) {
+            this.tryStop();
+            this.onEnd();
+        }
+    }
+}
+
+class ContinuousTimer extends Timer {
+    public constructor(private readonly onPeriod: Action) {
+        super();
+    }
+
+    protected onUpdate(timeLeft: TimeSpan): void {
+        if (timeLeft.milliseconds <= 0) {
+            this.onPeriod();
+        }
+    }
+}
+
+export function createCountdownTimer(onEnd: Action, onTick?: Action<TimeSpan>): ITimer {
+    Argument.isNotNullOrUndefined(onEnd, 'onEnd');
+
+    return new CountdownTimer(onEnd, onTick);
+}
+
+export function createContinuousTimer(onPeriod: Action): ITimer {
+    Argument.isNotNullOrUndefined(onPeriod, 'onPeriod');
+
+    return new ContinuousTimer(onPeriod);
 }

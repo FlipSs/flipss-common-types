@@ -1,4 +1,4 @@
-import {Constructor} from "../types";
+import {Type} from "../types";
 
 export class TypeUtils {
     public static isNullOrUndefined(arg: any): boolean {
@@ -13,7 +13,7 @@ export class TypeUtils {
         return typeof arg === 'string' || this.is(arg, String);
     }
 
-    public static is<T>(arg: any, type: Constructor<T>): arg is T {
+    public static is<T>(arg: any, type: Type<T>): arg is T {
         return arg instanceof type;
     }
 }
