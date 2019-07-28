@@ -8,4 +8,8 @@ export class AsyncCachedValue<T> implements IAsyncCachedValue<T> {
     public getValueAsync(): Promise<T> {
         return this.valueProvider.getValue();
     }
+
+    public dispose(): void {
+        this.valueProvider.dispose();
+    }
 }

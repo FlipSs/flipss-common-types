@@ -24,5 +24,9 @@ export class AbsoluteExpirationCachedValueProvider<T> implements ICachedValuePro
     public getValue(): T {
         return this.valueWrapper.getValue();
     }
+
+    public dispose(): void {
+        this.timer.dispose();
+    }
 }
 

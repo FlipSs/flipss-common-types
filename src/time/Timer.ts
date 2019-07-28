@@ -118,6 +118,10 @@ abstract class Timer implements ITimer {
         this.state = TimerState.suspended;
     }
 
+    public dispose(): void {
+        this.tryStop();
+    }
+
     protected tryStop(): void {
         if (this.state !== TimerState.stopped) {
             this.stopInternal();

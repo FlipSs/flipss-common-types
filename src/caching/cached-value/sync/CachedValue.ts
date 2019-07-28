@@ -8,4 +8,8 @@ export class CachedValue<T> implements ICachedValue<T> {
     public getValue(): T {
         return this.valueProvider.getValue();
     }
+
+    public dispose(): void {
+        this.valueProvider.dispose();
+    }
 }
