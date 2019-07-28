@@ -32,7 +32,7 @@ export class LocalStorage<T> implements IValueStorage<T> {
             toClear = this.storageCollection;
         } else {
             toClear = this.storageCollection.where(s => {
-                const value = s.load();
+                const value = s.get();
 
                 return value && value.createdOn <= till;
             });
@@ -41,7 +41,7 @@ export class LocalStorage<T> implements IValueStorage<T> {
         toClear.forEach(s => s.clear());
     }
 
-    public load(): IStorageValue<T> | null {
+    public get(): IStorageValue<T> | null {
         const json = localStorage.getItem(this.key);
         if (TypeUtils.isNullOrUndefined(json)) {
             return null;
@@ -50,7 +50,7 @@ export class LocalStorage<T> implements IValueStorage<T> {
         return this.serializer.deserialize(json);
     }
 
-    public save(value: T): void {
+    public set(value: T): void {
         const item: IStorageValue<T> = {
             createdOn: new Date(),
             value: value,

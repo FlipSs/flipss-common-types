@@ -3,7 +3,7 @@ import {IStorageValue} from "./IStorageValue";
 export interface IValueStorage<T> {
     clear(): void;
 
-    save(value: T): void;
+    set(value: T): void;
 
-    load(): IStorageValue<T> | null;
+    get(): IStorageValue<T> | null;
 }
