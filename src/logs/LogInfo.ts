@@ -4,17 +4,17 @@ import {LoggableError} from "./LoggableError";
 import {LogMessageFactory} from "./LogMessageFactory";
 import {asEnumerable, Dictionary, HashSet, IDictionary, IHashSet} from "../collections";
 
-const customLogInfoDictionary: IDictionary<Function, IDictionary<string, ILogInfo>> = new Dictionary<Function, IDictionary<string, ILogInfo>>();
-const disabledLogInfoDictionary: IDictionary<Function, IHashSet<string>> = new Dictionary<Function, IHashSet<string>>();
+const customLogInfoDictionary: IDictionary<any, IDictionary<string, ILogInfo>> = new Dictionary<any, IDictionary<string, ILogInfo>>();
+const disabledLogInfoDictionary: IDictionary<any, IHashSet<string>> = new Dictionary<any, IHashSet<string>>();
 
 export function ClassLogInfo(info: ILogInfo) {
     return (target: Function) => {
         const prototype = target.prototype;
 
-        const excludedMethods = disabledLogInfoDictionary.getValueOrDefault(target) || new HashSet<string>();
+        const excludedMethods = disabledLogInfoDictionary.getValueOrDefault(prototype) || new HashSet<string>();
         excludedMethods.add('constructor');
 
-        const customValues = customLogInfoDictionary.getValueOrDefault(target);
+        const customValues = customLogInfoDictionary.getValueOrDefault(prototype);
 
         const methods = asEnumerable(Object.getOwnPropertyNames(prototype))
             .where(p => !excludedMethods.has(p))
@@ -59,7 +59,7 @@ export function ClassLogInfo(info: ILogInfo) {
 }
 
 export function DisableMethodLogInfo() {
-    return (target: Function, propertyName: string) => {
+    return (target: any, propertyName: string) => {
         disabledLogInfoDictionary
             .getOrAdd(target, (target) => new HashSet<string>())
             .add(propertyName);
@@ -67,7 +67,7 @@ export function DisableMethodLogInfo() {
 }
 
 export function MethodLogInfo(info: ILogInfo) {
-    return (target: Function, propertyName: string) => {
+    return (target: any, propertyName: string) => {
         customLogInfoDictionary
             .getOrAdd(target, (t) => new Dictionary<string, ILogInfo>())
             .set(propertyName, info);
