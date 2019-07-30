@@ -15,7 +15,7 @@ import {StrictObjectConverterContextFactory} from "./contexts/StrictObjectConver
 import {IObjectConverterContextFactory} from "./contexts/IObjectConverterContextFactory";
 import {DirectPropertyTransferringObjectConverter} from "./DirectPropertyTransferringObjectConverter";
 import {IValueIgnoreStrategyConstructor} from "./IValueIgnoreStrategyConstructor";
-import {IgnoreNothingValueIgnoreStrategy} from "./IgnoreNothingValueIgnoreStrategy";
+import {IgnoreFunctionValueIgnoreStrategy} from "./IgnoreFunctionValueIgnoreStrategy";
 import {IgnoreNullAndUndefinedValueIgnoreStrategy} from "./IgnoreNullAndUndefinedValueIgnoreStrategy";
 
 export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverterBuilder<TSource, TTarget> {
@@ -29,7 +29,7 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
         this.propertyValueFactories = new Dictionary<string, IPropertyValueFactory<TSource, any>>();
         this.converterFactory = f => new ObjectConverter(f);
         this.contextFactoryConstructor = OptionalObjectConverterContextFactory;
-        this.valueIgnoreStrategyConstructor = IgnoreNothingValueIgnoreStrategy;
+        this.valueIgnoreStrategyConstructor = IgnoreFunctionValueIgnoreStrategy;
     }
 
     public create(): IObjectConverter<TSource, TTarget> {

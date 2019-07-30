@@ -48,7 +48,7 @@ function setPropertyValueRecursive(propertyName: string, sourceObject: any, targ
         return;
     }
 
-    if (isPrimitiveType(sourcePropertyValueType)) {
+    if (sourcePropertyValueType !== 'object') {
         targetObject[propertyName] = sourcePropertyValue;
 
         return;
@@ -67,8 +67,4 @@ function setPropertyValueRecursive(propertyName: string, sourceObject: any, targ
     }
 
     getAvailablePropertyNames(targetObjectPropertyValue).forEach(p => setPropertyValueRecursive(p, sourcePropertyValue, targetObjectPropertyValue, valueIgnoreStrategy));
-}
-
-function isPrimitiveType(type: string): boolean {
-    return type !== 'function' && type !== 'object';
 }

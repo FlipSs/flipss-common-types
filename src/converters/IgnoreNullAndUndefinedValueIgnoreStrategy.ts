@@ -1,8 +1,8 @@
 import {TypeUtils} from "../utils";
-import {IValueIgnoreStrategy} from "./IValueIgnoreStrategy";
+import {IgnoreFunctionValueIgnoreStrategy} from "./IgnoreFunctionValueIgnoreStrategy";
 
-export class IgnoreNullAndUndefinedValueIgnoreStrategy implements IValueIgnoreStrategy {
+export class IgnoreNullAndUndefinedValueIgnoreStrategy extends IgnoreFunctionValueIgnoreStrategy {
     public needToIgnore(value: any): boolean {
-        return TypeUtils.isNullOrUndefined(value);
+        return super.needToIgnore(value) || TypeUtils.isNullOrUndefined(value);
     }
 }
