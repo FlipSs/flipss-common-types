@@ -13,22 +13,28 @@ import {IObjectConverterContextFactoryConstructor} from "./contexts/IObjectConve
 import {OptionalObjectConverterContextFactory} from "./contexts/OptionalObjectConverterContextFactory";
 import {StrictObjectConverterContextFactory} from "./contexts/StrictObjectConverterContextFactory";
 import {IObjectConverterContextFactory} from "./contexts/IObjectConverterContextFactory";
-import {DirectMappingObjectConverter} from "./DirectMappingObjectConverter";
+import {DirectPropertyTransferringObjectConverter} from "./DirectPropertyTransferringObjectConverter";
+import {IValueIgnoreStrategyConstructor} from "./IValueIgnoreStrategyConstructor";
+import {IgnoreNothingValueIgnoreStrategy} from "./IgnoreNothingValueIgnoreStrategy";
+import {IgnoreNullAndUndefinedValueIgnoreStrategy} from "./IgnoreNullAndUndefinedValueIgnoreStrategy";
 
 export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverterBuilder<TSource, TTarget> {
     private readonly propertyValueFactories: IDictionary<string, IPropertyValueFactory<TSource, any>>;
 
     private converterFactory: Func<IObjectConverter<TSource, TTarget>, IObjectConverterContextFactory<TSource, TTarget>>;
     private contextFactoryConstructor: IObjectConverterContextFactoryConstructor<TSource, TTarget>;
+    private valueIgnoreStrategyConstructor: IValueIgnoreStrategyConstructor;
 
     public constructor(private readonly referenceObjectFactory: Func<TTarget>) {
         this.propertyValueFactories = new Dictionary<string, IPropertyValueFactory<TSource, any>>();
         this.converterFactory = f => new ObjectConverter(f);
         this.contextFactoryConstructor = OptionalObjectConverterContextFactory;
+        this.valueIgnoreStrategyConstructor = IgnoreNothingValueIgnoreStrategy;
     }
 
     public create(): IObjectConverter<TSource, TTarget> {
-        const contextFactory = new this.contextFactoryConstructor(this.referenceObjectFactory, this.propertyValueFactories);
+        const valueIgnoreStrategy = new this.valueIgnoreStrategyConstructor();
+        const contextFactory = new this.contextFactoryConstructor(this.referenceObjectFactory, valueIgnoreStrategy, this.propertyValueFactories);
 
         return this.converterFactory(contextFactory);
     }
@@ -67,16 +73,22 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
         return this;
     }
 
-    public useDirectMapping(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[]): IObjectConverterBuilder<TSource, TTarget> {
+    public useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[]): IObjectConverterBuilder<TSource, TTarget> {
         const excludedPropertySet = excludedProperties && asEnumerable(excludedProperties).select(p => p as string).toReadOnlyHashSet() || new HashSet<string>();
 
-        this.converterFactory = f => new DirectMappingObjectConverter(f, excludedPropertySet);
+        this.converterFactory = f => new DirectPropertyTransferringObjectConverter(f, excludedPropertySet);
 
         return this;
     }
 
     public enableStrictMode(): IObjectConverterBuilder<TSource, TTarget> {
         this.contextFactoryConstructor = StrictObjectConverterContextFactory;
+
+        return this;
+    }
+
+    public ignoreNullAndUndefinedValues(): IObjectConverterBuilder<TSource, TTarget> {
+        this.valueIgnoreStrategyConstructor = IgnoreNullAndUndefinedValueIgnoreStrategy;
 
         return this;
     }

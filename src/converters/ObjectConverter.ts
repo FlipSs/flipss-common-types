@@ -14,12 +14,19 @@ export class ObjectConverter<TSource, TTarget> implements IObjectConverter<TSour
 
         const resultValue = this.getReferenceObject(context, source);
 
-        context.propertyValueFactories.forEach(kv => resultValue[kv.key] = kv.value.create(source));
+        for (const propertyValueFactory of context.propertyValueFactories) {
+            const value = propertyValueFactory.value.create(source);
+            if (context.valueIgnoreStrategy.needToIgnore(value)) {
+                continue;
+            }
+
+            resultValue[propertyValueFactory.key] = value;
+        }
 
         return resultValue;
     }
 
-    protected getReferenceObject(context: IObjectConverterContext<TSource, TTarget>, source: TSource): TTarget {
+    protected getReferenceObject(context: IObjectConverterContext<TSource, TTarget>, source: Readonly<TSource>): TTarget {
         return context.referenceObject;
     }
 }
