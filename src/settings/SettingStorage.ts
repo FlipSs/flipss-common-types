@@ -1,24 +1,19 @@
-import {ReplaySubject, Subject} from "rxjs";
 import {ISettingStorage} from "./ISettingStorage";
 import {ISettingLoader} from "./ISettingLoader";
 import {Argument} from "../utils";
+import {ReplayObservable} from "../models";
 
-export class SettingStorage<TSettings> implements ISettingStorage<TSettings> {
-    private readonly internalValue: Subject<TSettings>;
-
+export class SettingStorage<TSettings> extends ReplayObservable<TSettings> implements ISettingStorage<TSettings> {
     public constructor(private readonly loader: ISettingLoader<TSettings>) {
+        super(1);
+
         Argument.isNotNullOrUndefined(loader, 'loader');
-
-        this.internalValue = new ReplaySubject<TSettings>(1);
-    }
-
-    public get value(): Subject<TSettings> {
-        return this.internalValue;
     }
 
     public async refreshAsync(): Promise<void> {
-        const loadedValue = await this.loader.loadAsync();
+        const value = await this.loader.loadAsync();
 
-        this.internalValue.next(loadedValue);
+        this.nextValue(value);
     }
 }
+

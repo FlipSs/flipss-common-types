@@ -1,7 +1,6 @@
-import {Subject} from "rxjs";
+import {IObservable} from "../models";
 
-export interface ISettingObject<TSettings> {
+export interface ISettingObject<TSettings> extends IObservable<void> {
     readonly value: Readonly<TSettings>;
-    readonly valueUpdated?: Subject<void>;
 }
 

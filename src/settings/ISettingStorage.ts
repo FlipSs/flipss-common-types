@@ -1,7 +1,5 @@
-import {Subject} from "rxjs";
+import {IObservable} from "../models";
 
-export interface ISettingStorage<TSettings> {
-    readonly value: Subject<TSettings>;
-
+export interface ISettingStorage<TSettings> extends IObservable<TSettings> {
     refreshAsync(): Promise<void>;
 }

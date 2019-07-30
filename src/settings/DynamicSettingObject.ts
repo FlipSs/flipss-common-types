@@ -1,28 +1,23 @@
-import {ReplaySubject, Subject} from "rxjs";
 import {ISettingObject} from "./ISettingObject";
 import {ISettingObjectErrorListener} from "./ISettingObjectErrorListener";
 import {ISettingStorage} from "./ISettingStorage";
 import {Argument, TypeUtils} from "../utils";
+import {Observable} from "../models";
 
-export abstract class DynamicSettingObject<TSettings, TStorageSettings> implements ISettingObject<TSettings> {
+export abstract class DynamicSettingObject<TSettings, TStorageSettings> extends Observable<void> implements ISettingObject<TSettings> {
     private currentValue: TSettings;
-    private readonly internalValueUpdated: Subject<void>;
 
     protected constructor(storage: ISettingStorage<TStorageSettings>,
                           private readonly errorListener: ISettingObjectErrorListener<TSettings>) {
+        super();
+
         Argument.isNotNullOrUndefined(storage, 'storage');
         Argument.isNotNullOrUndefined(errorListener, 'errorListener');
 
-        this.internalValueUpdated = new ReplaySubject<void>(1);
-
-        storage.value.subscribe(storageSettings => {
+        storage.subscribe(storageSettings => {
             this.setValue(storageSettings);
-            this.internalValueUpdated.next();
+            this.nextValue();
         });
-    }
-
-    public get valueUpdated(): Subject<void> {
-        return this.internalValueUpdated;
     }
 
     public get value(): Readonly<TSettings> {

@@ -12,7 +12,7 @@ describe('SettingStorage tests', () => {
 
     beforeAll(() => {
         settingStorage = new SettingStorage<ITestSettings>(new TestSettingLoader(Array.from(settings)));
-        settingStorage.value.subscribe(v => value = v);
+        settingStorage.subscribe(v => value = v);
     });
 
     beforeEach(() => settingStorage.refreshAsync());

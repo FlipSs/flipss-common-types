@@ -283,6 +283,14 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return this.toDictionary(keySelector, valueSelector);
     }
 
+    public skip(count: number): IEnumerable<T> {
+        return createDeferred(() => this.value.slice(count));
+    }
+
+    public take(count: number): IEnumerable<T> {
+        return createDeferred(() => this.value.slice(0, count - 1));
+    }
+
     protected abstract getValue(): T[];
 }
 

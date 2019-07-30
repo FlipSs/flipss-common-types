@@ -43,6 +43,10 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     prepend(value: T): IEnumerable<T>;
 
+    take(count: number): IEnumerable<T>;
+
+    skip(count: number): IEnumerable<T>;
+
     except(other: IEnumerable<T>): IEnumerable<T>;
 
     orderBy<TKey>(keySelector: Func<TKey, T>): IOrderedEnumerable<T>;
