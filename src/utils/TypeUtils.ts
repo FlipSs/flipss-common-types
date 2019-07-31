@@ -1,19 +1,19 @@
-import {Type} from "../types/internal";
+import {Constructor} from "../types/internal";
 
 export class TypeUtils {
-    public static isNullOrUndefined(arg: any): boolean {
-        return arg == undefined;
+    public static isNullOrUndefined(argument: any): boolean {
+        return argument == undefined;
     }
 
-    public static isNumber(arg: any): arg is number {
-        return !isNaN(arg) && (typeof arg === 'number' || this.is(arg, Number));
+    public static isNumber(argument: any): argument is number {
+        return !isNaN(argument) && (typeof argument === 'number' || this.is(argument, Number));
     }
 
-    public static isString(arg: any): arg is string {
-        return typeof arg === 'string' || this.is(arg, String);
+    public static isString(argument: any): argument is string {
+        return typeof argument === 'string' || this.is(argument, String);
     }
 
-    public static is<T>(arg: any, type: Type<T>): arg is T {
-        return arg instanceof type;
+    public static is<T>(argument: any, constructor: Constructor<T>): argument is T {
+        return argument instanceof constructor;
     }
 }

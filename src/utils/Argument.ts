@@ -2,14 +2,14 @@ import {TypeUtils} from "./internal";
 import {IReadOnlyCollection} from "../collections/internal";
 
 export class Argument {
-    public static isNotNullOrUndefined(arg: any, parameterName: string): void {
-        if (TypeUtils.isNullOrUndefined(arg)) {
+    public static isNotNullOrUndefined(argument: any, parameterName: string): void {
+        if (TypeUtils.isNullOrUndefined(argument)) {
             throw new Error(`${parameterName} can not be null or undefined.`);
         }
     }
 
-    public static isNotNullOrEmpty(arg: string | any[] | IReadOnlyCollection<any>, parameterName: string): void {
-        if (TypeUtils.isNullOrUndefined(arg) || arg.length === 0) {
+    public static isNotNullOrEmpty(argument: string | any[] | IReadOnlyCollection<any>, parameterName: string): void {
+        if (TypeUtils.isNullOrUndefined(argument) || argument.length === 0) {
             throw new Error(`${parameterName} can not be null or empty.`);
         }
     }

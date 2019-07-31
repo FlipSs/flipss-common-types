@@ -1,8 +1,8 @@
-import {Func, Type} from "../types/internal";
+import {Constructor, Func} from "../types/internal";
 import {TypeUtils} from "../utils/internal";
 
-export function toFactory<T>(value: T | Func<T>, type: Type<T>): Func<T> {
-    return TypeUtils.is(value, type)
+export function toFactory<T>(value: T | Func<T>, constructor: Constructor<T>): Func<T> {
+    return TypeUtils.is(value, constructor)
         ? () => value
         : value;
 }
