@@ -15,7 +15,7 @@ export class DirectPropertyTransferringObjectConverter<TSource, TTarget> extends
     protected getReferenceObject(context: IObjectConverterContext<TSource, TTarget>, source: Readonly<TSource>): TTarget {
         const referenceObject = super.getReferenceObject(context, source);
 
-        context.propertyValueFactories.keys
+        context.availablePropertyNames
             .where(k => !this.excludedPropertyNames.has(k))
             .forEach(p => setPropertyValueRecursive(p, source, referenceObject, context.valueIgnoreStrategy));
 

@@ -23,6 +23,7 @@ export abstract class ObjectConverterContextFactory<TSource, TTarget> implements
 
         return {
             referenceObject: referenceObject,
+            availablePropertyNames: availablePropertyNames,
             propertyValueFactories: this.getPropertyValueFactories(availablePropertyNames),
             valueIgnoreStrategy: this.valueIgnoreStrategy
         }
