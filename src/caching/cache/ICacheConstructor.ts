@@ -1,7 +1,7 @@
-import {Func} from "../../types";
-import {TimeSpan} from "../../time";
-import {IEnumerable, IKeyValuePair} from "../../collections";
-import {ICache} from "./ICache";
+import {Func} from "../../types/internal";
+import {TimeSpan} from "../../time/internal";
+import {IEnumerable, IKeyValuePair} from "../../collections/internal";
+import {ICache} from "../internal";
 
 export interface ICacheConstructor<TKey, TValue> {
     new(expirationPeriodFactory: Func<TimeSpan>,

@@ -1,7 +1,6 @@
-import {createCountdownTimer, ITimer, TimeSpan} from "../../time";
-import {IValueWrapper} from "./IValueWrapper";
-import {Func} from "../../types";
-import {ICachedValueProvider} from "./ICachedValueProvider";
+import {createCountdownTimer, ITimer, TimeSpan} from "../../time/internal";
+import {ICachedValueProvider, IValueWrapper} from "../internal";
+import {Func} from "../../types/internal";
 
 export class AbsoluteExpirationCachedValueProvider<T> implements ICachedValueProvider<T> {
     private readonly expirationPeriodTimer: ITimer;

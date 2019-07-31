@@ -1,5 +1,4 @@
-import {ICachedValueProvider} from "../ICachedValueProvider";
-import {ICachedValue} from "./ICachedValue";
+import {ICachedValue, ICachedValueProvider} from "../../internal";
 
 export class CachedValue<T> implements ICachedValue<T> {
     public constructor(private readonly valueProvider: ICachedValueProvider<T>) {

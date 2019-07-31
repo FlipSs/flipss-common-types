@@ -1,4 +1,4 @@
-import {AbsoluteExpirationCachedValueProvider} from "./AbsoluteExpirationCachedValueProvider";
+import {AbsoluteExpirationCachedValueProvider} from "../internal";
 
 export class SlidingExpirationCachedValueProvider<T> extends AbsoluteExpirationCachedValueProvider<T> {
     public getValue(): T {

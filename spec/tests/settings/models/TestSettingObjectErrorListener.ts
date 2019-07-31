@@ -1,4 +1,4 @@
-import {ISettingObjectErrorListener} from "../../../../src/settings";
+import {ISettingObjectErrorListener} from "../../../../src/settings/internal";
 
 export class TestSettingObjectErrorListener implements ISettingObjectErrorListener<string> {
     private isCalled: boolean;

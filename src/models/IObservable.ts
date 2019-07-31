@@ -1,4 +1,4 @@
-import {Action} from "../types";
+import {Action} from "../types/internal";
 
 export interface IObservable<T> {
     subscribe(action: Action<Readonly<T>>): void;

@@ -1,5 +1,5 @@
-import {Action} from "../types";
-import {TypeUtils} from "../utils";
+import {Action} from "../types/internal";
+import {TypeUtils} from "../utils/internal";
 
 export interface IDisposable {
     dispose(): void;

@@ -1,4 +1,4 @@
-import {TypeUtils} from "../../../src/utils";
+import {TypeUtils} from "../../../src/utils/internal";
 
 describe('TypeUtils', () => {
 

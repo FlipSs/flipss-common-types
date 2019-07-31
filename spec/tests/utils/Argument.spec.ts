@@ -1,4 +1,4 @@
-import {Argument} from "../../../src/utils";
+import {Argument} from "../../../src/utils/internal";
 
 describe('Argument tests', () => {
 

@@ -1,7 +1,11 @@
-export * from './ILogger';
-export * from './ILogMessage';
-export * from './LogLevel';
-export * from './ILogSender';
-export * from './LogInfo';
-export * from './ILogInfo';
-export * from './CreateLogger';
+export {
+    createLogger,
+    ILogInfo,
+    ILogMessage,
+    ClassLogInfo,
+    DisableMethodLogInfo,
+    ILogger,
+    ILogSender,
+    LogLevel,
+    MethodLogInfo
+} from './internal';

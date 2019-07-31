@@ -1,6 +1,5 @@
-import {ICollection} from "./ICollection";
-import {TypeUtils} from "../utils";
-import {ReadOnlyCollection} from "./ReadOnlyCollection";
+import {ICollection, ReadOnlyCollection} from "./internal";
+import {TypeUtils} from "../utils/internal";
 
 export class Collection<T> extends ReadOnlyCollection<T> implements ICollection<T> {
     private items: T[];

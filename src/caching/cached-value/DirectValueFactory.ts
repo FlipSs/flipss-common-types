@@ -1,5 +1,5 @@
-import {IValueFactory} from "./IValueFactory";
-import {Func} from "../../types";
+import {IValueFactory} from "../internal";
+import {Func} from "../../types/internal";
 
 export class DirectValueFactory<T> implements IValueFactory<T> {
     public constructor(private readonly valueFactory: Func<T>) {

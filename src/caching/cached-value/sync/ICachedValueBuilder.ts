@@ -1,6 +1,6 @@
-import {ICachedValue} from "./ICachedValue";
-import {IValueStorage} from "../../../storages/IValueStorage";
-import {Action} from "../../../types";
+import {ICachedValue} from "../../internal";
+import {IValueStorage} from "../../../storages/internal";
+import {Action} from "../../../types/internal";
 
 export interface ICachedValueBuilder<T> {
     useLazy(): ICachedValueBuilder<T>;

@@ -1,6 +1,4 @@
-import {IEnumerable} from "./IEnumerable";
-import {ICollection} from "./ICollection";
-import {IReadOnlyHashSet} from "./IReadOnlyHashSet";
+import {ICollection, IEnumerable, IReadOnlyHashSet} from "./internal";
 
 export interface IHashSet<T> extends ICollection<T>, IReadOnlyHashSet<T> {
     intersectWith(other: IEnumerable<T>): void;

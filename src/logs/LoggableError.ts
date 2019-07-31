@@ -1,4 +1,4 @@
-import {ILogMessage} from "./ILogMessage";
+import {ILogMessage} from "./internal";
 
 export class LoggableError extends Error {
     public constructor(private readonly logMessage: ILogMessage) {

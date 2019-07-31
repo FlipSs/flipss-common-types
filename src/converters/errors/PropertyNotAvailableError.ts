@@ -1,5 +1,5 @@
-import {IReadOnlyHashSet} from "../../collections";
-import {Argument} from "../../utils";
+import {IReadOnlyHashSet} from "../../collections/internal";
+import {Argument} from "../../utils/internal";
 
 export class PropertyNotAvailableError extends Error {
     public constructor(private readonly propertyNames: IReadOnlyHashSet<string>) {

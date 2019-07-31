@@ -1,3 +1,1 @@
-export * from './TimeSpan';
-export * from './ITimer';
-export {createCountdownTimer, createContinuousTimer} from './Timer';
+export {ITimer, TimeSpan, createCountdownTimer, createContinuousTimer} from './internal';

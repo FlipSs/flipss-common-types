@@ -1,9 +1,11 @@
-import {Func} from "../../types";
-import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections";
-import {IPropertyValueFactory} from "../value-factories/IPropertyValueFactory";
-import {PropertyNotAvailableError} from "../errors/PropertyNotAvailableError";
-import {ObjectConverterContextFactory} from "./ObjectConverterContextFactory";
-import {IValueIgnoreStrategy} from "../IValueIgnoreStrategy";
+import {Func} from "../../types/internal";
+import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections/internal";
+import {
+    IPropertyValueFactory,
+    IValueIgnoreStrategy,
+    ObjectConverterContextFactory,
+    PropertyNotAvailableError
+} from "../internal";
 
 export class StrictObjectConverterContextFactory<TSource, TTarget> extends ObjectConverterContextFactory<TSource, TTarget> {
     public constructor(referenceObjectFactory: Func<TTarget>,

@@ -1,5 +1,5 @@
-import {Func} from "../types";
-import {Enumerable} from "./Enumerable";
+import {Func} from "../types/internal";
+import {Enumerable} from "./internal";
 
 export class DeferredEnumerable<T> extends Enumerable<T> {
     public constructor(private readonly valueFactory: Func<T[]>) {

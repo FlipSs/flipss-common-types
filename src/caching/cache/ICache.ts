@@ -1,5 +1,5 @@
-import {Func} from "../../types";
-import {IDisposable} from "../../models";
+import {Func} from "../../types/internal";
+import {IDisposable} from "../../models/internal";
 
 export interface ICache<TKey, TValue> extends IDisposable {
     set(key: TKey, value: TValue): void;

@@ -1,5 +1,5 @@
-import {TypeUtils} from "./TypeUtils";
-import {IReadOnlyCollection} from "../collections";
+import {TypeUtils} from "./internal";
+import {IReadOnlyCollection} from "../collections/internal";
 
 export class Argument {
     public static isNotNullOrUndefined(arg: any, parameterName: string): void {

@@ -1,4 +1,4 @@
-import {Argument} from "../utils";
+import {Argument} from "../utils/internal";
 
 const millisecondsPerSecond = 1000;
 const secondsPerMinute = 60;

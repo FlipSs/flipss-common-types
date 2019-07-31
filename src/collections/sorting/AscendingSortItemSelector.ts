@@ -1,6 +1,5 @@
-import {SelectedSortItem} from "./SelectedSortItem";
-import {Func} from "../../types";
-import {SortItemSelector} from "./SortItemSelector";
+import {SelectedSortItem, SortItemSelector} from "../internal";
+import {Func} from "../../types/internal";
 
 export class AscendingSortItemSelector<TKey, TValue> extends SortItemSelector<TKey, TValue> {
     public constructor(keySelector: Func<TKey, TValue>) {

@@ -1,6 +1,6 @@
-import {IValueStorage} from "../../../storages/IValueStorage";
-import {Action} from "../../../types";
-import {IAsyncCachedValue} from "./IAsyncCachedValue";
+import {IValueStorage} from "../../../storages/internal";
+import {Action} from "../../../types/internal";
+import {IAsyncCachedValue} from "../../internal";
 
 export interface IAsyncCachedValueBuilder<T> {
     useLazy(): IAsyncCachedValueBuilder<T>;

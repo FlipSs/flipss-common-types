@@ -1,6 +1,6 @@
-import {Collection, ICollection} from "../collections";
-import {Action} from "../types";
-import {Observable} from "./Observable";
+import {Collection, ICollection} from "../collections/internal";
+import {Observable} from "./internal";
+import {Action} from "../types/internal";
 
 export abstract class ReplayObservable<T> extends Observable<T> {
     private values: ICollection<Readonly<T>>;

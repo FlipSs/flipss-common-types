@@ -1,4 +1,4 @@
-import {IStorageValue} from "./IStorageValue";
+import {IStorageValue} from "./internal";
 
 export interface IValueStorage<T> {
     clear(): void;

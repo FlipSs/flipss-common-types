@@ -1,12 +1,9 @@
-import {IValueStorage} from "../../storages/IValueStorage";
-import {Argument, TypeUtils} from "../../utils";
-import {Func} from "../../types";
-import {TimeSpan} from "../../time";
-import {ICachedValueBuilder} from "./sync/ICachedValueBuilder";
-import {CachedValueBuilder} from "./sync/CachedValueBuilder";
-import {IAsyncCachedValueBuilder} from "./async/IAsyncCachedValueBuilder";
-import {AsyncCachedValueBuilder} from "./async/AsyncCachedValueBuilder";
-import {toFactory} from "../../internal/functions";
+import {IValueStorage} from "../../storages/internal";
+import {Argument, TypeUtils} from "../../utils/internal";
+import {Func} from "../../types/internal";
+import {TimeSpan} from "../../time/internal";
+import {toFactory} from "../../internal/internal";
+import {AsyncCachedValueBuilder, CachedValueBuilder, IAsyncCachedValueBuilder, ICachedValueBuilder} from "../internal";
 
 export function getValueFromStorageOrDefault<T>(valueStorage: IValueStorage<T>, minValueCreatedOn?: Date): T | null {
     const storageValue = valueStorage.get();

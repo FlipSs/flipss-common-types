@@ -1,4 +1,4 @@
-import {LogLevel} from "./LogLevel";
+import {LogLevel} from "./internal";
 
 export interface ILogInfo {
     category: string;

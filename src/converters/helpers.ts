@@ -1,9 +1,7 @@
-import {IObjectConverterBuilder} from "./IObjectConverterBuilder";
-import {Argument, TypeUtils} from "../utils";
-import {Func} from "../types";
-import {IReferenceObjectConstructor} from "./IReferenceObjectConstructor";
-import {ObjectConverterBuilder} from "./ObjectConverterBuilder";
-import {asEnumerable, IReadOnlyHashSet} from "../collections";
+import {IObjectConverterBuilder, IReferenceObjectConstructor, ObjectConverterBuilder} from "./internal";
+import {Argument, TypeUtils} from "../utils/internal";
+import {Func} from "../types/internal";
+import {asEnumerable, IReadOnlyHashSet} from "../collections/internal";
 
 export function buildObjectConverterUsingConstructor<TSource, TTarget>(referenceObjectConstructor: IReferenceObjectConstructor<TTarget>): IObjectConverterBuilder<TSource, TTarget> {
     Argument.isNotNullOrUndefined(referenceObjectConstructor, 'referenceObjectConstructor');

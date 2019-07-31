@@ -1,22 +1,25 @@
-import {IObjectConverterBuilder} from "./IObjectConverterBuilder";
-import {Func} from "../types";
-import {ObjectConverterConvertiblePropertyNames, ObjectConverterTypedConvertiblePropertyNames} from "./types";
-import {IObjectConverter} from "./IObjectConverter";
-import {asEnumerable, Dictionary, HashSet, IDictionary} from "../collections";
-import {Argument} from "../utils";
-import {IPropertyValueFactory} from "./value-factories/IPropertyValueFactory";
-import {ConstantPropertyValueFactory} from "./value-factories/ConstantPropertyValueFactory";
-import {CreatedPropertyValueFactory} from "./value-factories/CreatedPropertyValueFactory";
-import {TransferredPropertyValueFactory} from "./value-factories/TransferredPropertyValueFactory";
-import {ObjectConverter} from "./ObjectConverter";
-import {IObjectConverterContextFactoryConstructor} from "./contexts/IObjectConverterContextFactoryConstructor";
-import {OptionalObjectConverterContextFactory} from "./contexts/OptionalObjectConverterContextFactory";
-import {StrictObjectConverterContextFactory} from "./contexts/StrictObjectConverterContextFactory";
-import {IObjectConverterContextFactory} from "./contexts/IObjectConverterContextFactory";
-import {DirectPropertyTransferringObjectConverter} from "./DirectPropertyTransferringObjectConverter";
-import {IValueIgnoreStrategyConstructor} from "./IValueIgnoreStrategyConstructor";
-import {IgnoreFunctionValueIgnoreStrategy} from "./IgnoreFunctionValueIgnoreStrategy";
-import {IgnoreNullAndUndefinedValueIgnoreStrategy} from "./IgnoreNullAndUndefinedValueIgnoreStrategy";
+import {
+    ConstantPropertyValueFactory,
+    CreatedPropertyValueFactory,
+    DirectPropertyTransferringObjectConverter,
+    IgnoreFunctionValueIgnoreStrategy,
+    IgnoreNullAndUndefinedValueIgnoreStrategy,
+    IObjectConverter,
+    IObjectConverterBuilder,
+    IObjectConverterContextFactory,
+    IObjectConverterContextFactoryConstructor,
+    IPropertyValueFactory,
+    IValueIgnoreStrategyConstructor,
+    ObjectConverter,
+    ObjectConverterConvertiblePropertyNames,
+    ObjectConverterTypedConvertiblePropertyNames,
+    OptionalObjectConverterContextFactory,
+    StrictObjectConverterContextFactory,
+    TransferredPropertyValueFactory
+} from "./internal";
+import {Func} from "../types/internal";
+import {asEnumerable, Dictionary, HashSet, IDictionary} from "../collections/internal";
+import {Argument} from "../utils/internal";
 
 export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverterBuilder<TSource, TTarget> {
     private readonly propertyValueFactories: IDictionary<string, IPropertyValueFactory<TSource, any>>;

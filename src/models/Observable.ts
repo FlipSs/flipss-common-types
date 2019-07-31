@@ -1,7 +1,7 @@
-import {Collection, ICollection} from "../collections";
-import {Action} from "../types";
-import {Argument} from "../utils";
-import {IObservable} from "./IObservable";
+import {Collection, ICollection} from "../collections/internal";
+import {Action} from "../types/internal";
+import {Argument} from "../utils/internal";
+import {IObservable} from "./internal";
 
 export abstract class Observable<T> implements IObservable<T> {
     private readonly subscribers: ICollection<Action<Readonly<T>>>;

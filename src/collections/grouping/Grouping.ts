@@ -1,5 +1,4 @@
-import {Enumerable} from "../Enumerable";
-import {IGrouping} from "./IGrouping";
+import {Enumerable, IGrouping} from "../internal";
 
 export class Grouping<TKey, TValue> extends Enumerable<TValue> implements IGrouping<TKey, TValue> {
     public constructor(private readonly groupKey: TKey, private readonly items: TValue[]) {

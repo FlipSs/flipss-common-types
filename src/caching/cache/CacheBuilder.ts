@@ -1,13 +1,9 @@
-import {TimeSpan} from "../../time";
-import {Func} from "../../types";
-import {ICacheConstructor} from "./ICacheConstructor";
-import {IKeyValuePair, IReadOnlyCollection} from "../../collections";
-import {AbsoluteExpirationCache} from "./AbsoluteExpirationCache";
-import {ICache} from "./ICache";
-import {Argument} from "../../utils";
-import {toFactory} from "../../internal/functions";
-import {SlidingExpirationCache} from "./SlidingExpirationCache";
-import {ICacheBuilder} from "./ICacheBuilder";
+import {TimeSpan} from "../../time/internal";
+import {Func} from "../../types/internal";
+import {AbsoluteExpirationCache, ICache, ICacheBuilder, ICacheConstructor, SlidingExpirationCache} from "../internal";
+import {IKeyValuePair, IReadOnlyCollection} from "../../collections/internal";
+import {Argument} from "../../utils/internal";
+import {toFactory} from "../../internal/internal";
 
 const defaultExpirationCheckingPeriod = TimeSpan.fromSeconds(30);
 

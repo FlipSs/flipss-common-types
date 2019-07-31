@@ -1,23 +1,25 @@
-import {Action, Func, Predicate} from "../types";
-import {IEnumerable} from "./IEnumerable";
-import {Argument, TypeUtils} from "../utils";
-import {IGrouping} from "./grouping/IGrouping";
-import {Grouping} from "./grouping/Grouping";
-import {IOrderedEnumerable} from "./sorting/IOrderedEnumerable";
-import {AscendingSortItemSelector} from "./sorting/AscendingSortItemSelector";
-import {OrderedEnumerable} from "./sorting/OrderedEnumerable";
-import {DescendingSortItemSelector} from "./sorting/DescendingSortItemSelector";
-import {ICollection} from "./ICollection";
-import {IReadOnlyCollection} from "./IReadOnlyCollection";
-import {Collection} from "./Collection";
-import {DeferredEnumerable} from "./DeferredEnumerable";
-import {IHashSet} from "./IHashSet";
-import {HashSet} from "./HashSet";
-import {IReadOnlyHashSet} from "./IReadOnlyHashSet";
-import {IDictionary} from "./IDictionary";
-import {IReadOnlyDictionary} from "./IReadOnlyDictionary";
-import {Dictionary} from "./Dictionary";
-import {IKeyValuePair} from "./IKeyValuePair";
+import {Action, Func, Predicate} from "../types/internal";
+import {Argument, TypeUtils} from "../utils/internal";
+import {
+    AscendingSortItemSelector,
+    Collection,
+    DeferredEnumerable,
+    DescendingSortItemSelector,
+    Dictionary,
+    Grouping,
+    HashSet,
+    ICollection,
+    IDictionary,
+    IEnumerable,
+    IGrouping,
+    IHashSet,
+    IKeyValuePair,
+    IOrderedEnumerable,
+    IReadOnlyCollection,
+    IReadOnlyDictionary,
+    IReadOnlyHashSet,
+    OrderedEnumerable
+} from "./internal";
 
 export function asEnumerable<T>(items: T[]): IEnumerable<T> {
     return new ArrayAsEnumerable(items);

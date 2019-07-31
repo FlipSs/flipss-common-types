@@ -1,5 +1,5 @@
-import {Func} from "../types";
-import {IReadOnlyDictionary} from "./IReadOnlyDictionary";
+import {Func} from "../types/internal";
+import {IReadOnlyDictionary} from "./internal";
 
 export interface IDictionary<TKey, TValue> extends IReadOnlyDictionary<TKey, TValue> {
     tryRemove(key: TKey): boolean;

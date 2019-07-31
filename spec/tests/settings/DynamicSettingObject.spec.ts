@@ -1,4 +1,4 @@
-import {SettingStorage} from "../../../src/settings";
+import {SettingStorage} from "../../../src/settings/internal";
 import {TestSettingLoader} from "./models/TestSettingLoader";
 import {defaultValue, TestSettingObject} from "./models/TestSettingObject";
 import {TestSettingObjectErrorListener} from "./models/TestSettingObjectErrorListener";

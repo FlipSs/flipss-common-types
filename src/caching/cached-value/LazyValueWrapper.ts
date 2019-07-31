@@ -1,6 +1,5 @@
-import {ILazy, Lazy} from "../../utils";
-import {IValueWrapper} from "./IValueWrapper";
-import {IValueFactory} from "./IValueFactory";
+import {ILazy, Lazy} from "../../utils/internal";
+import {IValueFactory, IValueWrapper} from "../internal";
 
 export class LazyValueWrapper<T> implements IValueWrapper<T> {
     private readonly lazyValue: ILazy<T>;

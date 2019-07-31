@@ -1,5 +1,4 @@
-import {LogLevel} from "./LogLevel";
-import {ILogMessage} from "./ILogMessage";
+import {ILogMessage, LogLevel} from "./internal";
 
 export interface ILogger {
     raw(rawMessage: string | Error, category: string, level: LogLevel, data?: any);

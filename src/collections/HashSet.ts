@@ -1,7 +1,5 @@
-import {IEnumerable} from "./IEnumerable";
-import {Argument, TypeUtils} from "../utils";
-import {IHashSet} from "./IHashSet";
-import {ReadOnlyCollection} from "./ReadOnlyCollection";
+import {IEnumerable, IHashSet, ReadOnlyCollection} from "./internal";
+import {Argument, TypeUtils} from "../utils/internal";
 
 export class HashSet<T> extends ReadOnlyCollection<T> implements IHashSet<T> {
     private set: Set<T>;

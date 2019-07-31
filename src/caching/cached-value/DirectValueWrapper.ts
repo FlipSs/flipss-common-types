@@ -1,5 +1,4 @@
-import {IValueWrapper} from "./IValueWrapper";
-import {IValueFactory} from "./IValueFactory";
+import {IValueFactory, IValueWrapper} from "../internal";
 
 export class DirectValueWrapper<T> implements IValueWrapper<T> {
     private value: T;

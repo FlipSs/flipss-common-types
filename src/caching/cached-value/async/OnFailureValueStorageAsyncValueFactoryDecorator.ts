@@ -1,8 +1,7 @@
-import {IValueFactory} from "../IValueFactory";
-import {IValueStorage} from "../../../storages/IValueStorage";
-import {Action} from "../../../types";
-import {TypeUtils} from "../../../utils";
-import {getValueFromStorageOrDefault} from "../helpers";
+import {getValueFromStorageOrDefault, IValueFactory} from "../../internal";
+import {IValueStorage} from "../../../storages/internal";
+import {Action} from "../../../types/internal";
+import {TypeUtils} from "../../../utils/internal";
 
 export class OnFailureValueStorageAsyncValueFactoryDecorator<T> implements IValueFactory<Promise<T>> {
     public constructor(private readonly valueFactory: IValueFactory<Promise<T>>,

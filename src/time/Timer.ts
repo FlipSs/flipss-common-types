@@ -1,9 +1,7 @@
-import {Action} from "../types";
-import {TimeSpan} from "./TimeSpan";
-import {ITimer} from "./ITimer";
-import {Argument, TypeUtils} from "../utils";
-import {Collection, ICollection} from "../collections";
-import {TimerState} from "./TimerState";
+import {Collection, ICollection} from "../collections/internal";
+import {Argument, TypeUtils} from "../utils/internal";
+import {ITimer, TimerState, TimeSpan} from "./internal";
+import {Action} from "../types/internal";
 
 const intervalPeriod = 250;
 
@@ -36,7 +34,7 @@ class TimerManager {
     }
 
     private setInterval(): void {
-        this.intervalId = setInterval(() => {
+        this.intervalId = window.setInterval(() => {
             for (const timer of this.timers) {
                 timer.update(TimeSpan.fromMilliseconds(intervalPeriod));
             }

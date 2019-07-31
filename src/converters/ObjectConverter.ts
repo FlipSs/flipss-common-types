@@ -1,7 +1,5 @@
-import {IObjectConverter} from "./IObjectConverter";
-import {IObjectConverterContextFactory} from "./contexts/IObjectConverterContextFactory";
-import {IObjectConverterContext} from "./contexts/IObjectConverterContext";
-import {Argument} from "../utils";
+import {IObjectConverter, IObjectConverterContext, IObjectConverterContextFactory} from "./internal";
+import {Argument} from "../utils/internal";
 
 export class ObjectConverter<TSource, TTarget> implements IObjectConverter<TSource, TTarget> {
     public constructor(private readonly contextFactory: IObjectConverterContextFactory<TSource, TTarget>) {

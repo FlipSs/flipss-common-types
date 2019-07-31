@@ -1,5 +1,4 @@
-import {IValueWrapper} from "./IValueWrapper";
-import {IValueFactory} from "./IValueFactory";
+import {IValueFactory, IValueWrapper} from "../internal";
 
 export interface IValueWrapperConstructor<T> {
     new(valueFactory: IValueFactory<T>): IValueWrapper<T>;

@@ -1,5 +1,4 @@
-import {IKeyValuePair} from "./IKeyValuePair";
-import {IReadOnlyCollection} from "./IReadOnlyCollection";
+import {IKeyValuePair, IReadOnlyCollection} from "./internal";
 
 export interface IReadOnlyDictionary<TKey, TValue> extends IReadOnlyCollection<IKeyValuePair<TKey, TValue>> {
     readonly values: IReadOnlyCollection<TValue>;

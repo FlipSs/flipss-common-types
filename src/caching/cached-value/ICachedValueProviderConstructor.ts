@@ -1,7 +1,6 @@
-import {IValueWrapper} from "./IValueWrapper";
-import {Func} from "../../types";
-import {TimeSpan} from "../../time";
-import {ICachedValueProvider} from "./ICachedValueProvider";
+import {ICachedValueProvider, IValueWrapper} from "../internal";
+import {Func} from "../../types/internal";
+import {TimeSpan} from "../../time/internal";
 
 export interface ICachedValueProviderConstructor<T> {
     new(valueWrapper: IValueWrapper<T>, expirationPeriodFactory: Func<TimeSpan>): ICachedValueProvider<T>;

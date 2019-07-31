@@ -1,5 +1,5 @@
-import {TypeUtils} from "../utils";
-import {IgnoreFunctionValueIgnoreStrategy} from "./IgnoreFunctionValueIgnoreStrategy";
+import {TypeUtils} from "../utils/internal";
+import {IgnoreFunctionValueIgnoreStrategy} from "./internal";
 
 export class IgnoreNullAndUndefinedValueIgnoreStrategy extends IgnoreFunctionValueIgnoreStrategy {
     public needToIgnore(value: any): boolean {

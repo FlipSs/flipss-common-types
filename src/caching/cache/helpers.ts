@@ -1,9 +1,8 @@
-import {Func} from "../../types";
-import {TimeSpan} from "../../time";
-import {ICacheBuilder} from "./ICacheBuilder";
-import {Argument} from "../../utils";
-import {CacheBuilder} from "./CacheBuilder";
-import {toFactory} from "../../internal/functions";
+import {Func} from "../../types/internal";
+import {TimeSpan} from "../../time/internal";
+import {CacheBuilder, ICacheBuilder} from "../internal";
+import {Argument} from "../../utils/internal";
+import {toFactory} from "../../internal/internal";
 
 export function buildCache<TKey, TValue>(expirationPeriod: TimeSpan | Func<TimeSpan>): ICacheBuilder<TKey, TValue> {
     Argument.isNotNullOrUndefined(expirationPeriod, 'expirationPeriod');

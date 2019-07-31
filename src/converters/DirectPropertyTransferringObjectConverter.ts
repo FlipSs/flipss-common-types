@@ -1,10 +1,12 @@
-import {IObjectConverterContextFactory} from "./contexts/IObjectConverterContextFactory";
-import {IReadOnlyHashSet} from "../collections";
-import {IObjectConverterContext} from "./contexts/IObjectConverterContext";
-import {ObjectConverter} from "./ObjectConverter";
-import {TypeUtils} from "../utils";
-import {getAvailablePropertyNames} from "./helpers";
-import {IValueIgnoreStrategy} from "./IValueIgnoreStrategy";
+import {
+    getAvailablePropertyNames,
+    IObjectConverterContext,
+    IObjectConverterContextFactory,
+    IValueIgnoreStrategy,
+    ObjectConverter
+} from "./internal";
+import {IReadOnlyHashSet} from "../collections/internal";
+import {TypeUtils} from "../utils/internal";
 
 export class DirectPropertyTransferringObjectConverter<TSource, TTarget> extends ObjectConverter<TSource, TTarget> {
     public constructor(contextFactory: IObjectConverterContextFactory<TSource, TTarget>,

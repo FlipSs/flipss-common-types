@@ -1,5 +1,4 @@
-import {Enumerable} from "./Enumerable";
-import {IReadOnlyCollection} from "./IReadOnlyCollection";
+import {Enumerable, IReadOnlyCollection} from "./internal";
 
 export abstract class ReadOnlyCollection<T> extends Enumerable<T> implements IReadOnlyCollection<T> {
     public get isEmpty(): boolean {

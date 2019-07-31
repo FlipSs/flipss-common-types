@@ -1,11 +1,13 @@
-import {Func} from "../../types";
-import {SelectedSortItem} from "./SelectedSortItem";
-import {Argument, TypeUtils} from "../../utils";
-import {IOrderedEnumerable} from "./IOrderedEnumerable";
-import {DeferredEnumerable} from "../DeferredEnumerable";
-import {ISortItemSelector} from "./ISortItemSelector";
-import {AscendingSortItemSelector} from "./AscendingSortItemSelector";
-import {DescendingSortItemSelector} from "./DescendingSortItemSelector";
+import {Func} from "../../types/internal";
+import {
+    AscendingSortItemSelector,
+    DeferredEnumerable,
+    DescendingSortItemSelector,
+    IOrderedEnumerable,
+    ISortItemSelector,
+    SelectedSortItem
+} from "../internal";
+import {Argument, TypeUtils} from "../../utils/internal";
 
 export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrderedEnumerable<T> {
     private readonly selectors: ISortItemSelector<T>[];

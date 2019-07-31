@@ -1,10 +1,5 @@
-import {LogLevel} from "./LogLevel";
-import {ILogger} from "./ILogger";
-import {Argument, TypeUtils} from "../utils";
-import {ILogSender} from "./ILogSender";
-import {ILogMessage} from "./ILogMessage";
-import {LoggableError} from "./LoggableError";
-import {LogMessageFactory} from "./LogMessageFactory";
+import {ILogger, ILogMessage, ILogSender, LoggableError, LogLevel, LogMessageFactory} from "./internal";
+import {Argument, TypeUtils} from "../utils/internal";
 
 export class Logger implements ILogger {
     public constructor(private readonly sender: ILogSender) {

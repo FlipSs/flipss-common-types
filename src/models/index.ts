@@ -1,4 +1,1 @@
-export * from './IDisposable';
-export * from './IObservable';
-export * from './Observable';
-export * from './ReplayObservable';
+export {Observable, ReplayObservable, IObservable, IDisposable, using} from './internal';

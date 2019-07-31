@@ -1,7 +1,7 @@
-import {IKeyValuePair, IReadOnlyCollection} from "../../collections";
-import {TimeSpan} from "../../time";
-import {Func} from "../../types";
-import {ICache} from "./ICache";
+import {IKeyValuePair, IReadOnlyCollection} from "../../collections/internal";
+import {TimeSpan} from "../../time/internal";
+import {Func} from "../../types/internal";
+import {ICache} from "../internal";
 
 export interface ICacheBuilder<TKey, TValue> {
     setPredefinedValues(values: IReadOnlyCollection<IKeyValuePair<TKey, TValue>>): ICacheBuilder<TKey, TValue>;

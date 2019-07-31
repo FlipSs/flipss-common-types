@@ -1,4 +1,4 @@
-import {ISettingStorage, SettingStorage} from "../../../src/settings";
+import {ISettingStorage, SettingStorage} from "../../../src/settings/internal";
 import {ITestSettings} from "./models/ITestSettings";
 import {TestSettingLoader} from "./models/TestSettingLoader";
 

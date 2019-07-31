@@ -1,8 +1,6 @@
-import {Func} from "../../types";
-import {IReadOnlyDictionary} from "../../collections";
-import {IPropertyValueFactory} from "../value-factories/IPropertyValueFactory";
-import {IObjectConverterContextFactory} from "./IObjectConverterContextFactory";
-import {IValueIgnoreStrategy} from "../IValueIgnoreStrategy";
+import {Func} from "../../types/internal";
+import {IReadOnlyDictionary} from "../../collections/internal";
+import {IObjectConverterContextFactory, IPropertyValueFactory, IValueIgnoreStrategy} from "../internal";
 
 export interface IObjectConverterContextFactoryConstructor<TSource, TTarget> {
     new(referenceObjectFactory: Func<TTarget>,

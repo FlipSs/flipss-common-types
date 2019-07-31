@@ -1,8 +1,8 @@
-import {Type} from "../types";
+import {Type} from "../types/internal";
 
 export class TypeUtils {
     public static isNullOrUndefined(arg: any): boolean {
-        return arg == null;
+        return arg == undefined;
     }
 
     public static isNumber(arg: any): arg is number {

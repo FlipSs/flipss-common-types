@@ -1,7 +1,6 @@
-import {IValueFactory} from "../IValueFactory";
-import {IValueStorage} from "../../../storages/IValueStorage";
-import {TypeUtils} from "../../../utils";
-import {getValueFromStorageOrDefault} from "../helpers";
+import {getValueFromStorageOrDefault, IValueFactory} from "../../internal";
+import {IValueStorage} from "../../../storages/internal";
+import {TypeUtils} from "../../../utils/internal";
 
 export class OnInitValueStorageAsyncValueFactoryDecorator<T> implements IValueFactory<Promise<T>> {
     private initialized: boolean;

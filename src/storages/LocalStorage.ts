@@ -1,9 +1,7 @@
-import {IJsonSerializer} from "../json/IJsonSerializer";
-import {Argument, TypeUtils} from "../utils";
-import {JsonSerializer} from "../json/JsonSerializer";
-import {IValueStorage} from "./IValueStorage";
-import {IStorageValue} from "./IStorageValue";
-import {Collection, ICollection, IEnumerable} from "../collections";
+import {IJsonSerializer, JsonSerializer} from "../json/internal";
+import {Argument, TypeUtils} from "../utils/internal";
+import {IStorageValue, IValueStorage} from "./internal";
+import {Collection, ICollection, IEnumerable} from "../collections/internal";
 
 export function isLocalStorageSupported(): boolean {
     return !TypeUtils.isNullOrUndefined(localStorage);

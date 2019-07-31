@@ -1,4 +1,4 @@
-import {DynamicSettingObject, ISettingObjectErrorListener, ISettingStorage} from "../../../../src/settings";
+import {DynamicSettingObject, ISettingObjectErrorListener, ISettingStorage} from "../../../../src/settings/internal";
 import {ITestSettings} from "./ITestSettings";
 
 export const defaultValue = 'default';

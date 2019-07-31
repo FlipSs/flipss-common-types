@@ -1,8 +1,6 @@
-import {Func} from "../../types";
-import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections";
-import {IPropertyValueFactory} from "../value-factories/IPropertyValueFactory";
-import {ObjectConverterContextFactory} from "./ObjectConverterContextFactory";
-import {IValueIgnoreStrategy} from "../IValueIgnoreStrategy";
+import {Func} from "../../types/internal";
+import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections/internal";
+import {IPropertyValueFactory, IValueIgnoreStrategy, ObjectConverterContextFactory} from "../internal";
 
 export class OptionalObjectConverterContextFactory<TSource, TTarget> extends ObjectConverterContextFactory<TSource, TTarget> {
     public constructor(referenceObjectFactory: Func<TTarget>,

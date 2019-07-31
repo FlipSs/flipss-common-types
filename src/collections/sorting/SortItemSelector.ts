@@ -1,6 +1,5 @@
-import {SelectedSortItem} from "./SelectedSortItem";
-import {Func} from "../../types";
-import {ISortItemSelector} from "./ISortItemSelector";
+import {ISortItemSelector, SelectedSortItem} from "../internal";
+import {Func} from "../../types/internal";
 
 export abstract class SortItemSelector<TKey, TValue> implements ISortItemSelector<TValue> {
     protected constructor(private readonly keySelector: Func<TKey, TValue>) {

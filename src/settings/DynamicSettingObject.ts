@@ -1,8 +1,6 @@
-import {ISettingObject} from "./ISettingObject";
-import {ISettingObjectErrorListener} from "./ISettingObjectErrorListener";
-import {ISettingStorage} from "./ISettingStorage";
-import {Argument, TypeUtils} from "../utils";
-import {Observable} from "../models";
+import {ISettingObject, ISettingObjectErrorListener, ISettingStorage} from "./internal";
+import {Argument, TypeUtils} from "../utils/internal";
+import {Observable} from "../models/internal";
 
 export abstract class DynamicSettingObject<TSettings, TStorageSettings> extends Observable<void> implements ISettingObject<TSettings> {
     private currentValue: TSettings;

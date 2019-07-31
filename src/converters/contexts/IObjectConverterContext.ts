@@ -1,6 +1,5 @@
-import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections";
-import {IPropertyValueFactory} from "../value-factories/IPropertyValueFactory";
-import {IValueIgnoreStrategy} from "../IValueIgnoreStrategy";
+import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections/internal";
+import {IPropertyValueFactory, IValueIgnoreStrategy} from "../internal";
 
 export interface IObjectConverterContext<TSource, TTarget> {
     readonly referenceObject: TTarget;

@@ -1,5 +1,4 @@
-import {IAsyncCachedValue} from "./IAsyncCachedValue";
-import {ICachedValueProvider} from "../ICachedValueProvider";
+import {IAsyncCachedValue, ICachedValueProvider} from "../../internal";
 
 export class AsyncCachedValue<T> implements IAsyncCachedValue<T> {
     public constructor(private readonly valueProvider: ICachedValueProvider<Promise<T>>) {

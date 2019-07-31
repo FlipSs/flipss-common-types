@@ -1,6 +1,9 @@
-import {Func} from "../types";
-import {IObjectConverter,} from "./IObjectConverter";
-import {ObjectConverterConvertiblePropertyNames, ObjectConverterTypedConvertiblePropertyNames} from "./types";
+import {Func} from "../types/internal";
+import {
+    IObjectConverter,
+    ObjectConverterConvertiblePropertyNames,
+    ObjectConverterTypedConvertiblePropertyNames
+} from "./internal";
 
 export interface IObjectConverterBuilder<TSource, TTarget> {
     useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[]): IObjectConverterBuilder<TSource, TTarget>;

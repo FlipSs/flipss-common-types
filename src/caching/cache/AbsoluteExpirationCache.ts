@@ -1,10 +1,8 @@
-import {createCountdownTimer, ITimer, TimeSpan} from "../../time";
-import {Dictionary, IDictionary, IKeyValuePair, IReadOnlyCollection} from "../../collections";
-import {IStoredValue} from "./IStoredValue";
-import {Func} from "../../types";
-import {Argument, TypeUtils} from "../../utils";
-import {ICache} from "./ICache";
-import {TimerState} from "../../time/TimerState";
+import {createCountdownTimer, ITimer, TimerState, TimeSpan} from "../../time/internal";
+import {Dictionary, IDictionary, IKeyValuePair, IReadOnlyCollection} from "../../collections/internal";
+import {ICache, IStoredValue} from "../internal";
+import {Func} from "../../types/internal";
+import {Argument, TypeUtils} from "../../utils/internal";
 
 export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValue> {
     private readonly timer: ITimer;

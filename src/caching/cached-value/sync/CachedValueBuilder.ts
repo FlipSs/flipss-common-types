@@ -1,21 +1,23 @@
-import {IValueWrapperConstructor} from "../IValueWrapperConstructor";
-import {ICachedValueProviderConstructor} from "../ICachedValueProviderConstructor";
-import {Action, Func} from "../../../types";
-import {TimeSpan} from "../../../time";
-import {DirectValueWrapper} from "../DirectValueWrapper";
-import {AbsoluteExpirationCachedValueProvider} from "../AbsoluteExpirationCachedValueProvider";
-import {LazyValueWrapper} from "../LazyValueWrapper";
-import {SlidingExpirationCachedValueProvider} from "../SlidingExpirationCachedValueProvider";
-import {ICachedValue} from "./ICachedValue";
-import {IValueStorage} from "../../../storages/IValueStorage";
-import {Argument} from "../../../utils";
-import {IValueFactory} from "../IValueFactory";
-import {DirectValueFactory} from "../DirectValueFactory";
-import {SaveValueToStorageValueFactoryDecorator} from "./SaveValueToStorageValueFactoryDecorator";
-import {OnInitValueStorageValueFactoryDecorator} from "./OnInitValueStorageValueFactoryDecorator";
-import {OnFailureValueStorageValueFactoryDecorator} from "./OnFailureValueStorageValueFactoryDecorator";
-import {ICachedValueBuilder} from "./ICachedValueBuilder";
-import {CachedValue} from "./CachedValue";
+import {
+    AbsoluteExpirationCachedValueProvider,
+    CachedValue,
+    DirectValueFactory,
+    DirectValueWrapper,
+    ICachedValue,
+    ICachedValueBuilder,
+    ICachedValueProviderConstructor,
+    IValueFactory,
+    IValueWrapperConstructor,
+    LazyValueWrapper,
+    OnFailureValueStorageValueFactoryDecorator,
+    OnInitValueStorageValueFactoryDecorator,
+    SaveValueToStorageValueFactoryDecorator,
+    SlidingExpirationCachedValueProvider
+} from "../../internal";
+import {IValueStorage} from "../../../storages/internal";
+import {Action, Func} from "../../../types/internal";
+import {TimeSpan} from "../../../time/internal";
+import {Argument} from "../../../utils/internal";
 
 export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
     private valueFactory: IValueFactory<T>;

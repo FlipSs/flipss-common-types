@@ -1,5 +1,4 @@
-import {ILogMessage, LogLevel} from "../../../src/logs";
-import {LogMessageFactory} from "../../../src/logs/LogMessageFactory";
+import {ILogMessage, LogLevel, LogMessageFactory} from "../../../src/logs/internal";
 
 describe('LogMessageFactory', () => {
     it('On string message', () => {

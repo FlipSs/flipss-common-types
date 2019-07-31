@@ -1,5 +1,5 @@
-import {IValueFactory} from "../IValueFactory";
-import {IValueStorage} from "../../../storages/IValueStorage";
+import {IValueFactory} from "../../internal";
+import {IValueStorage} from "../../../storages/internal";
 
 export class SaveValueToStorageAsyncValueFactoryDecorator<T> implements IValueFactory<Promise<T>> {
     public constructor(private readonly valueFactory: IValueFactory<Promise<T>>,

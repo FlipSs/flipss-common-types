@@ -1,6 +1,5 @@
-import {LogLevel} from "./LogLevel";
-import {TypeUtils} from "../utils";
-import {ILogMessage} from "./ILogMessage";
+import {ILogMessage, LogLevel} from "./internal";
+import {TypeUtils} from "../utils/internal";
 
 export class LogMessageFactory {
     public static create(rawMessage: string | Error, category: string, level: LogLevel, data?: any): ILogMessage {

@@ -1,5 +1,5 @@
-import {Func} from "../../types";
-import {IEnumerable} from "../IEnumerable";
+import {Func} from "../../types/internal";
+import {IEnumerable} from "../internal";
 
 export interface IOrderedEnumerable<T> extends IEnumerable<T> {
     thenBy<TKey>(keySelector: Func<TKey, T>): IOrderedEnumerable<T>;

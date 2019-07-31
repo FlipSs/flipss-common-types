@@ -1,12 +1,14 @@
-import {Action, Func, Predicate} from "../types";
-import {IOrderedEnumerable} from "./sorting/IOrderedEnumerable";
-import {IGrouping} from "./grouping/IGrouping";
-import {ICollection} from "./ICollection";
-import {IReadOnlyCollection} from "./IReadOnlyCollection";
-import {IHashSet} from "./IHashSet";
-import {IReadOnlyHashSet} from "./IReadOnlyHashSet";
-import {IDictionary} from "./IDictionary";
-import {IReadOnlyDictionary} from "./IReadOnlyDictionary";
+import {Action, Func, Predicate} from "../types/internal";
+import {
+    ICollection,
+    IDictionary,
+    IGrouping,
+    IHashSet,
+    IOrderedEnumerable,
+    IReadOnlyCollection,
+    IReadOnlyDictionary,
+    IReadOnlyHashSet
+} from "./internal";
 
 export interface IEnumerable<T> extends Iterable<T> {
     getElementAt(index: number): T;

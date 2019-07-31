@@ -1,5 +1,4 @@
-import {IStoredValue} from "./IStoredValue";
-import {AbsoluteExpirationCache} from "./AbsoluteExpirationCache";
+import {AbsoluteExpirationCache, IStoredValue} from "../internal";
 
 export class SlidingExpirationCache<TKey, TValue> extends AbsoluteExpirationCache<TKey, TValue> {
     protected getValue(storedValue: IStoredValue<TValue>): TValue {

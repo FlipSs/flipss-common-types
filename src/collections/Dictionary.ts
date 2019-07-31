@@ -1,10 +1,6 @@
-import {IKeyValuePair} from "./IKeyValuePair";
-import {IDictionary} from "./IDictionary";
-import {IReadOnlyCollection} from "./IReadOnlyCollection";
-import {Collection} from "./Collection";
-import {Func} from "../types";
-import {Argument} from "../utils";
-import {ReadOnlyCollection} from "./ReadOnlyCollection";
+import {Collection, IDictionary, IKeyValuePair, IReadOnlyCollection, ReadOnlyCollection} from "./internal";
+import {Func} from "../types/internal";
+import {Argument} from "../utils/internal";
 
 export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<TKey, TValue>> implements IDictionary<TKey, TValue> {
     private readonly map: Map<TKey, TValue>;
