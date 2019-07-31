@@ -18,11 +18,11 @@ describe('DynamicSettingObject', () => {
 
     beforeAll(() => {
         settingStorage = new SettingStorage<ITestSettings>(new TestSettingLoader(Array.from(settings)));
+        errorObserver = new TestSettingObjectErrorObserver();
     });
 
     beforeEach(() => {
         settingObject = new TestSettingObject(settingStorage);
-        errorObserver = new TestSettingObjectErrorObserver();
         settingObject.subscribe(errorObserver);
     });
 
@@ -51,10 +51,6 @@ describe('DynamicSettingObject', () => {
         beforeAll(() => settingStorage.refreshAsync());
 
         it('Should notify about errors', () => {
-
-            settingStorage.refreshAsync();
-            console.log(errorObserver);
-            console.log(settingObject);
             expect(errorObserver.called).toBeTruthy();
         });
 
