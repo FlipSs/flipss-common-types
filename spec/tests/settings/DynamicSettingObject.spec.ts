@@ -1,10 +1,11 @@
-import {SettingStorage} from "../../../src/settings/internal";
+import {DynamicSettingObject, ISettingStorage, SettingStorage} from "../../../src/settings/internal";
 import {TestSettingLoader} from "./models/TestSettingLoader";
-import {defaultValue, TestSettingObject} from "./models/TestSettingObject";
-import {TestSettingObjectErrorListener} from "./models/TestSettingObjectErrorListener";
 import {ITestSettings} from "./models/ITestSettings";
+import {IErrorObserver} from "../../../src/models/IErrorObserver";
 
-describe('DynamicSettingObject tests', () => {
+const defaultValue = 'default';
+
+describe('DynamicSettingObject', () => {
     const settings: ITestSettings[] = [
         {value: 'first'},
         {value: 'second'},
@@ -12,29 +13,30 @@ describe('DynamicSettingObject tests', () => {
     ];
 
     let settingStorage: SettingStorage<ITestSettings>;
-    let settingObjectErrorListener: TestSettingObjectErrorListener;
+    let errorObserver: TestSettingObjectErrorObserver;
     let settingObject: TestSettingObject;
 
     beforeAll(() => {
         settingStorage = new SettingStorage<ITestSettings>(new TestSettingLoader(Array.from(settings)));
-        settingObjectErrorListener = new TestSettingObjectErrorListener();
     });
 
     beforeEach(() => {
-        settingObject = new TestSettingObject(settingStorage, settingObjectErrorListener);
+        settingObject = new TestSettingObject(settingStorage);
+        errorObserver = new TestSettingObjectErrorObserver();
+        settingObject.subscribe(errorObserver);
     });
 
     it("Initial value should be undefined", () => {
-        expect(settingObject.value).not.toBeDefined();
+        expect(settingObject.value).toBeUndefined();
     });
 
-    describe('Value updating', () => {
+    describe('Should update value', () => {
         beforeEach(() => settingStorage.refreshAsync());
 
         for (let i = 0; i < settings.length; i++) {
             it(`Should be equal "${settings[i].value}" and valid`, () => {
                 expect(settingObject.value).toEqual(settings[i].value);
-                expect(settingObjectErrorListener.called).toBeFalsy();
+                expect(errorObserver.called).toBeFalsy();
             });
         }
     });
@@ -45,11 +47,15 @@ describe('DynamicSettingObject tests', () => {
         });
     });
 
-    describe("On bad value", () => {
+    describe("Bad values", () => {
         beforeAll(() => settingStorage.refreshAsync());
 
-        it('Should call error listener', () => {
-            expect(settingObjectErrorListener.called).toBeTruthy();
+        it('Should notify about errors', () => {
+
+            settingStorage.refreshAsync();
+            console.log(errorObserver);
+            console.log(settingObject);
+            expect(errorObserver.called).toBeTruthy();
         });
 
         it('Should set default value', () => {
@@ -57,3 +63,29 @@ describe('DynamicSettingObject tests', () => {
         });
     });
 });
+
+class TestSettingObject extends DynamicSettingObject<string, ITestSettings> {
+    public constructor(storage: ISettingStorage<ITestSettings>) {
+        super(storage);
+    }
+
+    protected getDefaults(): string {
+        return defaultValue;
+    }
+
+    protected getFromStorage(storageSettings: ITestSettings): string {
+        return storageSettings && storageSettings.value;
+    }
+}
+
+class TestSettingObjectErrorObserver implements IErrorObserver {
+    private isCalled = false;
+
+    public get called(): boolean {
+        return this.isCalled;
+    }
+
+    public onError(error: Readonly<Error>): void {
+        this.isCalled = true;
+    }
+}

@@ -12,7 +12,7 @@ export class SettingStorage<TSettings> extends ReplayObservable<TSettings> imple
     public async refreshAsync(): Promise<void> {
         const value = await this.loader.loadAsync();
 
-        this.nextValue(value);
+        this.next(value);
     }
 }
 

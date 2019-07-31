@@ -1,7 +1,5 @@
-import {Action} from "../types/internal";
+import {IDisposable, Observer} from "./internal";
 
 export interface IObservable<T> {
-    subscribe(action: Action<Readonly<T>>): void;
-
-    unsubscribe(action: Action<Readonly<T>>): void;
+    subscribe(observer: Observer<T>): IDisposable;
 }

@@ -1,1 +1,3 @@
-export {Observable, ReplayObservable, IObservable, IDisposable, using} from './internal';
+export {
+    Observable, ReplayObservable, IObservable, IDisposable, IValueObserver, using, IErrorObserver, Observer
+} from './internal';

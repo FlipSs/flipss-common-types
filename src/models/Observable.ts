@@ -1,32 +1,67 @@
-import {Collection, ICollection} from "../collections/internal";
+import {HashSet, IHashSet} from "../collections/internal";
 import {Action} from "../types/internal";
-import {Argument} from "../utils/internal";
-import {IObservable} from "./internal";
+import {Argument, TypeUtils} from "../utils/internal";
+import {IDisposable, IErrorObserver, IObservable, IValueObserver, Observer} from "./internal";
 
-export abstract class Observable<T> implements IObservable<T> {
-    private readonly subscribers: ICollection<Action<Readonly<T>>>;
+export abstract class Observable<T> implements IObservable<T>, IDisposable {
+    private readonly observers: IHashSet<Observer<T>>;
 
     protected constructor() {
-        this.subscribers = new Collection<Action<Readonly<T>>>();
+        this.observers = new HashSet<IValueObserver<Readonly<T>>>();
     }
 
-    public subscribe(action: Action<Readonly<T>>): void {
-        Argument.isNotNullOrUndefined(action, 'action');
-
-        this.subscribers.add(action);
+    protected static isValueObserver<T>(observer: Observer<T>): observer is IValueObserver<T> {
+        return !TypeUtils.isNullOrUndefined((observer as IValueObserver<T>).onNext);
     }
 
-    public unsubscribe(action: Action<Readonly<T>>): void {
-        Argument.isNotNullOrUndefined(action, 'action');
+    protected static isErrorObserver(observer: Observer<any>): observer is IErrorObserver {
+        return !TypeUtils.isNullOrUndefined((observer as IErrorObserver).onError);
+    }
 
-        if (!this.subscribers.tryRemove(action)) {
-            throw new Error('Subscriber not found');
+    public subscribe(observer: Observer<T>): IDisposable {
+        Argument.isNotNullOrUndefined(observer, 'observer');
+
+        if (this.observers.has(observer)) {
+            throw new Error('Observer already subscribed');
+        }
+
+        this.observers.add(observer);
+
+        return new Subscription(() => this.unsubscribe(observer));
+    }
+
+    public dispose(): void {
+        this.observers.clear();
+    }
+
+    protected next(value: Readonly<T>): void {
+        for (const observer of this.observers) {
+            if (Observable.isValueObserver(observer)) {
+                observer.onNext(value);
+            }
         }
     }
 
-    protected nextValue(value: Readonly<T>): void {
-        for (const subscriber of this.subscribers) {
-            subscriber(value);
+    protected error(error: Readonly<Error>): void {
+        for (const observer of this.observers) {
+            if (Observable.isErrorObserver(observer)) {
+                observer.onError(error);
+            }
         }
+    }
+
+    private unsubscribe(observer: Observer<T>): void {
+        if (!this.observers.tryRemove(observer)) {
+            throw new Error('Observer already unsubscribed');
+        }
+    }
+}
+
+class Subscription implements IDisposable {
+    public constructor(private readonly unsubscribeAction: Action) {
+    }
+
+    public dispose(): void {
+        this.unsubscribeAction();
     }
 }

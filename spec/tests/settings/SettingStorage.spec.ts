@@ -1,27 +1,41 @@
 import {ISettingStorage, SettingStorage} from "../../../src/settings/internal";
 import {ITestSettings} from "./models/ITestSettings";
 import {TestSettingLoader} from "./models/TestSettingLoader";
+import {IValueObserver} from "../../../src/models/IValueObserver";
 
-describe('SettingStorage tests', () => {
+describe('SettingStorage', () => {
     const settings: ITestSettings[] = [
         {value: 'first'}
     ];
 
     let settingStorage: ISettingStorage<ITestSettings>;
-    let value: ITestSettings;
+    let observer: TestSettingStorageObserver;
 
     beforeAll(() => {
         settingStorage = new SettingStorage<ITestSettings>(new TestSettingLoader(Array.from(settings)));
-        settingStorage.subscribe(v => value = v);
+        observer = new TestSettingStorageObserver();
+        settingStorage.subscribe(observer);
     });
 
     beforeEach(() => settingStorage.refreshAsync());
 
     it('Should update value', () => {
-        expect(value).toEqual(settings[0]);
+        expect(observer.value).toEqual(settings[0]);
     });
 
     it('Should be undefined', () => {
-        expect(value).toBeFalsy();
+        expect(observer.value).toBeUndefined();
     });
 });
+
+class TestSettingStorageObserver implements IValueObserver<ITestSettings> {
+    private lastValue: ITestSettings;
+
+    public get value(): ITestSettings {
+        return this.lastValue;
+    }
+
+    public onNext(value: Readonly<ITestSettings>): void {
+        this.lastValue = value;
+    }
+}
