@@ -1,7 +1,7 @@
 import {ILazy, Lazy} from "../../../src/utils/internal";
 import Spy = jasmine.Spy;
 
-describe('Lazy tests', () => {
+describe('Lazy', () => {
     const values: string[] = ['test1', 'test2', 'test3'];
     let spy: Spy;
     let lazy: ILazy<string>;
