@@ -3,7 +3,7 @@ import {Func} from "../../types/internal";
 import {AbsoluteExpirationCache, ICache, ICacheBuilder, ICacheConstructor, SlidingExpirationCache} from "../internal";
 import {IKeyValuePair, IReadOnlyCollection} from "../../collections/internal";
 import {Argument} from "../../utils/internal";
-import {toFactory} from "../../internal/internal";
+import {toFactory} from "../../common/internal";
 
 const defaultExpirationCheckingPeriod = TimeSpan.fromSeconds(30);
 
@@ -24,7 +24,7 @@ export class CacheBuilder<TKey, TValue> implements ICacheBuilder<TKey, TValue> {
     public setExpirationCheckingPeriod(expirationCheckingPeriod: TimeSpan | Func<TimeSpan>): ICacheBuilder<TKey, TValue> {
         Argument.isNotNullOrUndefined(expirationCheckingPeriod, 'expirationCheckingPeriod');
 
-        this.expirationCheckingPeriodFactory = toFactory(expirationCheckingPeriod, TimeSpan);
+        this.expirationCheckingPeriodFactory = toFactory(TimeSpan, expirationCheckingPeriod);
 
         return this;
     }

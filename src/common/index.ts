@@ -7,5 +7,6 @@ export {
     using,
     IErrorObserver,
     Observer,
-    IConstructorWithoutParameters
+    IConstructorWithoutParameters,
+    toFactory
 } from './internal';

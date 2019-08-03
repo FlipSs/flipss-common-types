@@ -2,8 +2,8 @@ import {IValueStorage} from "../../storages/internal";
 import {Argument, TypeUtils} from "../../utils/internal";
 import {Func} from "../../types/internal";
 import {TimeSpan} from "../../time/internal";
-import {toFactory} from "../../internal/internal";
 import {AsyncCachedValueBuilder, CachedValueBuilder, IAsyncCachedValueBuilder, ICachedValueBuilder} from "../internal";
+import {toFactory} from "../../common/internal";
 
 export function getValueFromStorageOrDefault<T>(valueStorage: IValueStorage<T>, minValueCreatedOn?: Date): T | null {
     const storageValue = valueStorage.get();
@@ -31,5 +31,5 @@ export function buildAsyncCachedValue<T>(valueFactory: Func<Promise<T>>, expirat
 function getExpirationPeriodFactory(expirationPeriod: TimeSpan | Func<TimeSpan>): Func<TimeSpan> {
     Argument.isNotNullOrUndefined(expirationPeriod, 'expirationPeriod');
 
-    return toFactory(expirationPeriod, TimeSpan);
+    return toFactory(TimeSpan, expirationPeriod);
 }

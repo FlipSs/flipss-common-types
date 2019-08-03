@@ -1,6 +1,6 @@
-import {IDisposable, tryDispose, using} from "../../../src/common/internal";
+import {IDisposable, toFactory, tryDispose, using} from "../../../src/common/internal";
 
-describe('IDisposable', () => {
+describe('functions', () => {
     describe('tryDispose', () => {
         it('Should dispose when object has dispose method', () => {
             const obj = new TestDisposable();
@@ -60,7 +60,39 @@ describe('IDisposable', () => {
             expect(() => using(undefined)).toThrow();
         });
     });
+
+    describe('toFactory', () => {
+        it('Should return factory when value provided', () => {
+            const test = new Test();
+
+            const factory = toFactory(Test, test);
+
+            expect(factory).not.toBe(test);
+            expect(factory()).toBe(test);
+        });
+
+        it('Factory should not be changed when provided', () => {
+            const factory = () => new Test();
+
+            const newFactory = toFactory(Test, factory);
+
+            expect(newFactory).toBe(factory);
+        });
+
+        it('Should not throw when value null or undefined', () => {
+            expect(() => toFactory(Test, null)).not.toThrow();
+            expect(() => toFactory(Test, undefined)).not.toThrow();
+        });
+
+        it('Should throw when constructor null or undefined', () => {
+            expect(() => toFactory(null, () => new Test())).toThrow();
+            expect(() => toFactory(undefined, () => new Test())).toThrow();
+        });
+    });
 });
+
+class Test {
+}
 
 class TestDisposable implements IDisposable {
     private isDisposed = false;

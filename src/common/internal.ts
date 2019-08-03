@@ -5,4 +5,5 @@ export * from './ReplayObservable';
 export * from './IValueObserver';
 export * from './IErrorObserver';
 export * from './types';
-export * from "./IConstructorWithoutParameters";
+export * from './IConstructorWithoutParameters';
+export * from './functions';
