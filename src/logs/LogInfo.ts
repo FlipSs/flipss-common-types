@@ -9,10 +9,10 @@ export function ClassLogInfo(info: ILogInfo) {
     return (target: Function) => {
         const prototype = target.prototype;
 
-        const excludedMethods = disabledLogInfoDictionary.getValueOrDefault(prototype) || new HashSet<string>();
+        const excludedMethods = disabledLogInfoDictionary.getOrDefault(prototype) || new HashSet<string>();
         excludedMethods.add('constructor');
 
-        const customValues = customLogInfoDictionary.getValueOrDefault(prototype);
+        const customValues = customLogInfoDictionary.getOrDefault(prototype);
 
         const methods = asEnumerable(Object.getOwnPropertyNames(prototype))
             .where(p => !excludedMethods.has(p))
@@ -27,7 +27,7 @@ export function ClassLogInfo(info: ILogInfo) {
 
         for (const method of methods) {
             const methodValue = method.descriptor.value;
-            const methodLogInfo: ILogInfo = customValues && customValues.getValueOrDefault(method.name) || info;
+            const methodLogInfo: ILogInfo = customValues && customValues.getOrDefault(method.name) || info;
 
             prototype[method.name] = (...args: any[]) => {
                 try {

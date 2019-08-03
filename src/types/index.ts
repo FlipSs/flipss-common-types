@@ -1,1 +1,1 @@
-export {Action, Func, Predicate, Constructor} from './internal';
+export {Action, Func, Predicate, TypeConstructor} from './internal';

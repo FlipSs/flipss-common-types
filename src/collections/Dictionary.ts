@@ -45,7 +45,7 @@ export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<T
         return this.map.get(key);
     }
 
-    public getValueOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
+    public getOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
         if (!this.containsKey(key)) {
             return defaultValue;
         }
@@ -69,6 +69,14 @@ export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<T
 
     public tryRemove(key: TKey): boolean {
         return this.map.delete(key);
+    }
+
+    public get(key: TKey): TValue {
+        if (!this.containsKey(key)) {
+            throw new Error('Item does not exists');
+        }
+
+        return this.map.get(key);
     }
 
     protected getValue(): IKeyValuePair<TKey, TValue>[] {

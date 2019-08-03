@@ -3,7 +3,6 @@ export * from './ObjectConverterBuilder';
 export * from './ObjectConverter';
 export * from './IValueIgnoreStrategyConstructor';
 export * from './IValueIgnoreStrategy';
-export * from './IReferenceObjectConstructor';
 export * from './IObjectConverterBuilder';
 export * from './IObjectConverter';
 export * from './IgnoreNullAndUndefinedValueIgnoreStrategy';

@@ -1,6 +1,33 @@
-import {IDisposable, using} from "../../../src/models/IDisposable";
+import {IDisposable, tryDispose, using} from "../../../src/models/internal";
 
 describe('IDisposable', () => {
+    describe('tryDispose', () => {
+        it('Should dispose when object has dispose method', () => {
+            const obj = new TestDisposable();
+
+            tryDispose(obj);
+
+            expect(obj.disposed).toBeTruthy();
+        });
+
+        it('Should not throw when object has dispose property', () => {
+            const obj = {
+                dispose: 17
+            };
+
+            expect(() => tryDispose(obj)).not.toThrow();
+        });
+
+        it('Should not throw when object is null or undefined', () => {
+            expect(() => tryDispose(null)).not.toThrow();
+            expect(() => tryDispose(undefined)).not.toThrow();
+        });
+
+        it('Should not throw when object is not disposable', () => {
+            expect(() => tryDispose(123)).not.toThrow();
+        });
+    });
+
     describe('using', () => {
         let disposable: TestDisposable;
 

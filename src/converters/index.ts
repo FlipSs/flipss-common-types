@@ -3,7 +3,6 @@ export {
     ObjectConverterTypedConvertiblePropertyNames,
     IObjectConverter,
     IObjectConverterBuilder,
-    IReferenceObjectConstructor,
     buildObjectConverter,
     buildObjectConverterUsingConstructor
 } from './internal';

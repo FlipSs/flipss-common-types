@@ -51,7 +51,7 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
     }
 
     public getValueOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
-        const storedValue = this.values.getValueOrDefault(key);
+        const storedValue = this.values.getOrDefault(key);
         if (TypeUtils.isNullOrUndefined(storedValue)) {
             return defaultValue;
         }
