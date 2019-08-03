@@ -1,5 +1,5 @@
 import {TimerState, TimeSpan} from "./internal";
-import {IDisposable} from "../models/internal";
+import {IDisposable} from "../common/internal";
 
 export interface ITimer extends IDisposable {
     getState(): TimerState;

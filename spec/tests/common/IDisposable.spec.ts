@@ -1,4 +1,4 @@
-import {IDisposable, tryDispose, using} from "../../../src/models/internal";
+import {IDisposable, tryDispose, using} from "../../../src/common/internal";
 
 describe('IDisposable', () => {
     describe('tryDispose', () => {

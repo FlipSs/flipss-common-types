@@ -1,6 +1,6 @@
 import {ISettingLoader, ISettingStorage} from "./internal";
 import {Argument} from "../utils/internal";
-import {ReplayObservable} from "../models/internal";
+import {ReplayObservable} from "../common/internal";
 
 export class SettingStorage<TSettings> extends ReplayObservable<TSettings> implements ISettingStorage<TSettings> {
     public constructor(private readonly loader: ISettingLoader<TSettings>) {

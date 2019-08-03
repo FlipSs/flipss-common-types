@@ -1,6 +1,6 @@
 import {ISettingObject, ISettingStorage} from "./internal";
 import {Argument, TypeUtils} from "../utils/internal";
-import {IDisposable, IValueObserver, Observable} from "../models/internal";
+import {IDisposable, IValueObserver, Observable} from "../common/internal";
 
 export abstract class DynamicSettingObject<TSettings, TStorageSettings> extends Observable<TSettings> implements ISettingObject<TSettings>, IValueObserver<TStorageSettings> {
     private readonly subscription: IDisposable;

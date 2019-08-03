@@ -2,7 +2,7 @@ import {IObjectConverterBuilder, ObjectConverterBuilder} from "./internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {Func} from "../types/internal";
 import {asEnumerable, IReadOnlyHashSet} from "../collections/internal";
-import {IConstructorWithoutParameters} from "../models/internal";
+import {IConstructorWithoutParameters} from "../common/internal";
 
 export function buildObjectConverterUsingConstructor<TSource, TTarget>(referenceObjectConstructor: IConstructorWithoutParameters<TTarget>): IObjectConverterBuilder<TSource, TTarget> {
     Argument.isNotNullOrUndefined(referenceObjectConstructor, 'referenceObjectConstructor');
