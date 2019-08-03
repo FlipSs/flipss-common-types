@@ -1,29 +1,33 @@
 import {ILogMessage, LogLevel, LogMessageFactory} from "../../../src/logs/internal";
 
 describe('LogMessageFactory', () => {
-    it('On string message', () => {
-        const logMessage: ILogMessage = {
-            message: 'test',
-            level: LogLevel.warn,
-            category: 'test',
-            data: undefined
-        };
-        expect(LogMessageFactory.create(logMessage.message, logMessage.category, logMessage.level, logMessage.data)).toEqual(logMessage);
-    });
+    describe('create', () => {
+        it('Should create valid log message from string', () => {
+            const validLogMessage: ILogMessage = {
+                message: 'test',
+                level: LogLevel.warn,
+                category: 'test',
+                data: undefined
+            };
 
-    it('On Error message', () => {
-        const error = new Error('test');
-        const data = {test: 'test'};
-        const logMessage: ILogMessage = {
-            message: error.message,
-            level: LogLevel.warn,
-            category: 'test',
-            data: {
-                stack: error.stack,
-                additionalData: data
-            }
-        };
+            expect(LogMessageFactory.create(validLogMessage.message, validLogMessage.category, validLogMessage.level, validLogMessage.data)).toEqual(validLogMessage);
+        });
 
-        expect(LogMessageFactory.create(error, logMessage.category, logMessage.level, data)).toEqual(logMessage);
+        it('Should create valid log message from error', () => {
+            const error = new Error('test');
+            const data = {test: 'test'};
+
+            const validLogMessage: ILogMessage = {
+                message: error.message,
+                level: LogLevel.warn,
+                category: 'test',
+                data: {
+                    stack: error.stack,
+                    additionalData: data
+                }
+            };
+
+            expect(LogMessageFactory.create(error, validLogMessage.category, validLogMessage.level, data)).toEqual(validLogMessage);
+        });
     });
 });

@@ -2,10 +2,10 @@ export {
     createLogger,
     ILogInfo,
     ILogMessage,
-    ClassLogInfo,
-    DisableMethodLogInfo,
+    LogInfo,
+    LogInfoDisable,
     ILogger,
     ILogSender,
     LogLevel,
-    MethodLogInfo
+    CustomLogInfo
 } from './internal';

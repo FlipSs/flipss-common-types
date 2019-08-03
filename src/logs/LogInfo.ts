@@ -2,20 +2,20 @@ import {TypeUtils} from "../utils/internal";
 import {ILogInfo, LoggableError, LogMessageFactory} from "./internal";
 import {asEnumerable, Dictionary, HashSet, IDictionary, IHashSet} from "../collections/internal";
 
-const customLogInfoDictionary: IDictionary<any, IDictionary<string, ILogInfo>> = new Dictionary<any, IDictionary<string, ILogInfo>>();
-const disabledLogInfoDictionary: IDictionary<any, IHashSet<string>> = new Dictionary<any, IHashSet<string>>();
+const customLogInfoDictionary: IDictionary<Object, IDictionary<string, ILogInfo>> = new Dictionary<Object, IDictionary<string, ILogInfo>>();
+const disabledLogInfoDictionary: IDictionary<Object, IHashSet<string>> = new Dictionary<Object, IHashSet<string>>();
 
-export function ClassLogInfo(info: ILogInfo) {
+export function LogInfo(info: ILogInfo) {
     return (target: Function) => {
         const prototype = target.prototype;
 
-        const excludedMethods = disabledLogInfoDictionary.getOrDefault(prototype) || new HashSet<string>();
-        excludedMethods.add('constructor');
+        const disabledProperties = disabledLogInfoDictionary.getOrDefault(prototype) || new HashSet<string>();
+        disabledProperties.add('constructor');
 
-        const customValues = customLogInfoDictionary.getOrDefault(prototype);
+        const customProperties = customLogInfoDictionary.getOrDefault(prototype);
 
-        const methods = asEnumerable(Object.getOwnPropertyNames(prototype))
-            .where(p => !excludedMethods.has(p))
+        const availableProperties = asEnumerable(Object.getOwnPropertyNames(prototype))
+            .where(p => !disabledProperties.has(p))
             .select(p => {
                 return {
                     descriptor: Object.getOwnPropertyDescriptor(prototype, p),
@@ -25,20 +25,22 @@ export function ClassLogInfo(info: ILogInfo) {
             .where(p => !TypeUtils.isNullOrUndefined(p.descriptor) && TypeUtils.is(p.descriptor.value, Function) && p.descriptor.writable)
             .toArray();
 
-        for (const method of methods) {
-            const methodValue = method.descriptor.value;
-            const methodLogInfo: ILogInfo = customValues && customValues.getOrDefault(method.name) || info;
+        for (const property of availableProperties) {
+            const propertyName = property.name;
+            const logInfo: ILogInfo = customProperties && customProperties.getOrDefault(propertyName) || info;
 
-            prototype[method.name] = (...args: any[]) => {
+            const propertyValue = property.descriptor.value;
+            prototype[propertyName] = (...args: any[]) => {
                 try {
-                    const result = methodValue.apply(this, args);
+                    const result = propertyValue.apply(this, args);
                     if (!TypeUtils.isNullOrUndefined(result)) {
                         return Promise.resolve(result).then(undefined, (reason) => {
                             if (TypeUtils.is(reason, LoggableError)) {
                                 return Promise.reject(reason);
                             }
 
-                            const logMessage = LogMessageFactory.create(reason, methodLogInfo.category, methodLogInfo.logLevel);
+                            const logMessage = LogMessageFactory.create(reason, logInfo.category, logInfo.logLevel);
+
                             return Promise.reject(new LoggableError(logMessage));
                         });
                     }
@@ -47,7 +49,7 @@ export function ClassLogInfo(info: ILogInfo) {
                         throw e;
                     }
 
-                    const logMessage = LogMessageFactory.create(e, methodLogInfo.category, methodLogInfo.logLevel);
+                    const logMessage = LogMessageFactory.create(e, logInfo.category, logInfo.logLevel);
 
                     throw new LoggableError(logMessage);
                 }
@@ -56,19 +58,15 @@ export function ClassLogInfo(info: ILogInfo) {
     }
 }
 
-export function DisableMethodLogInfo() {
-    return (target: any, propertyName: string) => {
-        disabledLogInfoDictionary
-            .getOrAdd(target, (target) => new HashSet<string>())
-            .add(propertyName);
-    }
+export function LogInfoDisable(): MethodDecorator {
+    return (target: Object, propertyName: string, descriptor: PropertyDescriptor) => {
+        disabledLogInfoDictionary.getOrAdd(target, target => new HashSet<string>()).add(propertyName);
+    };
 }
 
-export function MethodLogInfo(info: ILogInfo) {
-    return (target: any, propertyName: string) => {
-        customLogInfoDictionary
-            .getOrAdd(target, (t) => new Dictionary<string, ILogInfo>())
-            .set(propertyName, info);
+export function CustomLogInfo(info: ILogInfo) {
+    return (target: Object, propertyName: string, descriptor: PropertyDescriptor) => {
+        customLogInfoDictionary.getOrAdd(target, (t) => new Dictionary<string, ILogInfo>()).set(propertyName, info);
     }
 }
 
