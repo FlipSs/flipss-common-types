@@ -1,4 +1,4 @@
-import {IJsonSerializer, JsonSerializer} from "../json/internal";
+import {IJsonSerializer, JsonSerializer} from "../data/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {IStorageValue, IValueStorage} from "./internal";
 import {Collection, ICollection, IEnumerable} from "../collections/internal";
@@ -72,8 +72,10 @@ class LocalStorageJsonSerializer<T> extends JsonSerializer<IStorageValue<T>> {
                 }
 
                 if (k === 'createdOn') {
-                    return (v as Date).toUTCString();
+                    return new Date(v).toUTCString();
                 }
+
+                return v;
             },
             (k, v) => {
                 if (k === 'value') {
@@ -83,6 +85,8 @@ class LocalStorageJsonSerializer<T> extends JsonSerializer<IStorageValue<T>> {
                 if (k === 'createdOn') {
                     return new Date(v);
                 }
+
+                return v;
             });
     }
 }

@@ -1,5 +1,5 @@
-import {IJsonSerializer} from "./internal";
-import {Func} from "../types/internal";
+import {IJsonSerializer} from "../internal";
+import {Func} from "../../types/internal";
 
 export class JsonSerializer<T> implements IJsonSerializer<T> {
     public constructor(private readonly replacer?: Func<any, string, any>,
