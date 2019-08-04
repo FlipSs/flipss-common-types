@@ -79,7 +79,7 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
     }
 
     protected getValue(): T[] {
-        return Array.from(this.items);
+        return this.items;
     }
 
     private hasItem(item: T): boolean {

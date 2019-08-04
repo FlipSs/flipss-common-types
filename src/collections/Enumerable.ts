@@ -26,7 +26,9 @@ import {
 } from "./internal";
 
 export function asEnumerable<T>(items: T[]): IEnumerable<T> {
-    return new ArrayAsEnumerable(items);
+    Argument.isNotNullOrUndefined(items, 'items');
+
+    return new ArrayAsEnumerable([...items]);
 }
 
 export abstract class Enumerable<T> implements IEnumerable<T> {
@@ -71,7 +73,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return containsItem(this.value, value, equalityComparer);
     }
 
-    public getCount(predicate?: Predicate<T>): number {
+    public count(predicate?: Predicate<T>): number {
         if (TypeUtils.isNullOrUndefined(predicate)) {
             return this.value.length;
         }
@@ -112,12 +114,14 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         });
     }
 
-    public getFirst(): T {
+    public getFirst(predicate?: Predicate<T>): T {
         const value = this.value;
 
         ensureNotEmpty(value);
 
-        return getFirst(value);
+        return getFirstOrDefault(value, () => {
+            throw new Error('Item not found');
+        }, predicate);
     }
 
     public getFirstOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined {
@@ -127,17 +131,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
             return defaultValue;
         }
 
-        if (TypeUtils.isNullOrUndefined(predicate)) {
-            return getFirst(value);
-        }
-
-        for (const item of value) {
-            if (predicate(item)) {
-                return item;
-            }
-        }
-
-        return defaultValue;
+        return getFirstOrDefault(value, () => defaultValue, predicate);
     }
 
     public groupBy<TKey>(keySelector: Func<TKey, T>, comparer?: IEqualityComparer<TKey>): IEnumerable<IGrouping<TKey, T>> {
@@ -166,12 +160,14 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         });
     }
 
-    public getLast(): T {
+    public getLast(predicate?: Predicate<T>): T {
         const value = this.value;
 
         ensureNotEmpty(value);
 
-        return getLast(value);
+        return getLastOrDefault(value, () => {
+            throw new Error('Item not found');
+        }, predicate);
     }
 
     public getLastOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined {
@@ -181,18 +177,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
             return defaultValue;
         }
 
-        if (TypeUtils.isNullOrUndefined(predicate)) {
-            return getLast(value);
-        }
-
-        for (let i = getLastIndex(value); i >= 0; i--) {
-            const item = value[i];
-            if (predicate(item)) {
-                return item;
-            }
-        }
-
-        return defaultValue;
+        return getLastOrDefault(value, () => defaultValue, predicate);
     }
 
     public orderBy<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
@@ -376,12 +361,33 @@ function createDeferred<T>(valueFactory: Func<T[]>): IEnumerable<T> {
     return new DeferredEnumerable(valueFactory);
 }
 
-function getFirst<T>(value: T[]): T {
-    return value[0];
+function getFirstOrDefault<T>(value: T[], defaultValueFactory: Func<T>, predicate?: Predicate<T>): T {
+    if (TypeUtils.isNullOrUndefined(predicate)) {
+        return value[0];
+    }
+
+    for (const item of value) {
+        if (predicate(item)) {
+            return item;
+        }
+    }
+
+    return defaultValueFactory();
 }
 
-function getLast<T>(value: T[]): T {
-    return value[getLastIndex(value)];
+function getLastOrDefault<T>(value: T[], defaultValueFactory: Func<T>, predicate?: Predicate<T>): T {
+    if (TypeUtils.isNullOrUndefined(predicate)) {
+        return value[getLastIndex(value)];
+    }
+
+    for (let i = getLastIndex(value); i >= 0; i--) {
+        const item = value[i];
+        if (predicate(item)) {
+            return item;
+        }
+    }
+
+    return defaultValueFactory();
 }
 
 function getLastIndex<T>(value: T[]): number {

@@ -17,15 +17,15 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     getElementAtOrDefault(index: number, defaultValue?: T): T | undefined;
 
-    getCount(predicate?: Predicate<T>): number;
+    count(predicate?: Predicate<T>): number;
 
     any(predicate?: Predicate<T>): boolean;
 
     all(predicate: Predicate<T>): boolean;
 
-    getFirst(): T;
+    getFirst(predicate?: Predicate<T>): T;
 
-    getLast(): T;
+    getLast(predicate?: Predicate<T>): T;
 
     distinct(comparer?: IEqualityComparer<T>): IEnumerable<T>;
 

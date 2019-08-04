@@ -4,6 +4,7 @@ jasmine.getEnv().clearReporters();
 jasmine.getEnv().addReporter(new SpecReporter({
     customProcessors: [DisplayProcessor],
     spec: {
-        displayDuration: true
+        displayDuration: true,
+        displaySuccessful: false
     }
 }));
