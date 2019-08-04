@@ -1,25 +1,37 @@
-import {IEnumerable, IHashSet, ReadOnlyCollection} from "./internal";
+import {
+    containsItem,
+    getEqualityComparer,
+    IEnumerable,
+    IEqualityComparer,
+    IHashSet,
+    ReadOnlyCollection,
+    tryRemoveItem
+} from "./internal";
 import {Argument, TypeUtils} from "../utils/internal";
 
 export class HashSet<T> extends ReadOnlyCollection<T> implements IHashSet<T> {
-    private set: Set<T>;
+    private readonly comparer: IEqualityComparer<T>;
+    private items: T[];
 
-    public constructor(items?: T[]) {
+    public constructor(items?: T[], comparer?: IEqualityComparer<T>) {
         super();
 
-        this.set = new Set(items);
+        this.comparer = getEqualityComparer(comparer);
+        this.items = [];
+
+        if (!TypeUtils.isNullOrUndefined(items)) {
+            for (const item of items) {
+                this.tryAdd(item);
+            }
+        }
     }
 
     public get length(): number {
-        return this.set.size;
-    }
-
-    public add(value: T): void {
-        this.set.add(value);
+        return this.items.length;
     }
 
     public clear(): void {
-        this.set.clear();
+        this.items = [];
     }
 
     public exceptWith(other: IEnumerable<T>): void {
@@ -35,23 +47,42 @@ export class HashSet<T> extends ReadOnlyCollection<T> implements IHashSet<T> {
         }
     }
 
-    public has(value: T): boolean {
-        return this.set.has(value);
+    public has(item: T): boolean {
+        return this.hasItem(item);
     }
 
     public intersectWith(other: IEnumerable<T>): void {
         Argument.isNotNullOrUndefined(other, 'other');
 
         const otherItems = other.toArray();
+        if (TypeUtils.isNullOrUndefined(otherItems)) {
+            this.items = [];
 
-        this.set = new Set(otherItems && otherItems.filter(i => this.set.has(i)));
+            return;
+        }
+
+        this.items = otherItems.filter(i => this.hasItem(i));
     }
 
-    public tryRemove(value: T): boolean {
-        return this.set.delete(value);
+    public tryRemove(item: T): boolean {
+        return tryRemoveItem(this.items, i => this.hasItem(i));
+    }
+
+    public tryAdd(item: T): boolean {
+        if (this.hasItem(item)) {
+            return false;
+        }
+
+        this.items.push(item);
+
+        return true;
     }
 
     protected getValue(): T[] {
-        return Array.from(this.set);
+        return Array.from(this.items);
+    }
+
+    private hasItem(item: T): boolean {
+        return containsItem(this.items, item, this.comparer);
     }
 }

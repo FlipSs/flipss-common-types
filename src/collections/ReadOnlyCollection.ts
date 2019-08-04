@@ -7,3 +7,4 @@ export abstract class ReadOnlyCollection<T> extends Enumerable<T> implements IRe
 
     public abstract get length(): number;
 }
+

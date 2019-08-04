@@ -1,4 +1,4 @@
-import {ICollection, ReadOnlyCollection} from "./internal";
+import {ICollection, ReadOnlyCollection, tryRemoveItem} from "./internal";
 import {TypeUtils} from "../utils/internal";
 
 export class Collection<T> extends ReadOnlyCollection<T> implements ICollection<T> {
@@ -18,23 +18,16 @@ export class Collection<T> extends ReadOnlyCollection<T> implements ICollection<
         return this.items.length;
     }
 
-    public add(value: T): void {
-        this.items.push(value);
+    public add(item: T): void {
+        this.items.push(item);
     }
 
     public clear(): void {
         this.items = [];
     }
 
-    public tryRemove(value: T): boolean {
-        const itemIndex = this.items.findIndex(i => i === value);
-        if (itemIndex < 0) {
-            return false;
-        }
-
-        this.items.splice(itemIndex, 1);
-
-        return true;
+    public tryRemove(item: T): boolean {
+        return tryRemoveItem(this.items, i => i === item);
     }
 
     protected getValue(): T[] {

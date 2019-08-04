@@ -1,65 +1,89 @@
-import {Collection, IDictionary, IKeyValuePair, IReadOnlyCollection, ReadOnlyCollection} from "./internal";
+import {
+    Collection,
+    contains,
+    getEqualityComparer,
+    IDictionary,
+    IEqualityComparer,
+    IKeyValuePair,
+    IReadOnlyCollection,
+    ReadOnlyCollection,
+    tryRemoveItem
+} from "./internal";
 import {Func} from "../types/internal";
-import {Argument} from "../utils/internal";
+import {Argument, TypeUtils} from "../utils/internal";
 
 export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<TKey, TValue>> implements IDictionary<TKey, TValue> {
-    private readonly map: Map<TKey, TValue>;
+    private readonly comparer: IEqualityComparer<TKey>;
 
-    public constructor(items?: IKeyValuePair<TKey, TValue>[]) {
+    private items: IKeyValuePair<TKey, TValue>[];
+
+    public constructor(items?: IKeyValuePair<TKey, TValue>[], comparer?: IEqualityComparer<TKey>) {
         super();
 
-        this.map = new Map<TKey, TValue>(items && items.map(i => [i && i.key, i && i.value]));
+        this.comparer = getEqualityComparer(comparer);
+        this.items = items || [];
     }
 
     public get length(): number {
-        return this.map.size;
+        return this.items.length;
     }
 
     public get keys(): IReadOnlyCollection<TKey> {
-        return new Collection(Array.from(this.map.keys()));
+        return new Collection(this.items.map(i => i.key));
     }
 
     public get values(): IReadOnlyCollection<TValue> {
-        return new Collection(Array.from(this.map.values()));
+        return new Collection(this.items.map(i => i.value));
     }
 
     public clear(): void {
-        this.map.clear();
+        this.items = [];
     }
 
     public containsKey(key: TKey): boolean {
-        return this.map.has(key);
+        return contains(this.items, i => this.isMatch(i, key));
     }
 
     public getOrAdd(key: TKey, valueFactory: Func<TValue, TKey>): TValue {
         Argument.isNotNullOrUndefined(valueFactory, 'valueFactory');
 
-        if (!this.containsKey(key)) {
+        const item = this.find(key);
+        if (TypeUtils.isNullOrUndefined(item)) {
             const value = valueFactory(key);
 
-            this.set(key, value);
+            this.add(key, value);
 
             return value;
         }
 
-        return this.map.get(key);
+        return item.value;
     }
 
     public getOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
-        if (!this.containsKey(key)) {
+        const item = this.find(key);
+        if (TypeUtils.isNullOrUndefined(item)) {
             return defaultValue;
         }
 
-        return this.map.get(key);
+        return item.value;
     }
 
     public set(key: TKey, value: TValue): void {
-        this.map.set(key, value);
+        const index = this.findIndex(key);
+        if (index < 0) {
+            this.add(key, value);
+        }
+
+        this.items[index] = {
+            key,
+            value
+        };
     }
 
     public tryAdd(key: TKey, value: TValue): boolean {
-        if (!this.containsKey(key)) {
-            this.set(key, value);
+        const index = this.findIndex(key);
+        if (index < 0) {
+            this.add(key, value);
 
             return true;
         }
@@ -68,27 +92,38 @@ export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<T
     }
 
     public tryRemove(key: TKey): boolean {
-        return this.map.delete(key);
+        return tryRemoveItem(this.items, i => this.isMatch(i, key));
     }
 
     public get(key: TKey): TValue {
-        if (!this.containsKey(key)) {
+        const item = this.find(key);
+        if (TypeUtils.isNullOrUndefined(item)) {
             throw new Error('Item does not exists');
         }
 
-        return this.map.get(key);
+        return item.value;
     }
 
     protected getValue(): IKeyValuePair<TKey, TValue>[] {
-        const result: IKeyValuePair<TKey, TValue>[] = [];
+        return this.items;
+    }
 
-        this.map.forEach((v, k) => {
-            result.push({
-                key: k,
-                value: v
-            });
+    private add(key: TKey, value: TValue): void {
+        this.items.push({
+            key,
+            value
         });
+    }
 
-        return result;
+    private find(key: TKey): IKeyValuePair<TKey, TValue> {
+        return this.items.find(i => this.isMatch(i, key));
+    }
+
+    private findIndex(key: TKey): number {
+        return this.items.findIndex(i => this.isMatch(i, key));
+    }
+
+    private isMatch(item: IKeyValuePair<TKey, TValue>, key: TKey): boolean {
+        return this.comparer.equals(item.key, key);
     }
 }

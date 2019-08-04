@@ -14,12 +14,17 @@ export * from './IEnumerable';
 export * from './IKeyValuePair';
 
 export * from './sorting/IOrderedEnumerable';
-export * from './sorting/ISortItemSelector';
-export * from './sorting/SortItemSelector';
-export * from './sorting/AscendingSortItemSelector';
-export * from './sorting/DescendingSortItemSelector';
+export * from './sorting/ISortItemComparer';
+export * from './sorting/SortItemComparer';
+export * from './sorting/AscendingSortItemComparer';
+export * from './sorting/DescendingSortItemComparer';
 export * from './sorting/OrderedEnumerable';
-export * from './sorting/SelectedSortItem';
 
 export * from './grouping/Grouping';
 export * from './grouping/IGrouping';
+
+export * from './IEqualityComparer';
+export * from './DefaultEqualityComparer';
+export * from './helpers';
+export * from './sorting/DefaultComparer';
+export * from './sorting/IComparer';

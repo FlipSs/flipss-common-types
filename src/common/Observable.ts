@@ -21,11 +21,9 @@ export abstract class Observable<T> implements IObservable<T>, IDisposable {
     public subscribe(observer: Observer<T>): IDisposable {
         Argument.isNotNullOrUndefined(observer, 'observer');
 
-        if (this.observers.has(observer)) {
+        if (!this.observers.tryAdd(observer)) {
             throw new Error('Observer already subscribed');
         }
-
-        this.observers.add(observer);
 
         return new Subscription(() => this.unsubscribe(observer));
     }

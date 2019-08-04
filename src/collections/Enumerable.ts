@@ -1,16 +1,20 @@
 import {Action, Func, Predicate} from "../types/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {
-    AscendingSortItemSelector,
+    AscendingSortItemComparer,
     Collection,
+    containsItem,
     DeferredEnumerable,
-    DescendingSortItemSelector,
+    DescendingSortItemComparer,
     Dictionary,
+    getEqualityComparer,
     Grouping,
     HashSet,
     ICollection,
+    IComparer,
     IDictionary,
     IEnumerable,
+    IEqualityComparer,
     IGrouping,
     IHashSet,
     IKeyValuePair,
@@ -61,8 +65,10 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         });
     }
 
-    public contains(value: T): boolean {
-        return this.value.indexOf(value) >= 0;
+    public contains(value: T, comparer?: IEqualityComparer<T>): boolean {
+        const equalityComparer = getEqualityComparer(comparer);
+
+        return containsItem(this.value, value, equalityComparer);
     }
 
     public getCount(predicate?: Predicate<T>): number {
@@ -91,7 +97,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return value[index];
     }
 
-    public except(other: IEnumerable<T>): IEnumerable<T> {
+    public except(other: IEnumerable<T>, comparer?: IEqualityComparer<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(other, 'other');
 
         return createDeferred(() => {
@@ -100,9 +106,9 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
                 return this.value;
             }
 
-            const otherElementSet = new Set<T>(otherItems);
+            const equalityComparer = getEqualityComparer(comparer);
 
-            return this.value.filter(i => !otherElementSet.has(i));
+            return this.value.filter(item => !containsItem(otherItems, item, equalityComparer));
         });
     }
 
@@ -134,28 +140,29 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return defaultValue;
     }
 
-    public groupBy<TKey>(keySelector: Func<TKey, T>): IEnumerable<IGrouping<TKey, T>> {
+    public groupBy<TKey>(keySelector: Func<TKey, T>, comparer?: IEqualityComparer<TKey>): IEnumerable<IGrouping<TKey, T>> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
         return createDeferred(() => {
             const value = this.value;
 
-            const groupMap = new Map<TKey, T[]>();
+            const equalityComparer = getEqualityComparer(comparer);
+            const groupings: { key: TKey, value: T[] }[] = [];
             for (const item of value) {
                 const key = keySelector(item);
 
-                if (groupMap.has(key)) {
-                    groupMap.get(key).push(item);
+                const grouping = groupings.find(i => equalityComparer.equals(i.key, key));
+                if (TypeUtils.isNullOrUndefined(item)) {
+                    groupings.push({
+                        key: key,
+                        value: [item]
+                    })
                 } else {
-                    groupMap.set(key, [item]);
+                    grouping.value.push(item);
                 }
             }
 
-            const result = [];
-
-            groupMap.forEach((v, k) => result.push(new Grouping(k, v)));
-
-            return result;
+            return groupings.map(g => new Grouping(g.key, g.value));
         });
     }
 
@@ -188,18 +195,18 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return defaultValue;
     }
 
-    public orderBy<TKey>(keySelector: Func<TKey, T>): IOrderedEnumerable<T> {
+    public orderBy<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        const sortItemSelector = new AscendingSortItemSelector(keySelector);
+        const sortItemSelector = new AscendingSortItemComparer(keySelector, comparer);
 
         return new OrderedEnumerable(() => this.value, sortItemSelector);
     }
 
-    public orderByDescending<TKey>(keySelector: Func<TKey, T>): IOrderedEnumerable<T> {
+    public orderByDescending<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        const sortItemSelector = new DescendingSortItemSelector(keySelector);
+        const sortItemSelector = new DescendingSortItemComparer(keySelector, comparer);
 
         return new OrderedEnumerable(() => this.value, sortItemSelector);
     }
@@ -259,15 +266,15 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return this.toCollection();
     }
 
-    public toHashSet(): IHashSet<T> {
-        return new HashSet(this.value);
+    public toHashSet(comparer?: IEqualityComparer<T>): IHashSet<T> {
+        return new HashSet(this.value, comparer);
     }
 
-    public toReadOnlyHashSet(): IReadOnlyHashSet<T> {
-        return this.toHashSet();
+    public toReadOnlyHashSet(comparer?: IEqualityComparer<T>): IReadOnlyHashSet<T> {
+        return this.toHashSet(comparer);
     }
 
-    public toDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>): IDictionary<TKey, TValue> {
+    public toDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IDictionary<TKey, TValue> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
         Argument.isNotNullOrUndefined(valueSelector, 'valueSelector');
 
@@ -278,11 +285,11 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
             };
         });
 
-        return new Dictionary(keyValuePairs);
+        return new Dictionary(keyValuePairs, comparer);
     }
 
-    public toReadOnlyDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>): IReadOnlyDictionary<TKey, TValue> {
-        return this.toDictionary(keySelector, valueSelector);
+    public toReadOnlyDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IReadOnlyDictionary<TKey, TValue> {
+        return this.toDictionary(keySelector, valueSelector, comparer);
     }
 
     public skip(count: number): IEnumerable<T> {
@@ -291,6 +298,65 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
 
     public take(count: number): IEnumerable<T> {
         return createDeferred(() => this.value.slice(0, count - 1));
+    }
+
+    public average(valueProvider: Func<number, T>): number {
+        Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
+
+        const value = this.value;
+
+        return calculateSum(value, valueProvider) / value.length;
+    }
+
+    public min(valueProvider: Func<number, T>): number {
+        Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
+
+        const value = this.value;
+
+        return findBestMatchingValue(value, valueProvider, (n, o) => n < o);
+    }
+
+    public sum(valueProvider: Func<number, T>): number {
+        Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
+
+        const value = this.value;
+
+        return calculateSum(value, valueProvider);
+    }
+
+    public max(valueProvider: Func<number, T>): number {
+        Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
+
+        const value = this.value;
+
+        return findBestMatchingValue(value, valueProvider, (n, o) => n > o);
+    }
+
+    public distinct(comparer?: IEqualityComparer<T>): IEnumerable<T> {
+        return createDeferred(() => {
+            const value = this.value;
+
+            const equalityComparer = getEqualityComparer(comparer);
+            const result: T[] = [];
+            for (const item of value) {
+                if (!containsItem(result, item, equalityComparer)) {
+                    result.push(item);
+                }
+            }
+
+            return result;
+        });
+    }
+
+    public defaultIfEmpty(defaultValue: T): IEnumerable<T> {
+        return createDeferred(() => {
+            const value = this.value;
+            if (isEmpty(value)) {
+                return [defaultValue];
+            }
+
+            return value;
+        });
     }
 
     protected abstract getValue(): T[];
@@ -310,28 +376,53 @@ function createDeferred<T>(valueFactory: Func<T[]>): IEnumerable<T> {
     return new DeferredEnumerable(valueFactory);
 }
 
-function getFirst<T>(value: T[]) {
+function getFirst<T>(value: T[]): T {
     return value[0];
 }
 
-function getLast<T>(value: T[]) {
+function getLast<T>(value: T[]): T {
     return value[getLastIndex(value)];
 }
 
-function getLastIndex<T>(value: T[]) {
+function getLastIndex<T>(value: T[]): number {
     return value.length - 1;
 }
 
-function isIndexOutOfRange<T>(value: T[], index: number) {
+function isIndexOutOfRange<T>(value: T[], index: number): boolean {
     return index < 0 || index >= value.length;
 }
 
-function ensureNotEmpty<T>(value: T[]) {
+function findBestMatchingValue<T, TValue>(array: T[], valueProvider: Func<TValue, T>, predicate: Predicate<TValue, TValue>): TValue {
+    ensureNotEmpty(array);
+
+    let result = valueProvider(array[0]);
+    for (let i = 1; i < array.length; i++) {
+        const item = valueProvider(array[i]);
+        if (predicate(item, result)) {
+            result = item;
+        }
+    }
+
+    return result;
+}
+
+function calculateSum<T>(array: T[], valueProvider: Func<number, T>): number {
+    ensureNotEmpty(array);
+
+    let result = 0;
+    for (const item of array) {
+        result += valueProvider(item);
+    }
+
+    return result;
+}
+
+function ensureNotEmpty<T>(value: T[]): void {
     if (isEmpty(value)) {
         throw new RangeError('Enumerable is empty.');
     }
 }
 
-function isEmpty<T>(value: T[]) {
+function isEmpty<T>(value: T[]): boolean {
     return value.length === 0;
 }

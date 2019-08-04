@@ -9,10 +9,10 @@ export function LogInfo(info: ILogInfo) {
     return (target: Function) => {
         const prototype = target.prototype;
 
-        const disabledProperties = disabledLogInfoDictionary.getOrDefault(prototype) || new HashSet<string>();
-        disabledProperties.add('constructor');
+        const disabledProperties = disabledLogInfoDictionary.getOrDefault(prototype, new HashSet<string>());
+        disabledProperties.tryAdd('constructor');
 
-        const customProperties = customLogInfoDictionary.getOrDefault(prototype);
+        const customProperties = customLogInfoDictionary.getOrDefault(prototype, new Dictionary<string, ILogInfo>());
 
         const availableProperties = asEnumerable(Object.getOwnPropertyNames(prototype))
             .where(p => !disabledProperties.has(p))
@@ -27,7 +27,7 @@ export function LogInfo(info: ILogInfo) {
 
         for (const property of availableProperties) {
             const propertyName = property.name;
-            const logInfo: ILogInfo = customProperties && customProperties.getOrDefault(propertyName) || info;
+            const logInfo: ILogInfo = customProperties.getOrDefault(propertyName, info);
 
             const propertyValue = property.descriptor.value;
             prototype[propertyName] = (...args: any[]) => {
@@ -60,7 +60,7 @@ export function LogInfo(info: ILogInfo) {
 
 export function LogInfoDisable(): MethodDecorator {
     return (target: Object, propertyName: string, descriptor: PropertyDescriptor) => {
-        disabledLogInfoDictionary.getOrAdd(target, target => new HashSet<string>()).add(propertyName);
+        disabledLogInfoDictionary.getOrAdd(target, target => new HashSet<string>()).tryAdd(propertyName);
     };
 }
 

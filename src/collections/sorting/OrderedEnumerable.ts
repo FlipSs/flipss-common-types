@@ -1,38 +1,38 @@
 import {Func} from "../../types/internal";
 import {
-    AscendingSortItemSelector,
+    AscendingSortItemComparer,
     DeferredEnumerable,
-    DescendingSortItemSelector,
+    DescendingSortItemComparer,
+    IComparer,
     IOrderedEnumerable,
-    ISortItemSelector,
-    SelectedSortItem
+    ISortItemComparer
 } from "../internal";
 import {Argument, TypeUtils} from "../../utils/internal";
 
 export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrderedEnumerable<T> {
-    private readonly selectors: ISortItemSelector<T>[];
+    private readonly comparerArray: ISortItemComparer<T>[];
 
     public constructor(valueFactory: Func<T[]>,
-                       ...selectors: ISortItemSelector<T>[]) {
+                       ...selectors: ISortItemComparer<T>[]) {
         super(valueFactory);
 
-        this.selectors = selectors;
+        this.comparerArray = selectors;
     }
 
-    public thenBy<TKey>(keySelector: Func<TKey, T>): IOrderedEnumerable<T> {
+    public thenBy<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        const newSelector = new AscendingSortItemSelector(keySelector);
+        const sortItemComparer = new AscendingSortItemComparer(keySelector, comparer);
 
-        return new OrderedEnumerable(super.getValue, ...this.selectors, newSelector);
+        return new OrderedEnumerable(super.getValue, ...this.comparerArray, sortItemComparer);
     }
 
-    public thenByDescending<TKey>(keySelector: Func<TKey, T>): IOrderedEnumerable<T> {
+    public thenByDescending<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        const newSelector = new DescendingSortItemSelector(keySelector);
+        const sortItemComparer = new DescendingSortItemComparer(keySelector, comparer);
 
-        return new OrderedEnumerable(super.getValue, ...this.selectors, newSelector);
+        return new OrderedEnumerable(super.getValue, ...this.comparerArray, sortItemComparer);
     }
 
     protected getValue(): T[] {
@@ -42,14 +42,14 @@ export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrde
         }
 
         return value.sort((left, right) => {
-            for (const selector of this.selectors) {
-                const selectedItem = selector.select(left, right);
-                if (selectedItem != SelectedSortItem.none) {
-                    return selectedItem;
+            for (const comparer of this.comparerArray) {
+                const compareResult = comparer.compare(left, right);
+                if (compareResult !== 0) {
+                    return compareResult;
                 }
             }
 
-            return SelectedSortItem.none;
+            return 0;
         });
     }
 }

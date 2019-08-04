@@ -12,5 +12,7 @@ export {
     Collection,
     HashSet,
     Dictionary,
-    asEnumerable
+    asEnumerable,
+    IEqualityComparer,
+    IComparer
 } from './internal';
