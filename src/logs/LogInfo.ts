@@ -1,6 +1,6 @@
 import {TypeUtils} from "../utils/internal";
 import {ILogInfo, LoggableError, LogMessageFactory} from "./internal";
-import {asEnumerable, Dictionary, Set, IDictionary, ISet} from "../collections/internal";
+import {asEnumerable, Dictionary, IDictionary, ISet, Set} from "../collections/internal";
 
 const customLogInfoDictionary: IDictionary<Object, IDictionary<string, ILogInfo>> = new Dictionary<Object, IDictionary<string, ILogInfo>>();
 const disabledLogInfoDictionary: IDictionary<Object, ISet<string>> = new Dictionary<Object, ISet<string>>();
