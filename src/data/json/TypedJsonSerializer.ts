@@ -1,17 +1,15 @@
 import {ITypedJsonSerializer, JsonSerializer} from "../internal";
-import {buildObjectConverterUsingConstructor, IObjectConverter} from "../../converters/internal";
-import {IConstructorWithoutParameters} from "../../common/internal";
+import {IObjectConverter} from "../../converters/internal";
 import {Func} from "../../types/internal";
+import {Argument} from "../../utils/internal";
 
 export class TypedJsonSerializer<T> extends JsonSerializer implements ITypedJsonSerializer<T> {
-    private readonly converter: IObjectConverter<any, T>;
-
-    public constructor(typeConstructor: IConstructorWithoutParameters<T>,
+    public constructor(private readonly converter: IObjectConverter<any, T>,
                        replacer?: Func<any, string, any>,
                        reviver?: Func<any, string, any>) {
         super(replacer, reviver);
 
-        this.converter = buildObjectConverterUsingConstructor(typeConstructor).useDirectPropertyTransferring().create();
+        Argument.isNotNullOrUndefined(this.converter, 'converter');
     }
 
     public deserialize(json: string): T {
