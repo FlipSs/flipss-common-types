@@ -1,1 +1,1 @@
-export {IJsonSerializer, JsonSerializer} from './internal';
+export {IJsonSerializer, JsonSerializer, TypedJsonSerializer, ITypedJsonSerializer} from './internal';

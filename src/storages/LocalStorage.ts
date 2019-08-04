@@ -10,16 +10,16 @@ export function isLocalStorageSupported(): boolean {
 export class LocalStorage<T> implements IValueStorage<T> {
     private static readonly storageCollection: ICollection<LocalStorage<any>> = new Collection<LocalStorage<any>>();
 
-    private readonly serializer: IJsonSerializer<IStorageValue<T>>;
+    private readonly serializer: LocalStorageJsonSerializer<T>;
 
-    public constructor(private readonly key: string, valueSerializer?: IJsonSerializer<T>) {
+    public constructor(private readonly key: string, valueSerializer?: IJsonSerializer) {
         if (!isLocalStorageSupported()) {
             throw new Error('Local storage is not supported.');
         }
 
         Argument.isNotNullOrEmpty(key, 'key');
 
-        this.serializer = new LocalStorageJsonSerializer<T>(valueSerializer || new JsonSerializer<T>());
+        this.serializer = new LocalStorageJsonSerializer<T>(valueSerializer);
 
         LocalStorage.storageCollection.add(this);
     }
@@ -64,29 +64,35 @@ export class LocalStorage<T> implements IValueStorage<T> {
     }
 }
 
-class LocalStorageJsonSerializer<T> extends JsonSerializer<IStorageValue<T>> {
-    public constructor(valueSerializer: IJsonSerializer<T>) {
-        super((k, v) => {
-                if (k === 'value') {
-                    return valueSerializer.serialize(v);
-                }
+class LocalStorageJsonSerializer<T> extends JsonSerializer {
+    private readonly valueSerializer: IJsonSerializer;
 
-                if (k === 'createdOn') {
-                    return new Date(v).toUTCString();
-                }
+    public constructor(valueSerializer?: IJsonSerializer) {
+        super();
 
-                return v;
-            },
-            (k, v) => {
-                if (k === 'value') {
-                    return valueSerializer.deserialize(v);
-                }
-
-                if (k === 'createdOn') {
-                    return new Date(v);
-                }
-
-                return v;
-            });
+        this.valueSerializer = valueSerializer || new JsonSerializer();
     }
+
+    public serialize(storedValue: IStorageValue<T>): string {
+        const serializableStoredValue: ISerializableStoredValue = {
+            createdOn: storedValue.createdOn.toJSON(),
+            value: this.valueSerializer.serialize(storedValue.value)
+        };
+
+        return super.serialize(serializableStoredValue);
+    }
+
+    public deserialize(json: string): IStorageValue<T> {
+        const serializableStoredValue = super.deserialize(json) as ISerializableStoredValue;
+
+        return {
+            createdOn: new Date(serializableStoredValue.createdOn),
+            value: this.valueSerializer.deserialize(serializableStoredValue.value)
+        };
+    }
+}
+
+interface ISerializableStoredValue {
+    createdOn: string;
+    value: string;
 }
