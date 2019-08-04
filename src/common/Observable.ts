@@ -1,13 +1,13 @@
-import {HashSet, IHashSet} from "../collections/internal";
+import {Set, ISet} from "../collections/internal";
 import {Action} from "../types/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {IDisposable, IErrorObserver, IObservable, IValueObserver, Observer} from "./internal";
 
 export abstract class Observable<T> implements IObservable<T>, IDisposable {
-    private readonly observers: IHashSet<Observer<T>>;
+    private readonly observers: ISet<Observer<T>>;
 
     protected constructor() {
-        this.observers = new HashSet<IValueObserver<Readonly<T>>>();
+        this.observers = new Set<IValueObserver<Readonly<T>>>();
     }
 
     protected static isValueObserver<T>(observer: Observer<T>): observer is IValueObserver<T> {

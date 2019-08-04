@@ -1,5 +1,5 @@
 import {Argument} from "../../../src/utils/internal";
-import {Collection} from "../../../src/collections/internal";
+import {List} from "../../../src/collections/internal";
 
 describe('Argument', () => {
 
@@ -71,7 +71,7 @@ describe('Argument', () => {
         });
 
         it('Should throw error on empty collection', () => {
-            expect(() => Argument.isNotNullOrEmpty(new Collection(), parameterName))
+            expect(() => Argument.isNotNullOrEmpty(new List(), parameterName))
                 .toThrow();
         });
 
@@ -86,7 +86,7 @@ describe('Argument', () => {
         });
 
         it('Should not throw error on non empty collection', () => {
-            expect(() => Argument.isNotNullOrEmpty(new Collection([5]), parameterName))
+            expect(() => Argument.isNotNullOrEmpty(new List([5]), parameterName))
                 .not.toThrow();
         });
     });

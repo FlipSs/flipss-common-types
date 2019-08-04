@@ -5,12 +5,12 @@ import {
     IValueIgnoreStrategy,
     ObjectConverter
 } from "./internal";
-import {IReadOnlyHashSet} from "../collections/internal";
+import {IReadOnlySet} from "../collections/internal";
 import {TypeUtils} from "../utils/internal";
 
 export class DirectPropertyTransferringObjectConverter<TSource, TTarget> extends ObjectConverter<TSource, TTarget> {
     public constructor(contextFactory: IObjectConverterContextFactory<TSource, TTarget>,
-                       private readonly excludedPropertyNames: IReadOnlyHashSet<string>) {
+                       private readonly excludedPropertyNames: IReadOnlySet<string>) {
         super(contextFactory);
     }
 

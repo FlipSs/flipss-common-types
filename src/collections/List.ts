@@ -1,7 +1,7 @@
-import {ICollection, ReadOnlyCollection, tryRemoveItem} from "./internal";
+import {IList, ReadOnlyCollection, tryRemoveItem} from "./internal";
 import {TypeUtils} from "../utils/internal";
 
-export class Collection<T> extends ReadOnlyCollection<T> implements ICollection<T> {
+export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
     private items: T[];
 
     public constructor(items?: T[]) {

@@ -1,14 +1,14 @@
 import {IJsonSerializer, JsonSerializer} from "../data/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {IStorageValue, IValueStorage} from "./internal";
-import {Collection, ICollection, IEnumerable} from "../collections/internal";
+import {IEnumerable, IList, List} from "../collections/internal";
 
 export function isLocalStorageSupported(): boolean {
     return !TypeUtils.isNullOrUndefined(localStorage);
 }
 
 export class LocalStorage<T> implements IValueStorage<T> {
-    private static readonly storageCollection: ICollection<LocalStorage<any>> = new Collection<LocalStorage<any>>();
+    private static readonly storageList: IList<LocalStorage<any>> = new List<LocalStorage<any>>();
 
     private readonly serializer: LocalStorageJsonSerializer<T>;
 
@@ -21,15 +21,15 @@ export class LocalStorage<T> implements IValueStorage<T> {
 
         this.serializer = new LocalStorageJsonSerializer<T>(valueSerializer);
 
-        LocalStorage.storageCollection.add(this);
+        LocalStorage.storageList.add(this);
     }
 
     public static clearAll(till?: Date): void {
         let toClear: IEnumerable<LocalStorage<any>>;
         if (TypeUtils.isNullOrUndefined(till)) {
-            toClear = this.storageCollection;
+            toClear = this.storageList;
         } else {
-            toClear = this.storageCollection.where(s => {
+            toClear = this.storageList.where(s => {
                 const value = s.get();
 
                 return value && value.createdOn <= till;

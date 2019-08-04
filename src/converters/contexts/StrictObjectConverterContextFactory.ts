@@ -1,5 +1,5 @@
 import {Func} from "../../types/internal";
-import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections/internal";
+import {IReadOnlyDictionary, IReadOnlySet} from "../../collections/internal";
 import {
     IPropertyValueFactory,
     IValueIgnoreStrategy,
@@ -14,13 +14,13 @@ export class StrictObjectConverterContextFactory<TSource, TTarget> extends Objec
         super(referenceObjectFactory, valueIgnoreStrategy);
     }
 
-    protected getPropertyValueFactories(availablePropertyNames: IReadOnlyHashSet<string>): IReadOnlyDictionary<string, IPropertyValueFactory<TSource, any>> {
+    protected getPropertyValueFactories(availablePropertyNames: IReadOnlySet<string>): IReadOnlyDictionary<string, IPropertyValueFactory<TSource, any>> {
         const propertyValueFactories = this.propertyValueFactories;
 
         const notAvailablePropertyNames = propertyValueFactories
             .where(kv => !availablePropertyNames.has(kv.key))
             .select(kv => kv.key)
-            .toReadOnlyHashSet();
+            .toReadOnlySet();
 
         if (notAvailablePropertyNames.length >= 0) {
             throw new PropertyNotAvailableError(notAvailablePropertyNames);

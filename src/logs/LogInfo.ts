@@ -1,15 +1,15 @@
 import {TypeUtils} from "../utils/internal";
 import {ILogInfo, LoggableError, LogMessageFactory} from "./internal";
-import {asEnumerable, Dictionary, HashSet, IDictionary, IHashSet} from "../collections/internal";
+import {asEnumerable, Dictionary, Set, IDictionary, ISet} from "../collections/internal";
 
 const customLogInfoDictionary: IDictionary<Object, IDictionary<string, ILogInfo>> = new Dictionary<Object, IDictionary<string, ILogInfo>>();
-const disabledLogInfoDictionary: IDictionary<Object, IHashSet<string>> = new Dictionary<Object, IHashSet<string>>();
+const disabledLogInfoDictionary: IDictionary<Object, ISet<string>> = new Dictionary<Object, ISet<string>>();
 
 export function LogInfo(info: ILogInfo) {
     return (target: Function) => {
         const prototype = target.prototype;
 
-        const disabledProperties = disabledLogInfoDictionary.getOrDefault(prototype, new HashSet<string>());
+        const disabledProperties = disabledLogInfoDictionary.getOrDefault(prototype, new Set<string>());
         disabledProperties.tryAdd('constructor');
 
         const customProperties = customLogInfoDictionary.getOrDefault(prototype, new Dictionary<string, ILogInfo>());
@@ -60,7 +60,7 @@ export function LogInfo(info: ILogInfo) {
 
 export function LogInfoDisable(): MethodDecorator {
     return (target: Object, propertyName: string, descriptor: PropertyDescriptor) => {
-        disabledLogInfoDictionary.getOrAdd(target, target => new HashSet<string>()).tryAdd(propertyName);
+        disabledLogInfoDictionary.getOrAdd(target, target => new Set<string>()).tryAdd(propertyName);
     };
 }
 

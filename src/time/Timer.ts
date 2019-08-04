@@ -1,4 +1,4 @@
-import {Collection, ICollection} from "../collections/internal";
+import {List, IList} from "../collections/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {ITimer, TimerState, TimeSpan} from "./internal";
 import {Action} from "../types/internal";
@@ -6,11 +6,11 @@ import {Action} from "../types/internal";
 const intervalPeriod = 250;
 
 class TimerManager {
-    private readonly timers: ICollection<Timer>;
+    private readonly timers: IList<Timer>;
     private intervalId: number;
 
     public constructor() {
-        this.timers = new Collection<Timer>();
+        this.timers = new List<Timer>();
     }
 
     private get isIntervalSet(): boolean {

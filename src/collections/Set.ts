@@ -3,13 +3,13 @@ import {
     getEqualityComparer,
     IEnumerable,
     IEqualityComparer,
-    IHashSet,
+    ISet,
     ReadOnlyCollection,
     tryRemoveItem
 } from "./internal";
 import {Argument, TypeUtils} from "../utils/internal";
 
-export class HashSet<T> extends ReadOnlyCollection<T> implements IHashSet<T> {
+export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
     private readonly comparer: IEqualityComparer<T>;
     private items: T[];
 

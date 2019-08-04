@@ -18,7 +18,7 @@ import {
     TransferredPropertyValueFactory
 } from "./internal";
 import {Func} from "../types/internal";
-import {asEnumerable, Dictionary, HashSet, IDictionary} from "../collections/internal";
+import {asEnumerable, Dictionary, Set, IDictionary} from "../collections/internal";
 import {Argument} from "../utils/internal";
 
 export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverterBuilder<TSource, TTarget> {
@@ -77,7 +77,7 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
     }
 
     public useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[]): IObjectConverterBuilder<TSource, TTarget> {
-        const excludedPropertySet = excludedProperties && asEnumerable(excludedProperties).select(p => p as string).toReadOnlyHashSet() || new HashSet<string>();
+        const excludedPropertySet = excludedProperties && asEnumerable(excludedProperties).select(p => p as string).toReadOnlySet() || new Set<string>();
 
         this.converterFactory = f => new DirectPropertyTransferringObjectConverter(f, excludedPropertySet);
 

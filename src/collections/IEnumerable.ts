@@ -1,15 +1,15 @@
 import {Action, Func, Predicate} from "../types/internal";
 import {
-    ICollection,
     IComparer,
     IDictionary,
     IEqualityComparer,
     IGrouping,
-    IHashSet,
+    IList,
     IOrderedEnumerable,
-    IReadOnlyCollection,
     IReadOnlyDictionary,
-    IReadOnlyHashSet
+    IReadOnlyList,
+    IReadOnlySet,
+    ISet
 } from "./internal";
 
 export interface IEnumerable<T> extends Iterable<T> {
@@ -75,13 +75,13 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     toArray(): T[];
 
-    toCollection(): ICollection<T>;
+    toList(): IList<T>;
 
-    toReadOnlyCollection(): IReadOnlyCollection<T>;
+    toReadOnlyList(): IReadOnlyList<T>;
 
-    toHashSet(comparer?: IEqualityComparer<T>): IHashSet<T>;
+    toSet(comparer?: IEqualityComparer<T>): ISet<T>;
 
-    toReadOnlyHashSet(comparer?: IEqualityComparer<T>): IReadOnlyHashSet<T>;
+    toReadOnlySet(comparer?: IEqualityComparer<T>): IReadOnlySet<T>;
 
     toDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IDictionary<TKey, TValue>;
 

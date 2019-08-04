@@ -8,7 +8,7 @@ import {
 } from "../internal";
 import {Func} from "../../types/internal";
 import {TypeUtils} from "../../utils";
-import {IReadOnlyDictionary, IReadOnlyHashSet} from "../../collections/internal";
+import {IReadOnlyDictionary, IReadOnlySet} from "../../collections/internal";
 
 export abstract class ObjectConverterContextFactory<TSource, TTarget> implements IObjectConverterContextFactory<TSource, TTarget> {
     protected constructor(private readonly referenceObjectFactory: Func<TTarget>,
@@ -31,5 +31,5 @@ export abstract class ObjectConverterContextFactory<TSource, TTarget> implements
         }
     }
 
-    protected abstract getPropertyValueFactories(availablePropertyNames: IReadOnlyHashSet<string>): IReadOnlyDictionary<string, IPropertyValueFactory<TSource, any>>;
+    protected abstract getPropertyValueFactories(availablePropertyNames: IReadOnlySet<string>): IReadOnlyDictionary<string, IPropertyValueFactory<TSource, any>>;
 }

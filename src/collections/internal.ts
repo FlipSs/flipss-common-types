@@ -1,15 +1,15 @@
 export * from './Enumerable';
 export * from './ReadOnlyCollection';
 export * from './Dictionary';
-export * from './HashSet';
+export * from './Set';
 export * from './DeferredEnumerable';
-export * from './IReadOnlyHashSet';
+export * from './IReadOnlySet';
 export * from './IReadOnlyCollection';
-export * from './ICollection';
+export * from './IList';
 export * from './IReadOnlyDictionary';
 export * from './IDictionary';
-export * from './IHashSet';
-export * from './Collection';
+export * from './ISet';
+export * from './List';
 export * from './IEnumerable';
 export * from './IKeyValuePair';
 
@@ -28,3 +28,4 @@ export * from './DefaultEqualityComparer';
 export * from './helpers';
 export * from './sorting/DefaultComparer';
 export * from './sorting/IComparer';
+export * from './IReadOnlyList';

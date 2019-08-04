@@ -1,18 +1,19 @@
 export {
     IEnumerable,
-    ICollection,
+    IList,
     IReadOnlyCollection,
     IGrouping,
     IOrderedEnumerable,
-    IHashSet,
-    IReadOnlyHashSet,
+    ISet,
+    IReadOnlySet,
     IKeyValuePair,
     IReadOnlyDictionary,
     IDictionary,
-    Collection,
-    HashSet,
+    List,
+    Set,
     Dictionary,
     asEnumerable,
     IEqualityComparer,
-    IComparer
+    IComparer,
+    IReadOnlyList
 } from './internal';

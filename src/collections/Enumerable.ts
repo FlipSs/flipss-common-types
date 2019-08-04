@@ -2,27 +2,27 @@ import {Action, Func, Predicate} from "../types/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {
     AscendingSortItemComparer,
-    Collection,
     containsItem,
     DeferredEnumerable,
     DescendingSortItemComparer,
     Dictionary,
     getEqualityComparer,
     Grouping,
-    HashSet,
-    ICollection,
     IComparer,
     IDictionary,
     IEnumerable,
     IEqualityComparer,
     IGrouping,
-    IHashSet,
     IKeyValuePair,
+    IList,
     IOrderedEnumerable,
-    IReadOnlyCollection,
     IReadOnlyDictionary,
-    IReadOnlyHashSet,
-    OrderedEnumerable
+    IReadOnlyList,
+    IReadOnlySet,
+    ISet,
+    List,
+    OrderedEnumerable,
+    Set
 } from "./internal";
 
 export function asEnumerable<T>(items: T[]): IEnumerable<T> {
@@ -258,20 +258,20 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return createDeferred(() => this.value.reverse());
     }
 
-    public toCollection(): ICollection<T> {
-        return new Collection(this.value);
+    public toList(): IList<T> {
+        return new List(this.value);
     }
 
-    public toReadOnlyCollection(): IReadOnlyCollection<T> {
-        return this.toCollection();
+    public toReadOnlyList(): IReadOnlyList<T> {
+        return this.toList();
     }
 
-    public toHashSet(comparer?: IEqualityComparer<T>): IHashSet<T> {
-        return new HashSet(this.value, comparer);
+    public toSet(comparer?: IEqualityComparer<T>): ISet<T> {
+        return new Set(this.value, comparer);
     }
 
-    public toReadOnlyHashSet(comparer?: IEqualityComparer<T>): IReadOnlyHashSet<T> {
-        return this.toHashSet(comparer);
+    public toReadOnlySet(comparer?: IEqualityComparer<T>): IReadOnlySet<T> {
+        return this.toSet(comparer);
     }
 
     public toDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IDictionary<TKey, TValue> {

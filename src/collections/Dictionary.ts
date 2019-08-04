@@ -1,11 +1,9 @@
 import {
-    Collection,
     contains,
     getEqualityComparer,
     IDictionary,
     IEqualityComparer,
     IKeyValuePair,
-    IReadOnlyCollection,
     ReadOnlyCollection,
     tryRemoveItem
 } from "./internal";
@@ -28,12 +26,12 @@ export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<T
         return this.items.length;
     }
 
-    public get keys(): IReadOnlyCollection<TKey> {
-        return new Collection(this.items.map(i => i.key));
+    public get keys(): ReadonlyArray<TKey> {
+        return this.items.map(i => i.key);
     }
 
-    public get values(): IReadOnlyCollection<TValue> {
-        return new Collection(this.items.map(i => i.value));
+    public get values(): ReadonlyArray<TValue> {
+        return this.items.map(i => i.value);
     }
 
     public clear(): void {

@@ -1,8 +1,8 @@
-import {IReadOnlyHashSet} from "../../collections/internal";
+import {IReadOnlySet} from "../../collections/internal";
 import {Argument} from "../../utils/internal";
 
 export class PropertyNotAvailableError extends Error {
-    public constructor(private readonly propertyNames: IReadOnlyHashSet<string>) {
+    public constructor(private readonly propertyNames: IReadOnlySet<string>) {
         super('Some properties not available.');
 
         Argument.isNotNullOrEmpty(propertyNames, 'propertyNames');
@@ -12,7 +12,7 @@ export class PropertyNotAvailableError extends Error {
         this.name = 'PropertyNotAvailableError';
     }
 
-    public get notAvailablePropertyNames(): IReadOnlyHashSet<string> {
+    public get notAvailablePropertyNames(): IReadOnlySet<string> {
         return this.propertyNames;
     }
 }
