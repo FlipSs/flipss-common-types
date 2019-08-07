@@ -5,8 +5,8 @@ export function getEqualityComparer<T>(comparer?: IEqualityComparer<T>): IEquali
     return comparer || new DefaultEqualityComparer<T>();
 }
 
-export function containsItem<T>(array: T[], item: T, equalityComparer: IEqualityComparer<T>): boolean {
-    return contains(array, i => equalityComparer.equals(i, item));
+export function containsValue<T>(array: T[], value: T, equalityComparer: IEqualityComparer<T>): boolean {
+    return contains(array, i => equalityComparer.equals(i, value));
 }
 
 export function contains<T>(array: T[], predicate: Predicate<T>): boolean {

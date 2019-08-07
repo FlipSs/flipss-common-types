@@ -2,7 +2,7 @@ import {Action, Func, Predicate} from "../types/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {
     AscendingSortItemComparer,
-    containsItem,
+    containsValue,
     DeferredEnumerable,
     DescendingSortItemComparer,
     Dictionary,
@@ -70,7 +70,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     public contains(value: T, comparer?: IEqualityComparer<T>): boolean {
         const equalityComparer = getEqualityComparer(comparer);
 
-        return containsItem(this.value, value, equalityComparer);
+        return containsValue(this.value, value, equalityComparer);
     }
 
     public count(predicate?: Predicate<T>): number {
@@ -110,7 +110,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
 
             const equalityComparer = getEqualityComparer(comparer);
 
-            return this.value.filter(item => !containsItem(otherItems, item, equalityComparer));
+            return this.value.filter(item => !containsValue(otherItems, item, equalityComparer));
         });
     }
 
@@ -282,7 +282,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public take(count: number): IEnumerable<T> {
-        return createDeferred(() => this.value.slice(0, count - 1));
+        return createDeferred(() => this.value.slice(0, count));
     }
 
     public average(valueProvider: Func<number, T>): number {
@@ -324,7 +324,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
             const equalityComparer = getEqualityComparer(comparer);
             const result: T[] = [];
             for (const item of value) {
-                if (!containsItem(result, item, equalityComparer)) {
+                if (!containsValue(result, item, equalityComparer)) {
                     result.push(item);
                 }
             }

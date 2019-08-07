@@ -1,5 +1,5 @@
 import {
-    containsItem,
+    containsValue,
     getEqualityComparer,
     IEnumerable,
     IEqualityComparer,
@@ -47,8 +47,8 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
         }
     }
 
-    public has(item: T): boolean {
-        return this.hasItem(item);
+    public has(value: T): boolean {
+        return this.hasValue(value);
     }
 
     public intersectWith(other: IEnumerable<T>): void {
@@ -61,19 +61,19 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
             return;
         }
 
-        this.items = otherItems.filter(i => this.hasItem(i));
+        this.items = otherItems.filter(i => this.hasValue(i));
     }
 
-    public tryRemove(item: T): boolean {
-        return tryRemoveItem(this.items, i => this.hasItem(i));
+    public tryRemove(value: T): boolean {
+        return tryRemoveItem(this.items, i => this.hasValue(i));
     }
 
-    public tryAdd(item: T): boolean {
-        if (this.hasItem(item)) {
+    public tryAdd(value: T): boolean {
+        if (this.hasValue(value)) {
             return false;
         }
 
-        this.items.push(item);
+        this.items.push(value);
 
         return true;
     }
@@ -82,7 +82,7 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
         return this.items;
     }
 
-    private hasItem(item: T): boolean {
-        return containsItem(this.items, item, this.comparer);
+    private hasValue(value: T): boolean {
+        return containsValue(this.items, value, this.comparer);
     }
 }

@@ -18,16 +18,16 @@ export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
         return this.items.length;
     }
 
-    public add(item: T): void {
-        this.items.push(item);
+    public add(value: T): void {
+        this.items.push(value);
     }
 
     public clear(): void {
         this.items = [];
     }
 
-    public tryRemove(item: T): boolean {
-        return tryRemoveItem(this.items, i => i === item);
+    public tryRemove(value: T): boolean {
+        return tryRemoveItem(this.items, i => i === value);
     }
 
     protected getValue(): T[] {

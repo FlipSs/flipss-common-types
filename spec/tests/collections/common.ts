@@ -2,11 +2,10 @@ import {IEnumerable, IEqualityComparer} from "../../../src/collections/internal"
 import {Action, Func} from "../../../src/types/internal";
 import {performance} from 'perf_hooks';
 
-const smallArrayLength = 100;
-const normalArrayLength = 1000;
-const bigArrayLength = 10000;
-const hugeArrayLength = 100000;
-const timeDifferenceCoefficient = 0.001;
+const smallArrayLength = 10;
+const normalArrayLength = 100;
+const bigArrayLength = 1000;
+const hugeArrayLength = 10000;
 
 export function testEnumerable(enumerableFactory: Func<IEnumerable<number>, number[]>) {
     return testEnumerableGeneric(enumerableFactory, v => v, 17);
@@ -17,7 +16,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
         testCases(enumerableFactory,
             [
                 {
-                    name: 'Should iterate throw collection',
+                    name: 'Should iterate through collection',
                     action: (array, enumerable) => {
                         for (const item of enumerable) {
                             expect(valueProvider(item)).toBe(array.shift());
@@ -326,8 +325,9 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                     name: 'Should return only different items depending on comparer',
                     action: (array, enumerable) => {
                         const expectedItems = [];
+                        const comparer = new TestNumberEqualityComparer();
                         for (const item of array) {
-                            if (item <= 0 || !expectedItems.some(i => i > 0)) {
+                            if (!expectedItems.some(i => comparer.equals(item, i))) {
                                 expectedItems.push(item);
                             }
                         }
@@ -338,7 +338,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should not throw if empty',
                     action: () => {
-                        expect(() => enumerableFactory([]).distinct()).not.toThrow();
+                        expect(() => enumerableFactory([]).distinct().toArray()).not.toThrow();
                     }
                 }
             ]
@@ -354,7 +354,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
 
             return result;
         }, e => {
-            return e.distinct();
+            return e.distinct().toArray();
         });
     });
 
@@ -474,6 +474,538 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
             return Math.random() >= 0.5 ? e.getFirstOrDefault() : e.getFirstOrDefault(i => valueProvider(i) < 0, defaultValue);
         });
     });
+
+    describe('where', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when predicate is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.where(null)).toThrow();
+                        expect(() => enumerable.where(undefined)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should filter all elements that not match predicate',
+                    action: (array, enumerable) => {
+                        expect(enumerable.where(i => valueProvider(i) > 0).toArray().map(i => valueProvider(i))).toEqual(array.filter(i => i > 0));
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return a.filter(i => i === 15);
+        }, e => {
+            return e.where(i => i === defaultValue).toArray();
+        });
+    });
+
+    describe('select', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.select(null)).toThrow();
+                        expect(() => enumerable.select(undefined)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should select element part according to selector',
+                    action: (array, enumerable) => {
+                        expect(enumerable.select(i => valueProvider(i) + 1).toArray()).toEqual(array.map(i => i + 1));
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return a.map(i => 15);
+        }, e => {
+            return e.select(i => defaultValue).toArray();
+        });
+    });
+
+    describe('selectMany', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.selectMany(null)).toThrow();
+                        expect(() => enumerable.selectMany(undefined)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should concat selected elements into one array',
+                    action: (array, enumerable) => {
+                        const expectedResult = [];
+                        array.forEach(i => expectedResult.push(i, 0));
+
+                        expect(enumerable.selectMany(i => [valueProvider(i), 0]).toArray()).toEqual(expectedResult);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            const result = [];
+            a.forEach(i => result.push(i, i, i, i, i));
+
+            return result;
+        }, e => {
+            return e.selectMany(i => [i, i, i, i, i]).toArray();
+        });
+    });
+
+    describe('concat', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when other is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.concat(null)).toThrow();
+                        expect(() => enumerable.concat(undefined)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should concat two collections',
+                    action: (array, enumerable) => {
+                        expect(enumerable.concat(enumerable).toArray().map(i => valueProvider(i))).toEqual([...array, ...array]);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return [...a, ...a];
+        }, e => {
+            return e.concat(e).toArray();
+        });
+    });
+
+    describe('contains', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should find equal items by default',
+                    action: () => {
+                        const enumerable = enumerableFactory([0, 1, 2]);
+
+                        expect(enumerable.select(i => valueProvider(i)).contains(3)).toBeFalsy();
+                        expect(enumerable.select(i => valueProvider(i)).contains(0)).toBeTruthy();
+                    }
+                },
+                {
+                    name: 'Should find item according to comparer',
+                    action: () => {
+                        expect(enumerableFactory([-1]).select(i => valueProvider(i)).contains(1, new TestNumberEqualityComparer())).toBeFalsy();
+                        expect(enumerableFactory([213]).select(i => valueProvider(i)).contains(1, new TestNumberEqualityComparer())).toBeTruthy();
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return Math.random() >= 0.5 ? a.includes(1) : a.some(i => 13 > 0 && i > 0);
+        }, e => {
+            return Math.random() >= 0.5 ? e.select(i => valueProvider(i)).contains(1) : e.select(i => valueProvider(i)).contains(13, new TestNumberEqualityComparer());
+        });
+    });
+
+    describe('reverse', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should return reversed items',
+                    action: (array, enumerable) => {
+                        expect(enumerable.reverse().select(i => valueProvider(i)).toArray()).toEqual(array.reverse());
+                    }
+                },
+                {
+                    name: 'Should not throw error if empty',
+                    action: () => {
+                        expect(() => enumerableFactory([]).reverse().toArray()).not.toThrow();
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return a.reverse();
+        }, e => {
+            return e.reverse().toArray();
+        });
+    });
+
+    describe('append', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should add value to the ending of collection',
+                    action: (array, enumerable) => {
+                        expect(enumerable.where(i => i !== defaultValue).append(defaultValue).getLast()).toEqual(defaultValue);
+                    }
+                },
+                {
+                    name: 'Should add value to the ending of collection even if it null or undefined',
+                    action: (array, enumerable) => {
+                        expect(enumerable.where(i => i !== null).append(null).getLast()).toBeNull();
+                        expect(enumerable.where(i => i !== undefined).append(undefined).getLast()).toBeUndefined();
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return [...a, 0];
+        }, e => {
+            return e.append(defaultValue).toArray();
+        });
+    });
+
+    describe('prepend', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should add value to the beginning of collection',
+                    action: (array, enumerable) => {
+                        expect(enumerable.where(i => i !== defaultValue).prepend(defaultValue).getFirst()).toEqual(defaultValue);
+                    }
+                },
+                {
+                    name: 'Should add value to the beginning of collection even if it null or undefined',
+                    action: (array, enumerable) => {
+                        expect(enumerable.where(i => i !== null).prepend(null).getFirst()).toBeNull();
+                        expect(enumerable.where(i => i !== undefined).prepend(undefined).getFirst()).toBeUndefined();
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return [0, ...a];
+        }, e => {
+            return e.prepend(defaultValue).toArray();
+        });
+    });
+
+    describe('max', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when value provider is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.max(undefined)).toThrow();
+                        expect(() => enumerable.max(null)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should throw error when empty',
+                    action: () => {
+                        expect(() => enumerableFactory([]).max(valueProvider)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should find max value according to value provider',
+                    action: (array, enumerable) => {
+                        let max = array[0];
+                        for (let i = 1; i < array.length; i++) {
+                            if (array[i] > max) {
+                                max = array[i];
+                            }
+                        }
+
+                        expect(enumerable.max(valueProvider)).toEqual(max);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            let max = a[0];
+            for (let i = 1; i < a.length; i++) {
+                if (a[i] > max) {
+                    max = a[i];
+                }
+            }
+
+            return max;
+        }, e => {
+            return e.max(valueProvider);
+        });
+    });
+
+    describe('min', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when value provider is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.min(undefined)).toThrow();
+                        expect(() => enumerable.min(null)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should throw error when empty',
+                    action: () => {
+                        expect(() => enumerableFactory([]).min(valueProvider)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should find min value according to value provider',
+                    action: (array, enumerable) => {
+                        let min = array[0];
+                        for (let i = 1; i < array.length; i++) {
+                            if (array[i] < min) {
+                                min = array[i];
+                            }
+                        }
+
+                        expect(enumerable.min(valueProvider)).toEqual(min);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            let min = a[0];
+            for (let i = 1; i < a.length; i++) {
+                if (a[i] < min) {
+                    min = a[i];
+                }
+            }
+
+            return min;
+        }, e => {
+            return e.min(valueProvider);
+        });
+    });
+
+    describe('sum', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when value provider is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.sum(undefined)).toThrow();
+                        expect(() => enumerable.sum(null)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should throw error when empty',
+                    action: () => {
+                        expect(() => enumerableFactory([]).sum(valueProvider)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should calculate sum according to value provider',
+                    action: (array, enumerable) => {
+                        let sum = 0;
+                        for (const item of array) {
+                            sum += item;
+                        }
+
+                        expect(enumerable.sum(valueProvider)).toEqual(sum);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            let sum = 0;
+            for (const item of a) {
+                sum += item;
+            }
+
+            return sum;
+        }, e => {
+            return e.sum(valueProvider);
+        });
+    });
+
+    describe('average', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error when value provider is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.average(undefined)).toThrow();
+                        expect(() => enumerable.average(null)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should throw error when empty',
+                    action: () => {
+                        expect(() => enumerableFactory([]).average(valueProvider)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should calculate average value according to value provider',
+                    action: (array, enumerable) => {
+                        let sum = 0;
+                        for (const item of array) {
+                            sum += item;
+                        }
+
+                        expect(enumerable.average(valueProvider)).toEqual(sum / array.length);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            let sum = 0;
+            for (const item of a) {
+                sum += item;
+            }
+
+            return sum / a.length;
+        }, e => {
+            return e.average(valueProvider);
+        });
+    });
+
+    describe('take', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should take all collection if length less than items to take',
+                    action: (array, enumerable) => {
+                        expect(enumerable.take(array.length * 2).toArray().length).toEqual(array.length);
+                    }
+                },
+                {
+                    name: 'Should take N elements from beginning of collection',
+                    action: (array, enumerable) => {
+                        const countToTake = Math.floor(array.length / 2);
+
+                        expect(enumerable.take(countToTake).select(i => valueProvider(i)).toArray()).toEqual(array.slice(0, countToTake));
+                    }
+                },
+                {
+                    name: 'Should cut off collection from the end if value less than zero',
+                    action: (array, enumerable) => {
+                        expect(enumerable.take(-1).select(i => valueProvider(i)).toArray()).toEqual(array.slice(0, array.length - 1));
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return a.slice(0, 5);
+        }, e => {
+            return e.take(5).toArray();
+        });
+    });
+
+    describe('skip', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should skip all collection elements to skip greater than length',
+                    action: (array, enumerable) => {
+                        expect(enumerable.skip(array.length * 2).toArray().length).toEqual(0);
+                    }
+                },
+                {
+                    name: 'Should skip N elements',
+                    action: (array, enumerable) => {
+                        const countToSkip = Math.floor(array.length / 2);
+
+                        expect(enumerable.skip(countToSkip).select(i => valueProvider(i)).toArray()).toEqual(array.slice(countToSkip));
+                    }
+                },
+                {
+                    name: 'Should take elements from the end of collection if value less than zero',
+                    action: (array, enumerable) => {
+                        expect(enumerable.skip(-1).select(i => valueProvider(i)).toArray()).toEqual([array[array.length - 1]]);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            return a.slice(5);
+        }, e => {
+            return e.skip(5).toArray();
+        });
+    });
+
+    describe('except', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should return collection of elements that not contains in given collection',
+                    action: (array, enumerable) => {
+                        const except = array.slice(0, 5);
+                        const expected = array.filter(i => !except.includes(i));
+
+                        expect(enumerable.select(i => valueProvider(i)).except(enumerableFactory(except).select(i => valueProvider(i))).toArray()).toEqual(expected);
+                    }
+                },
+                {
+                    name: 'Should throw error if given collection is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.except(null)).toThrow();
+                        expect(() => enumerable.except(undefined)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should return collection of elements that not contains in given collection according to given equality comparer',
+                    action: (array, enumerable) => {
+                        const except = array.slice(0, 3);
+
+                        const comparer = new TestNumberEqualityComparer();
+                        const expected = array.filter(i => !except.some(e => comparer.equals(i, e)));
+
+                        expect(enumerable.select(i => valueProvider(i)).except(enumerableFactory(except).select(i => valueProvider(i)), new TestNumberEqualityComparer()).toArray()).toEqual(expected);
+                    }
+                }
+            ]
+        );
+
+        testPerformance(enumerableFactory, a => {
+            if (Math.random() >= 0.5) {
+                const except = [0, 1, 2, 3, 4];
+
+                return a.filter(i => !except.includes(i));
+            }
+
+            const toExcept = [0];
+            const comparer = new TestNumberEqualityComparer();
+
+            return a.filter(i => !toExcept.some(e => comparer.equals(i, e)));
+        }, e => {
+            return Math.random() >= 0.5 ? e.except(enumerableFactory([0, 1, 2, 3, 4])).toArray() : e.except(enumerableFactory([0]), new TestEqualityComparer(valueProvider)).toArray();
+        });
+    });
+
+    describe('orderBy', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should order by ascending according to selected key',
+                    action: (array, enumerable) => {
+                        expect(enumerable.orderBy(i => valueProvider(i)).select(i => valueProvider(i)).toArray()).toEqual(array.sort((a, b) => a - b));
+                    }
+                },
+                {
+                    name: 'Should throw error if key selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.orderBy(null)).toThrow();
+                        expect(() => enumerable.orderBy(undefined)).toThrow();
+                    }
+                }
+            ]
+        );
+
+        // todo
+        testPerformance(enumerableFactory, a => {
+        }, e => {
+        });
+    });
 }
 
 function testCases<T>(enumerableFactory: Func<IEnumerable<T>, number[]>, testCases: ITestCase<T>[]) {
@@ -516,8 +1048,12 @@ function testPerformanceByLength<T>(length: number,
         const enumerable = enumerableFactory(array);
         const enumerableExecutionTime = getActionExecutionTime(() => enumerableAction(enumerable, length));
 
-        expect(enumerableExecutionTime).toBeLessThan(arrayExecutionTime + length * timeDifferenceCoefficient);
+        expect(enumerableExecutionTime).toBeLessThan(arrayExecutionTime + getAllowableError(length));
     });
+}
+
+function getAllowableError(length: number): number {
+    return length > 100 ? length / 100 : length / 10;
 }
 
 function getActionExecutionTime(action: Action): number {
@@ -553,6 +1089,12 @@ class TestEqualityComparer<T> implements IEqualityComparer<T> {
     }
 
     public equals(obj1: T, obj2: T): boolean {
-        return this.valueProvider(obj1) > 0 && this.valueProvider(obj2) > 0;
+        return new TestNumberEqualityComparer().equals(this.valueProvider(obj1), this.valueProvider(obj2));
+    }
+}
+
+class TestNumberEqualityComparer implements IEqualityComparer<number> {
+    public equals(obj1: number, obj2: number): boolean {
+        return obj1 > 0 && obj2 > 0;
     }
 }
