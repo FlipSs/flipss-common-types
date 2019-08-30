@@ -54,16 +54,15 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return createDeferred(() => [...this.value, value]);
     }
 
-    public concat(other: IEnumerable<T>): IEnumerable<T> {
+    public concat(other: Iterable<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(other, 'other');
 
         return createDeferred(() => {
-            const otherItems = other.toArray();
-            if (TypeUtils.isNullOrUndefined(otherItems)) {
+            if (TypeUtils.isNullOrUndefined(other)) {
                 return this.value;
             }
 
-            return [...this.value, ...otherItems];
+            return [...this.value, ...other];
         });
     }
 
@@ -99,16 +98,16 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return value[index];
     }
 
-    public except(other: IEnumerable<T>, comparer?: IEqualityComparer<T>): IEnumerable<T> {
+    public except(other: Iterable<T>, comparer?: IEqualityComparer<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(other, 'other');
 
         return createDeferred(() => {
-            const otherItems = other.toArray();
-            if (TypeUtils.isNullOrUndefined(otherItems)) {
+            if (TypeUtils.isNullOrUndefined(other)) {
                 return this.value;
             }
 
             const equalityComparer = getEqualityComparer(comparer);
+            const otherItems = Array.from(other);
 
             return this.value.filter(item => !containsValue(otherItems, item, equalityComparer));
         });
@@ -146,7 +145,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
                 const key = keySelector(item);
 
                 const grouping = groupings.find(i => equalityComparer.equals(i.key, key));
-                if (TypeUtils.isNullOrUndefined(item)) {
+                if (TypeUtils.isNullOrUndefined(grouping)) {
                     groupings.push({
                         key: key,
                         value: [item]
@@ -226,7 +225,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public toArray(): T[] {
-        return [...this.value];
+        return this.value;
     }
 
     public forEach(action: Action<T, number>): void {

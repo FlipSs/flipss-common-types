@@ -4,7 +4,7 @@ import {TypeUtils} from "../utils/internal";
 export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
     private items: T[];
 
-    public constructor(items?: T[]) {
+    public constructor(items?: Iterable<T>) {
         super();
 
         if (TypeUtils.isNullOrUndefined(items)) {

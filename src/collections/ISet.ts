@@ -1,9 +1,9 @@
-import {IEnumerable, IReadOnlySet} from "./internal";
+import {IReadOnlySet} from "./internal";
 
 export interface ISet<T> extends IReadOnlySet<T> {
-    intersectWith(other: IEnumerable<T>): void;
+    intersectWith(other: Iterable<T>): void;
 
-    exceptWith(other: IEnumerable<T>): void;
+    exceptWith(other: Iterable<T>): void;
 
     tryAdd(item: T): boolean;
 

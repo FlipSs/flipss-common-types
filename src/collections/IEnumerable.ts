@@ -41,7 +41,7 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     selectMany<TResult>(selector: Func<TResult[], T>): IEnumerable<TResult>;
 
-    concat(other: IEnumerable<T>): IEnumerable<T>;
+    concat(other: Iterable<T>): IEnumerable<T>;
 
     contains(value: T, comparer?: IEqualityComparer<T>): boolean;
 
@@ -63,7 +63,7 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     skip(count: number): IEnumerable<T>;
 
-    except(other: IEnumerable<T>, comparer?: IEqualityComparer<T>): IEnumerable<T>;
+    except(other: Iterable<T>, comparer?: IEqualityComparer<T>): IEnumerable<T>;
 
     orderBy<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T>;
 

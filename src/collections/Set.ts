@@ -1,7 +1,6 @@
 import {
     containsValue,
     getEqualityComparer,
-    IEnumerable,
     IEqualityComparer,
     ISet,
     ReadOnlyCollection,
@@ -13,16 +12,15 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
     private readonly comparer: IEqualityComparer<T>;
     private items: T[];
 
-    public constructor(items?: T[], comparer?: IEqualityComparer<T>) {
+    public constructor(items?: Iterable<T>, comparer?: IEqualityComparer<T>) {
         super();
 
         this.comparer = getEqualityComparer(comparer);
-        this.items = [];
 
-        if (!TypeUtils.isNullOrUndefined(items)) {
-            for (const item of items) {
-                this.tryAdd(item);
-            }
+        if (TypeUtils.isNullOrUndefined(items)) {
+            this.items = [];
+        } else {
+            this.items = this.getUniqueItems(items);
         }
     }
 
@@ -34,15 +32,10 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
         this.items = [];
     }
 
-    public exceptWith(other: IEnumerable<T>): void {
+    public exceptWith(other: Iterable<T>): void {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        const otherItems = other.toArray();
-        if (TypeUtils.isNullOrUndefined(otherItems)) {
-            return;
-        }
-
-        for (let item of otherItems) {
+        for (let item of other) {
             this.tryRemove(item);
         }
     }
@@ -51,21 +44,22 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
         return this.hasValue(value);
     }
 
-    public intersectWith(other: IEnumerable<T>): void {
+    public intersectWith(other: Iterable<T>): void {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        const otherItems = other.toArray();
-        if (TypeUtils.isNullOrUndefined(otherItems)) {
-            this.items = [];
-
-            return;
+        const newItems = [];
+        const uniqueItems = this.getUniqueItems(other);
+        for (const item of this.items) {
+            if (this.containsValue(uniqueItems, item)) {
+                newItems.push(item);
+            }
         }
 
-        this.items = otherItems.filter(i => this.hasValue(i));
+        this.items = newItems;
     }
 
     public tryRemove(value: T): boolean {
-        return tryRemoveItem(this.items, i => this.hasValue(i));
+        return tryRemoveItem(this.items, i => this.comparer.equals(i, value));
     }
 
     public tryAdd(value: T): boolean {
@@ -82,7 +76,22 @@ export class Set<T> extends ReadOnlyCollection<T> implements ISet<T> {
         return this.items;
     }
 
+    private getUniqueItems(items: Iterable<T>): T[] {
+        const result = [];
+        for (const item of items) {
+            if (!this.containsValue(result, item)) {
+                result.push(item);
+            }
+        }
+
+        return result;
+    }
+
     private hasValue(value: T): boolean {
-        return containsValue(this.items, value, this.comparer);
+        return this.containsValue(this.items, value);
+    }
+
+    private containsValue(items: T[], value: T): boolean {
+        return containsValue(items, value, this.comparer);
     }
 }

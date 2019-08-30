@@ -1,14 +1,52 @@
-import {IEnumerable, IEqualityComparer} from "../../../src/collections/internal";
+import {
+    Dictionary,
+    IComparer,
+    IEnumerable,
+    IEqualityComparer,
+    IKeyValuePair,
+    IReadOnlyCollection,
+    List,
+    Set as MySet
+} from "../../../src/collections/internal";
 import {Action, Func} from "../../../src/types/internal";
-import {performance} from 'perf_hooks';
+import {TypeUtils} from "../../../src/utils/TypeUtils";
+/*import {performance} from 'perf_hooks';
 
-const smallArrayLength = 10;
+const smallArrayLength = 10;*/
+
 const normalArrayLength = 100;
-const bigArrayLength = 1000;
-const hugeArrayLength = 10000;
+
+/*const bigArrayLength = 1000;
+const hugeArrayLength = 10000;*/
 
 export function testEnumerable(enumerableFactory: Func<IEnumerable<number>, number[]>) {
     return testEnumerableGeneric(enumerableFactory, v => v, 17);
+}
+
+export function testReadonlyCollection<T>(collectionFactory: Func<IReadOnlyCollection<T>, number[]>): void {
+    describe('length', () => {
+        it('Should return actual length', () => {
+            const expectedLength = Math.floor(Math.random() * normalArrayLength);
+            const source = createArray(expectedLength);
+            const collection = collectionFactory(source);
+
+            expect(collection.length).toEqual(expectedLength);
+        });
+    });
+
+    describe('isEmpty', () => {
+        it('Should be true when no items', () => {
+            const collection = collectionFactory([]);
+
+            expect(collection.isEmpty).toBeTruthy();
+        });
+
+        it('Should be false if not empty', () => {
+            const collection = collectionFactory(createArray(normalArrayLength));
+
+            expect(collection.isEmpty).toBeFalsy();
+        })
+    });
 }
 
 export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>, number[]>, valueProvider: Func<number, T>, defaultValue: T): void {
@@ -25,14 +63,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, (a, l) => {
-            for (const item of a) {
-            }
-        }, (e, l) => {
-            for (const item of e) {
-            }
-        });
     });
 
     describe('getElementAt', () => {
@@ -61,16 +91,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, (a, l) => {
-            for (let i = 0; i < l; i++) {
-                const item = a[i];
-            }
-        }, (e, l) => {
-            for (let i = 0; i < l; i++) {
-                const item = e.getElementAt(i);
-            }
-        });
     });
 
     describe('getElementAtOrDefault', () => {
@@ -105,16 +125,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, (a, l) => {
-            for (let i = 0; i < l; i++) {
-                const item = a[i];
-            }
-        }, (e, l) => {
-            for (let i = 0; i < l; i++) {
-                const item = e.getElementAtOrDefault(i);
-            }
-        });
     });
 
     describe('count', () => {
@@ -134,12 +144,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return Math.random() >= 0.5 ? a.filter(i => i < 0).length : a.length;
-        }, e => {
-            return Math.random() >= 0.5 ? e.count(i => valueProvider(i) < 0) : e.count();
-        });
     });
 
     describe('any', () => {
@@ -173,16 +177,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            const random = Math.random();
-
-            return random >= 0.5 ? a.some(i => i === random) : a.length > 0;
-        }, e => {
-            const random = Math.random();
-
-            return random >= 0.5 ? e.any(i => valueProvider(i) === random) : e.any();
-        });
     });
 
     describe('all', () => {
@@ -191,7 +185,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should return true if all elements match predicate',
                     action: (array, enumerable) => {
-                        expect(enumerable.all(i => true)).toBeTruthy();
+                        expect(enumerable.all(() => true)).toBeTruthy();
                     }
                 },
                 {
@@ -211,12 +205,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return a.every(i => Math.random() >= 0.5);
-        }, e => {
-            return e.all(i => Math.random() >= 0.5);
-        });
     });
 
     describe('getFirst', () => {
@@ -237,7 +225,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should throw error if no one element match predicate',
                     action: (array, enumerable) => {
-                        expect(() => enumerable.getFirst(i => false)).toThrow();
+                        expect(() => enumerable.getFirst(() => false)).toThrow();
                     }
                 },
                 {
@@ -250,12 +238,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return Math.random() >= 0.5 ? a[0] : a.find(i => true);
-        }, e => {
-            return Math.random() >= 0.5 ? e.getFirst() : e.getFirst(i => true);
-        });
     });
 
     describe('getLast', () => {
@@ -276,7 +258,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should throw error if no one element match predicate',
                     action: (array, enumerable) => {
-                        expect(() => enumerable.getLast(i => false)).toThrow();
+                        expect(() => enumerable.getLast(() => false)).toThrow();
                     }
                 },
                 {
@@ -289,20 +271,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            if (Math.random() >= 0.5) {
-                return a[a.length - 1];
-            }
-
-            for (let i = a.length - 1; i >= 0; i--) {
-                if (true) {
-                    return a[i];
-                }
-            }
-        }, e => {
-            return Math.random() >= 0.5 ? e.getLast() : e.getLast(i => true);
-        });
     });
 
     describe('distinct', () => {
@@ -343,19 +311,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            const result = [];
-            for (const item of a) {
-                if (!result.includes(item)) {
-                    result.push(item);
-                }
-            }
-
-            return result;
-        }, e => {
-            return e.distinct().toArray();
-        });
     });
 
     describe('defaultIfEmpty', () => {
@@ -375,16 +330,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            if (a.length === 0) {
-                return [0];
-            }
-
-            return a;
-        }, e => {
-            return e.defaultIfEmpty(defaultValue).toArray();
-        });
     });
 
     describe('getLastOrDefault', () => {
@@ -405,7 +350,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should return defaultValue if no one element match predicate',
                     action: (array, enumerable) => {
-                        expect(enumerable.getLastOrDefault(i => false, defaultValue)).toBe(defaultValue);
+                        expect(enumerable.getLastOrDefault(() => false, defaultValue)).toBe(defaultValue);
                     }
                 },
                 {
@@ -418,22 +363,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            if (Math.random() >= 0.5) {
-                return a[a.length - 1];
-            }
-
-            for (let i = a.length - 1; i >= 0; i--) {
-                if (i > 0) {
-                    return a[i];
-                }
-            }
-
-            return 0;
-        }, e => {
-            return Math.random() >= 0.5 ? e.getLastOrDefault() : e.getLastOrDefault(i => valueProvider(i) > 0, defaultValue);
-        });
     });
 
     describe('getFirstOrDefault', () => {
@@ -454,7 +383,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should return defaultValue if no one element match predicate',
                     action: (array, enumerable) => {
-                        expect(enumerable.getFirstOrDefault(i => false, defaultValue)).toBe(defaultValue);
+                        expect(enumerable.getFirstOrDefault(() => false, defaultValue)).toBe(defaultValue);
                     }
                 },
                 {
@@ -467,12 +396,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return Math.random() >= 0.5 ? a[0] : a.find(i => i < 0) || 0;
-        }, e => {
-            return Math.random() >= 0.5 ? e.getFirstOrDefault() : e.getFirstOrDefault(i => valueProvider(i) < 0, defaultValue);
-        });
     });
 
     describe('where', () => {
@@ -493,12 +416,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return a.filter(i => i === 15);
-        }, e => {
-            return e.where(i => i === defaultValue).toArray();
-        });
     });
 
     describe('select', () => {
@@ -519,12 +436,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return a.map(i => 15);
-        }, e => {
-            return e.select(i => defaultValue).toArray();
-        });
     });
 
     describe('selectMany', () => {
@@ -548,15 +459,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            const result = [];
-            a.forEach(i => result.push(i, i, i, i, i));
-
-            return result;
-        }, e => {
-            return e.selectMany(i => [i, i, i, i, i]).toArray();
-        });
     });
 
     describe('concat', () => {
@@ -577,12 +479,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return [...a, ...a];
-        }, e => {
-            return e.concat(e).toArray();
-        });
     });
 
     describe('contains', () => {
@@ -606,12 +502,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return Math.random() >= 0.5 ? a.includes(1) : a.some(i => 13 > 0 && i > 0);
-        }, e => {
-            return Math.random() >= 0.5 ? e.select(i => valueProvider(i)).contains(1) : e.select(i => valueProvider(i)).contains(13, new TestNumberEqualityComparer());
-        });
     });
 
     describe('reverse', () => {
@@ -631,12 +521,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return a.reverse();
-        }, e => {
-            return e.reverse().toArray();
-        });
     });
 
     describe('append', () => {
@@ -657,12 +541,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return [...a, 0];
-        }, e => {
-            return e.append(defaultValue).toArray();
-        });
     });
 
     describe('prepend', () => {
@@ -683,12 +561,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return [0, ...a];
-        }, e => {
-            return e.prepend(defaultValue).toArray();
-        });
     });
 
     describe('max', () => {
@@ -722,19 +594,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            let max = a[0];
-            for (let i = 1; i < a.length; i++) {
-                if (a[i] > max) {
-                    max = a[i];
-                }
-            }
-
-            return max;
-        }, e => {
-            return e.max(valueProvider);
-        });
     });
 
     describe('min', () => {
@@ -768,19 +627,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            let min = a[0];
-            for (let i = 1; i < a.length; i++) {
-                if (a[i] < min) {
-                    min = a[i];
-                }
-            }
-
-            return min;
-        }, e => {
-            return e.min(valueProvider);
-        });
     });
 
     describe('sum', () => {
@@ -812,17 +658,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            let sum = 0;
-            for (const item of a) {
-                sum += item;
-            }
-
-            return sum;
-        }, e => {
-            return e.sum(valueProvider);
-        });
     });
 
     describe('average', () => {
@@ -854,17 +689,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            let sum = 0;
-            for (const item of a) {
-                sum += item;
-            }
-
-            return sum / a.length;
-        }, e => {
-            return e.average(valueProvider);
-        });
     });
 
     describe('take', () => {
@@ -892,12 +716,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return a.slice(0, 5);
-        }, e => {
-            return e.take(5).toArray();
-        });
     });
 
     describe('skip', () => {
@@ -925,12 +743,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            return a.slice(5);
-        }, e => {
-            return e.skip(5).toArray();
-        });
     });
 
     describe('except', () => {
@@ -965,21 +777,6 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        testPerformance(enumerableFactory, a => {
-            if (Math.random() >= 0.5) {
-                const except = [0, 1, 2, 3, 4];
-
-                return a.filter(i => !except.includes(i));
-            }
-
-            const toExcept = [0];
-            const comparer = new TestNumberEqualityComparer();
-
-            return a.filter(i => !toExcept.some(e => comparer.equals(i, e)));
-        }, e => {
-            return Math.random() >= 0.5 ? e.except(enumerableFactory([0, 1, 2, 3, 4])).toArray() : e.except(enumerableFactory([0]), new TestEqualityComparer(valueProvider)).toArray();
-        });
     });
 
     describe('orderBy', () => {
@@ -992,6 +789,14 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                     }
                 },
                 {
+                    name: 'Should order by ascending according to selected key and comparer',
+                    action: (array, enumerable) => {
+                        const comparer = new TestNumberComparer();
+
+                        expect(enumerable.orderBy(i => valueProvider(i), comparer).select(i => valueProvider(i)).toArray()).toEqual(array.sort((a, b) => comparer.compare(a, b)));
+                    }
+                },
+                {
                     name: 'Should throw error if key selector is null or undefined',
                     action: (array, enumerable) => {
                         expect(() => enumerable.orderBy(null)).toThrow();
@@ -1000,12 +805,463 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 }
             ]
         );
-
-        // todo
-        testPerformance(enumerableFactory, a => {
-        }, e => {
-        });
     });
+
+    describe('thenBy', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should order by ascending according to selected key',
+                    action: (array, enumerable) => {
+                        const expectedResult = array.sort((a, b) => {
+                            const firstResult = (a % 10) - (b % 10);
+                            if (firstResult !== 0) {
+                                return firstResult;
+                            }
+
+                            return (a % 5) - (b % 5);
+                        });
+
+                        const orderedEnumerable = enumerable.select(i => valueProvider(i)).orderBy(i => i % 10);
+
+                        expect(orderedEnumerable.thenBy(i => i % 5).toArray()).toEqual(expectedResult);
+                    }
+                },
+                {
+                    name: 'Should order by ascending according to selected key and comparer',
+                    action: (array, enumerable) => {
+                        const comparer = new TestNumberComparer();
+
+                        const expectedResult = array.sort((a, b) => {
+                            const firstResult = (a % 3) - (b % 3);
+                            if (firstResult !== 0) {
+                                return firstResult;
+                            }
+
+                            return comparer.compare(a % 2, b % 2);
+                        });
+
+                        const orderedEnumerable = enumerable.select(i => valueProvider(i)).orderBy(i => i % 3);
+
+                        expect(orderedEnumerable.thenBy(i => i % 2, comparer).toArray()).toEqual(expectedResult);
+                    }
+                },
+                {
+                    name: 'Should throw error if key selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.orderBy(i => i).thenBy(null)).toThrow();
+                        expect(() => enumerable.orderBy(i => i).thenBy(undefined)).toThrow();
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('orderByDescending', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should order by descending according to selected key',
+                    action: (array, enumerable) => {
+                        expect(enumerable.orderByDescending(i => valueProvider(i)).select(i => valueProvider(i)).toArray()).toEqual(array.sort((a, b) => b - a));
+                    }
+                },
+                {
+                    name: 'Should order by ascending according to selected key and comparer',
+                    action: (array, enumerable) => {
+                        const comparer = new TestNumberComparer();
+
+                        expect(enumerable.orderByDescending(i => valueProvider(i), comparer).select(i => valueProvider(i)).toArray()).toEqual(array.sort((a, b) => comparer.compare(b, a)));
+                    }
+                },
+                {
+                    name: 'Should throw error if key selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.orderByDescending(null)).toThrow();
+                        expect(() => enumerable.orderByDescending(undefined)).toThrow();
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('thenByDescending', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should order by descending according to selected key',
+                    action: (array, enumerable) => {
+                        const expectedResult = array.sort((a, b) => {
+                            const firstResult = (a % 3) - (b % 3);
+                            if (firstResult !== 0) {
+                                return firstResult;
+                            }
+
+                            return (b % 5) - (a % 5);
+                        });
+
+                        const orderedEnumerable = enumerable.select(i => valueProvider(i)).orderBy(i => i % 3);
+
+                        expect(orderedEnumerable.thenByDescending(i => i % 5).toArray()).toEqual(expectedResult);
+                    }
+                },
+                {
+                    name: 'Should order by descending according to selected key and comparer',
+                    action: (array, enumerable) => {
+                        const comparer = new TestNumberComparer();
+
+                        const expectedResult = array.sort((a, b) => {
+                            const firstResult = (a % 6) - (b % 6);
+                            if (firstResult !== 0) {
+                                return firstResult;
+                            }
+
+                            return comparer.compare(b % 2, a % 2);
+                        });
+
+                        const orderedEnumerable = enumerable.select(i => valueProvider(i)).orderBy(i => i % 6);
+
+                        expect(orderedEnumerable.thenByDescending(i => i % 2, comparer).toArray()).toEqual(expectedResult);
+                    }
+                },
+                {
+                    name: 'Should throw error if key selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.orderBy(i => i).thenByDescending(null)).toThrow();
+                        expect(() => enumerable.orderBy(i => i).thenByDescending(undefined)).toThrow();
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('groupBy', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should group by provided key',
+                    action: (array, enumerable) => {
+                        const expectedGroups = [];
+                        for (const item of array) {
+                            const group = expectedGroups.find(g => g.key === item);
+                            if (group) {
+                                group.values.push(item);
+                            } else {
+                                expectedGroups.push({
+                                    key: item,
+                                    values: [item]
+                                });
+                            }
+                        }
+
+                        expect(enumerable.select(i => valueProvider(i)).groupBy(i => i).select(g => {
+                            return {
+                                key: g.key,
+                                values: g.toArray()
+                            };
+                        }).toArray()).toEqual(expectedGroups);
+                    }
+                },
+                {
+                    name: 'Should group by provided key with equality comparer',
+                    action: (array, enumerable) => {
+                        const expectedGroups = [];
+                        const equalityComparer = new TestNumberEqualityComparer();
+                        for (const item of array) {
+                            const group = expectedGroups.find(g => equalityComparer.equals(g.key, item));
+                            if (group) {
+                                group.values.push(item);
+                            } else {
+                                expectedGroups.push({
+                                    key: item,
+                                    values: [item]
+                                });
+                            }
+                        }
+
+                        expect(enumerable.select(i => valueProvider(i)).groupBy(i => i, equalityComparer).select(g => {
+                            return {
+                                key: g.key,
+                                values: g.toArray()
+                            };
+                        }).toArray()).toEqual(expectedGroups);
+                    }
+                },
+                {
+                    name: 'Should throw error if key selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.groupBy(null)).toThrow();
+                        expect(() => enumerable.groupBy(undefined)).toThrow();
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('forEach', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should properly iterate items',
+                    action: (array, enumerable) => {
+                        const expectedItems = [];
+                        array.forEach((v, i) => expectedItems.push({
+                            value: v,
+                            index: i
+                        }));
+
+                        const items = [];
+                        enumerable.forEach((v, i) => items.push({
+                            value: valueProvider(v),
+                            index: i
+                        }));
+
+                        expect(items).toEqual(expectedItems);
+                    }
+                },
+                {
+                    name: 'Should throw error if action is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.forEach(null)).toThrow();
+                        expect(() => enumerable.forEach(undefined)).toThrow();
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('toArray', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should produce proper array',
+                    action: (array, enumerable) => {
+                        expect(enumerable.select(i => valueProvider(i)).toArray()).toEqual(array);
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('toList', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should produce proper list',
+                    action: (array, enumerable) => {
+                        const list = enumerable.toList();
+
+                        expect(TypeUtils.is(list, List)).toBeTruthy();
+                        expect(list.select(i => valueProvider(i)).toArray()).toEqual(array);
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('toReadOnlyList', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should produce proper ReadOnlyList',
+                    action: (array, enumerable) => {
+                        const list = enumerable.toReadOnlyList();
+
+                        expect(TypeUtils.is(list, List)).toBeTruthy();
+                        expect(list.select(i => valueProvider(i)).toArray()).toEqual(array);
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('toSet', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should produce proper Set',
+                    action: (array, enumerable) => {
+                        const set = enumerable.toSet();
+
+                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+                        expect(set.select(i => valueProvider(i)).toArray()).toEqual(Array.from(new Set(array)));
+                    }
+                },
+                {
+                    name: 'Should produce proper Set with equality comparer',
+                    action: (array, enumerable) => {
+                        const equalityComparer = new TestNumberEqualityComparer();
+                        const expectedResult = [];
+                        for (const item of array) {
+                            if (!expectedResult.some(i => equalityComparer.equals(i, item))) {
+                                expectedResult.push(item);
+                            }
+                        }
+
+                        const set = enumerable.select(i => valueProvider(i)).toSet(equalityComparer);
+                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+
+                        expect(set.toArray()).toEqual(expectedResult);
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('toReadOnlySet', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should produce proper ReadOnlySet',
+                    action: (array, enumerable) => {
+                        const set = enumerable.toReadOnlySet();
+
+                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+                        expect(set.select(i => valueProvider(i)).toArray()).toEqual(Array.from(new Set(array)));
+                    }
+                },
+                {
+                    name: 'Should produce proper ReadOnlySet with equality comparer',
+                    action: (array, enumerable) => {
+                        const equalityComparer = new TestNumberEqualityComparer();
+                        const expectedResult = [];
+                        for (const item of array) {
+                            if (!expectedResult.some(i => equalityComparer.equals(i, item))) {
+                                expectedResult.push(item);
+                            }
+                        }
+
+                        const set = enumerable.select(i => valueProvider(i)).toReadOnlySet(equalityComparer);
+                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+
+                        expect(set.toArray()).toEqual(expectedResult);
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('toDictionary', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error if key selector or value selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.toDictionary(undefined, i => i)).toThrow();
+                        expect(() => enumerable.toDictionary(null, i => i)).toThrow();
+
+                        expect(() => enumerable.toDictionary(undefined, undefined)).toThrow();
+                        expect(() => enumerable.toDictionary(null, null)).toThrow();
+
+                        expect(() => enumerable.toDictionary(i => i, undefined)).toThrow();
+                        expect(() => enumerable.toDictionary(i => i, null)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should produce proper Dictionary',
+                    action: (array, enumerable) => {
+                        const expectedResult: IKeyValuePair<number, number>[] = [];
+                        for (const item of array) {
+                            if (!expectedResult.some(i => i.key === item)) {
+                                expectedResult.push({
+                                    key: item,
+                                    value: item
+                                });
+                            }
+                        }
+
+                        const dictionary = enumerable.toDictionary(i => valueProvider(i), i => valueProvider(i));
+
+                        expect(TypeUtils.is(dictionary, Dictionary)).toBeTruthy();
+                        expect(dictionary.toArray()).toEqual(expectedResult);
+                    }
+                },
+                {
+                    name: 'Should produce proper Dictionary with equality comparer',
+                    action: (array, enumerable) => {
+                        const equalityComparer = new TestNumberEqualityComparer();
+                        const expectedResult = getExpectedKeyValuePairs(array, equalityComparer);
+
+                        const dictionary = enumerable.toDictionary(i => valueProvider(i), i => valueProvider(i), equalityComparer);
+
+                        expect(TypeUtils.is(dictionary, Dictionary)).toBeTruthy();
+                        expect(dictionary.toArray()).toEqual(expectedResult);
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('toReadOnlyDictionary', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should throw error if key selector or value selector is null or undefined',
+                    action: (array, enumerable) => {
+                        expect(() => enumerable.toReadOnlyDictionary(undefined, i => i)).toThrow();
+                        expect(() => enumerable.toReadOnlyDictionary(null, i => i)).toThrow();
+
+                        expect(() => enumerable.toReadOnlyDictionary(undefined, undefined)).toThrow();
+                        expect(() => enumerable.toReadOnlyDictionary(null, null)).toThrow();
+
+                        expect(() => enumerable.toReadOnlyDictionary(i => i, undefined)).toThrow();
+                        expect(() => enumerable.toReadOnlyDictionary(i => i, null)).toThrow();
+                    }
+                },
+                {
+                    name: 'Should produce proper ReadOnlyDictionary',
+                    action: (array, enumerable) => {
+                        const expectedResult: IKeyValuePair<number, number>[] = [];
+                        for (const item of array) {
+                            if (!expectedResult.some(i => i.key === item)) {
+                                expectedResult.push({
+                                    key: item,
+                                    value: item
+                                });
+                            }
+                        }
+
+                        const dictionary = enumerable.toReadOnlyDictionary(i => valueProvider(i), i => valueProvider(i));
+
+                        expect(TypeUtils.is(dictionary, Dictionary)).toBeTruthy();
+                        expect(dictionary.toArray()).toEqual(expectedResult);
+                    }
+                },
+                {
+                    name: 'Should produce proper ReadOnlyDictionary with equality comparer',
+                    action: (array, enumerable) => {
+                        const equalityComparer = new TestNumberEqualityComparer();
+                        const expectedResult = getExpectedKeyValuePairs(array, equalityComparer);
+
+                        const dictionary = enumerable.toReadOnlyDictionary(i => valueProvider(i), i => valueProvider(i), equalityComparer);
+
+                        expect(TypeUtils.is(dictionary, Dictionary)).toBeTruthy();
+                        expect(dictionary.toArray()).toEqual(expectedResult);
+                    }
+                }
+            ]
+        );
+    });
+}
+
+function getExpectedKeyValuePairs<T>(array: T[], equalityComparer: IEqualityComparer<T>): IKeyValuePair<T, T>[] {
+    const result: IKeyValuePair<T, T>[] = [];
+    for (const item of array) {
+        const index = result.findIndex(i => equalityComparer.equals(i.key, item));
+        if (index < 0) {
+            result.push({
+                key: item,
+                value: item
+            });
+        } else {
+            result[index] = {
+                key: result[index].key,
+                value: item
+            };
+        }
+    }
+
+    return result;
 }
 
 function testCases<T>(enumerableFactory: Func<IEnumerable<T>, number[]>, testCases: ITestCase<T>[]) {
@@ -1026,7 +1282,8 @@ function testCases<T>(enumerableFactory: Func<IEnumerable<T>, number[]>, testCas
     });
 }
 
-function testPerformance<T>(enumerableFactory: Func<IEnumerable<T>, number[]>,
+// todo for each collection
+/*function testPerformance<T>(enumerableFactory: Func<IEnumerable<T>, number[]>,
                             arrayAction: Action<number[], number>,
                             enumerableAction: Action<IEnumerable<T>, number>): void {
     describe('Performance', () => {
@@ -1065,6 +1322,7 @@ function getActionExecutionTime(action: Action): number {
 
     return end - start;
 }
+*/
 
 function createArray(length: number): number[] {
     const result = [];
@@ -1090,6 +1348,12 @@ class TestEqualityComparer<T> implements IEqualityComparer<T> {
 
     public equals(obj1: T, obj2: T): boolean {
         return new TestNumberEqualityComparer().equals(this.valueProvider(obj1), this.valueProvider(obj2));
+    }
+}
+
+class TestNumberComparer implements IComparer<number> {
+    public compare(obj1: number, obj2: number): number {
+        return obj1 - obj2 + 3;
     }
 }
 

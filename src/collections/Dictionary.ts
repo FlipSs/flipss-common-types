@@ -15,11 +15,17 @@ export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<T
 
     private items: IKeyValuePair<TKey, TValue>[];
 
-    public constructor(items?: IKeyValuePair<TKey, TValue>[], comparer?: IEqualityComparer<TKey>) {
+    public constructor(items?: Iterable<IKeyValuePair<TKey, TValue>>, comparer?: IEqualityComparer<TKey>) {
         super();
 
         this.comparer = getEqualityComparer(comparer);
-        this.items = items || [];
+        this.items = [];
+
+        if (!TypeUtils.isNullOrUndefined(items)) {
+            for (const item of items) {
+                this.set(item.key, item.value);
+            }
+        }
     }
 
     public get length(): number {
@@ -70,12 +76,13 @@ export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<T
         const index = this.findIndex(key);
         if (index < 0) {
             this.add(key, value);
+        } else {
+            const oldItem = this.items[index];
+            this.items[index] = {
+                key: oldItem.key,
+                value: value
+            };
         }
-
-        this.items[index] = {
-            key,
-            value
-        };
     }
 
     public tryAdd(key: TKey, value: TValue): boolean {

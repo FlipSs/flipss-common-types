@@ -13,26 +13,26 @@ export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrde
     private readonly comparerArray: ISortItemComparer<T>[];
 
     public constructor(valueFactory: Func<T[]>,
-                       ...selectors: ISortItemComparer<T>[]) {
+                       comparer: ISortItemComparer<T>) {
         super(valueFactory);
 
-        this.comparerArray = selectors;
+        this.comparerArray = [comparer];
     }
 
     public thenBy<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        const sortItemComparer = new AscendingSortItemComparer(keySelector, comparer);
+        this.addComparer(new AscendingSortItemComparer(keySelector, comparer));
 
-        return new OrderedEnumerable(super.getValue, ...this.comparerArray, sortItemComparer);
+        return this;
     }
 
     public thenByDescending<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        const sortItemComparer = new DescendingSortItemComparer(keySelector, comparer);
+        this.addComparer(new DescendingSortItemComparer(keySelector, comparer));
 
-        return new OrderedEnumerable(super.getValue, ...this.comparerArray, sortItemComparer);
+        return this;
     }
 
     protected getValue(): T[] {
@@ -51,5 +51,9 @@ export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrde
 
             return 0;
         });
+    }
+
+    private addComparer(comparer: ISortItemComparer<T>): void {
+        this.comparerArray.push(comparer);
     }
 }
