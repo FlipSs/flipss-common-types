@@ -3,8 +3,8 @@ import {JsonSerializer} from "../../../src/data/internal";
 describe('JsonSerializer', () => {
     it('Should serialize and deserialize as JSON', () => {
         const replacer = (k, v) => {
-            if (k === 'date' && v instanceof Date) {
-                return v.toJSON();
+            if (k === 'date') {
+                return new Date().getMilliseconds();
             }
 
             return v;
