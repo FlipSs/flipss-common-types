@@ -6,6 +6,8 @@ export interface ITimer extends IDisposable {
 
     start(period: TimeSpan): void;
 
+    resetTime(): void;
+
     stop(): void;
 
     restart(period: TimeSpan): void;

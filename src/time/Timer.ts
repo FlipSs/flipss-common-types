@@ -121,13 +121,31 @@ abstract class Timer implements ITimer {
         this.tryStop();
     }
 
+    public resetTime(): void {
+        if (this.state === TimerState.stopped) {
+            throw new Error('Timer is stopped.');
+        }
+
+        this.resetTimeInternal();
+    }
+
     protected tryStop(): void {
         if (this.state !== TimerState.stopped) {
             this.stopInternal();
         }
     }
 
+    protected tryResetTime(): void {
+        if (this.state !== TimerState.stopped) {
+            this.resetTimeInternal();
+        }
+    }
+
     protected abstract onUpdate(timeLeft: TimeSpan): void;
+
+    private resetTimeInternal(): void {
+        this.timeLeft = this.period;
+    }
 
     private stopInternal(): void {
         if (this.state === TimerState.started) {
@@ -175,6 +193,7 @@ class ContinuousTimer extends Timer {
     protected onUpdate(timeLeft: TimeSpan): void {
         if (timeLeft.milliseconds <= 0) {
             this.onPeriod();
+            this.tryResetTime();
         }
     }
 }
