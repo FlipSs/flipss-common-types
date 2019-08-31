@@ -1,4 +1,4 @@
-import {ILazy, Lazy} from "../../../src/utils/internal";
+import {ILazy, Lazy} from "../../src/utils/internal";
 import Spy = jasmine.Spy;
 
 describe('Lazy', () => {

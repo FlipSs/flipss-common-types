@@ -1,5 +1,5 @@
 import {testEnumerable} from "./common";
-import {asEnumerable} from "../../../src/collections/internal";
+import {asEnumerable} from "../../src/collections/internal";
 
 describe('asEnumerable', () => {
     testEnumerable(a => asEnumerable(a));

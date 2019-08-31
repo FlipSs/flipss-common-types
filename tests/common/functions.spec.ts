@@ -1,4 +1,4 @@
-import {IDisposable, toFactory, tryDispose, using} from "../../../src/common/internal";
+import {IDisposable, toFactory, tryDispose, using} from "../../src/common/internal";
 
 describe('functions', () => {
     describe('tryDispose', () => {

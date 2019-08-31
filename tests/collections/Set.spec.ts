@@ -1,5 +1,5 @@
 import {testEnumerable, testReadonlyCollection} from "./common";
-import {IEqualityComparer, ISet, Set} from "../../../src/collections/internal";
+import {IEqualityComparer, ISet, Set} from "../../src/collections/internal";
 
 describe('Set', () => {
     testEnumerable(createFromNumberArray);

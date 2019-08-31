@@ -1,7 +1,7 @@
-import {ISettingStorage, SettingStorage} from "../../../src/settings/internal";
+import {ISettingStorage, SettingStorage} from "../../src/settings/internal";
 import {ITestSettings} from "./models/ITestSettings";
 import {TestSettingLoader} from "./models/TestSettingLoader";
-import {IValueObserver} from "../../../src/common/IValueObserver";
+import {IValueObserver} from "../../src/common/IValueObserver";
 
 describe('SettingStorage', () => {
     const settings: ITestSettings[] = [

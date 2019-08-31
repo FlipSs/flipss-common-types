@@ -1,5 +1,5 @@
-import {Argument} from "../../../src/utils/internal";
-import {List} from "../../../src/collections/internal";
+import {Argument} from "../../src/utils/internal";
+import {List} from "../../src/collections/internal";
 
 describe('Argument', () => {
 

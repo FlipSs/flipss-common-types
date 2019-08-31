@@ -1,4 +1,4 @@
-import {IErrorObserver, IValueObserver, Observable} from "../../../src/common/internal";
+import {IErrorObserver, IValueObserver, Observable} from "../../src/common/internal";
 
 describe('Observable', () => {
     let observable: TestObservable;

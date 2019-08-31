@@ -1,4 +1,4 @@
-import {Action} from "../../../src/types/internal";
+import {Action} from "../../src/types/internal";
 import {
     createLogger,
     ILogger,
@@ -7,7 +7,7 @@ import {
     LoggableError,
     LogLevel,
     LogMessageFactory
-} from "../../../src/logs/internal";
+} from "../../src/logs/internal";
 import Spy = jasmine.Spy;
 
 describe('Logger', () => {

@@ -1,4 +1,4 @@
-import {ISettingLoader} from "../../../../src/settings/internal";
+import {ISettingLoader} from "../../../src/settings/internal";
 import {ITestSettings} from "./ITestSettings";
 
 export class TestSettingLoader implements ISettingLoader<ITestSettings> {

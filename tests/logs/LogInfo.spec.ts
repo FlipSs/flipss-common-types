@@ -1,5 +1,5 @@
-import {CustomLogInfo, LoggableError, LogInfo, LogInfoDisable, LogLevel} from "../../../src/logs/internal";
-import {TypeUtils} from "../../../src/utils/internal";
+import {CustomLogInfo, LoggableError, LogInfo, LogInfoDisable, LogLevel} from "../../src/logs/internal";
+import {TypeUtils} from "../../src/utils/internal";
 
 const category = 'Class';
 const logLevel = LogLevel.warn;

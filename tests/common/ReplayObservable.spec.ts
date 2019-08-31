@@ -1,4 +1,4 @@
-import {IValueObserver, ReplayObservable} from "../../../src/common/internal";
+import {IValueObserver, ReplayObservable} from "../../src/common/internal";
 
 const replayCount = Math.floor(Math.random() * 17);
 const testValueCount = replayCount * 5;

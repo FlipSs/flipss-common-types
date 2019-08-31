@@ -3,8 +3,8 @@
   "version": "1.0.23",
   "description": "Common types for FlipSs projects",
   "scripts": {
-    "test": "npm run build && jasmine",
-    "build": "node ./build/before-build.js && tsc && node ./build/after-build.js",
+    "test": "karma start karma.conf.js",
+    "build": "webpack --config webpack.config.js",
     "update-package-version": "npm version patch",
     "npm-publish": "npm run test && npm run update-package-version && npm run build && cd dist/src && npm publish"
   },
@@ -26,10 +26,21 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
-    "@types/jasmine": "^3.3.16",
+    "@types/jasmine": "^3.4.0",
     "@types/node": "^12.6.8",
-    "jasmine": "^3.4.0",
+    "jasmine-core": "^3.4.0",
     "jasmine-spec-reporter": "^4.2.1",
-    "typescript": "^3.5.3"
+    "karma": "^4.3.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-webpack": "^4.0.2",
+    "karma-jasmine": "^2.0.1",
+    "karma-jasmine-html-reporter": "^1.4.2",
+    "karma-typescript": "^4.1.1",
+    "typescript": "^3.5.3",
+    "webpack": "^4.39.3",
+    "ts-loader": "^6.0.4",
+    "webpack-cli": "^3.3.7",
+    "copy-webpack-plugin": "^5.0.4",
+    "clean-webpack-plugin": "^3.0.0"
   }
 }

@@ -1,5 +1,5 @@
 import {testEnumerable, testReadonlyCollection} from "./common";
-import {IList, List} from "../../../src/collections/internal";
+import {IList, List} from "../../src/collections/internal";
 
 describe('List', () => {
     testEnumerable(createFromNumberArray);

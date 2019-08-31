@@ -7,9 +7,9 @@ import {
     IReadOnlyCollection,
     List,
     Set as MySet
-} from "../../../src/collections/internal";
-import {Action, Func} from "../../../src/types/internal";
-import {TypeUtils} from "../../../src/utils/TypeUtils";
+} from "../../src/collections/internal";
+import {Action, Func} from "../../src/types/internal";
+import {TypeUtils} from "../../src/utils/TypeUtils";
 /*import {performance} from 'perf_hooks';
 
 const smallArrayLength = 10;*/
