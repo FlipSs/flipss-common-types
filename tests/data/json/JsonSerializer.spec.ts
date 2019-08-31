@@ -4,7 +4,7 @@ describe('JsonSerializer', () => {
     it('Should serialize and deserialize as JSON', () => {
         const replacer = (k, v) => {
             if (k === 'date') {
-                return new Date().getMilliseconds();
+                return new Date().getSeconds();
             }
 
             return v;
