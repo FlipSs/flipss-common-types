@@ -20,6 +20,19 @@ import {
 import {Func} from "../types/internal";
 import {asEnumerable, Dictionary, IDictionary, Set} from "../collections/internal";
 import {Argument} from "../utils/internal";
+import {IConstructorWithoutParameters} from "../common/IConstructorWithoutParameters";
+
+export function buildObjectConverterUsingConstructor<TSource, TTarget>(referenceObjectConstructor: IConstructorWithoutParameters<TTarget>): IObjectConverterBuilder<TSource, TTarget> {
+    Argument.isNotNullOrUndefined(referenceObjectConstructor, 'referenceObjectConstructor');
+
+    return new ObjectConverterBuilder(() => new referenceObjectConstructor());
+}
+
+export function buildObjectConverter<TSource, TTarget>(referenceObjectFactory: Func<TTarget>): IObjectConverterBuilder<TSource, TTarget> {
+    Argument.isNotNullOrUndefined(referenceObjectFactory, 'referenceObjectFactory');
+
+    return new ObjectConverterBuilder(referenceObjectFactory);
+}
 
 export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverterBuilder<TSource, TTarget> {
     private readonly propertyValueFactories: IDictionary<string, IPropertyValueFactory<TSource, any>>;
