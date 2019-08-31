@@ -13,6 +13,9 @@ module.exports = {
             'package.json'
         ])
     ],
+    optimization: {
+        minimize: false
+    },
     entry: {
         caching: './src/caching/index.ts',
         collections: './src/collections/index.ts',
