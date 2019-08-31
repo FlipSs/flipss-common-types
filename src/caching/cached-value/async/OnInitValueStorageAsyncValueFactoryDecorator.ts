@@ -8,7 +8,7 @@ export class OnInitValueStorageAsyncValueFactoryDecorator<T> implements IValueFa
     public constructor(private readonly valueFactory: IValueFactory<Promise<T>>,
                        private readonly valueStorage: IValueStorage<T>,
                        private readonly minValueCreatedOn?: Date) {
-        this.initialized = true;
+        this.initialized = false;
     }
 
     public createValue(): Promise<T> {

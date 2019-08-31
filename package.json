@@ -6,7 +6,7 @@
     "test": "karma start karma.config.js",
     "build": "webpack --config webpack.config.js",
     "update-package-version": "npm version patch",
-    "npm-publish": "npm run test && npm run update-package-version && npm run build && cd dist/src && npm publish"
+    "npm-publish": "npm run test --watch=false && npm run update-package-version && npm run build && cd dist/src && npm publish"
   },
   "repository": {
     "type": "git",

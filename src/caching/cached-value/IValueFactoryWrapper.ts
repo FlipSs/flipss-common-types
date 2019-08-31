@@ -1,4 +1,4 @@
-export interface IValueWrapper<T> {
+export interface IValueFactoryWrapper<T> {
     getValue(): T;
 
     updateValue(): void;

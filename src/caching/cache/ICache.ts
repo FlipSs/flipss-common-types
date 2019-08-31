@@ -6,9 +6,11 @@ export interface ICache<TKey, TValue> extends IDisposable {
 
     getOrAdd(key: TKey, valueFactory: Func<TValue, TKey>): TValue;
 
+    get(key: TKey): TValue;
+
     containsKey(key: TKey): boolean;
 
-    getValueOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined;
+    getOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined;
 
     clear(): void;
 }

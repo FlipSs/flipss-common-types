@@ -1,4 +1,4 @@
-import {IDisposable, toFactory, tryDispose, using} from "../../src/common/internal";
+import {IDisposable, toFactory, tryDispose, using, usingAsync} from "../../src/common/internal";
 
 describe('functions', () => {
     describe('tryDispose', () => {
@@ -58,6 +58,40 @@ describe('functions', () => {
         it('Should throw error when disposable null or undefined', () => {
             expect(() => using(null)).toThrow();
             expect(() => using(undefined)).toThrow();
+        });
+    });
+
+    describe('usingAsync', () => {
+        let disposable: TestDisposable;
+
+        beforeEach(() => disposable = new TestDisposable());
+
+        it('Should dispose when not error action', async () => {
+            await usingAsync(disposable, () => {
+                return Promise.resolve();
+            });
+            expect(disposable.disposed).toBeTruthy();
+        });
+
+        it('Should dispose when error action', async () => {
+            try {
+                await usingAsync(disposable, () => {
+                    throw new Error();
+                });
+            } catch (e) {
+            }
+
+            expect(disposable.disposed).toBeTruthy();
+        });
+
+        it('Should throw error when disposable null or undefined', async () => {
+            await expectAsync(usingAsync(null, () => Promise.resolve())).toBeRejected();
+            await expectAsync(usingAsync(undefined, () => Promise.resolve())).toBeRejected();
+        });
+
+        it('Should throw error when asyncAction null or undefined', async () => {
+            await expectAsync(usingAsync(disposable, null)).toBeRejected();
+            await expectAsync(usingAsync(disposable, undefined)).toBeRejected();
         });
     });
 

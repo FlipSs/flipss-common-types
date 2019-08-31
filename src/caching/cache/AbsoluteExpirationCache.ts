@@ -1,8 +1,8 @@
 import {createCountdownTimer, ITimer, TimerState, TimeSpan} from "../../time/internal";
-import {Dictionary, IDictionary, IKeyValuePair, IReadOnlyCollection} from "../../collections/internal";
+import {Dictionary, IDictionary, IEqualityComparer, IKeyValuePair} from "../../collections/internal";
 import {ICache, IStoredValue} from "../internal";
 import {Func} from "../../types/internal";
-import {Argument, TypeUtils} from "../../utils/internal";
+import {Argument} from "../../utils/internal";
 
 export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValue> {
     private readonly timer: ITimer;
@@ -10,21 +10,19 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
 
     public constructor(private readonly expirationPeriodFactory: Func<TimeSpan>,
                        private readonly expirationCheckingPeriodFactory: Func<TimeSpan>,
-                       values?: IReadOnlyCollection<IKeyValuePair<TKey, TValue>>) {
-        const predefinedValues = values && values.select<IKeyValuePair<TKey, IStoredValue<TValue>>>(kv => {
+                       values?: IKeyValuePair<TKey, TValue>[],
+                       equalityComparer?: IEqualityComparer<TKey>) {
+        const predefinedValues = values && values.map<IKeyValuePair<TKey, IStoredValue<TValue>>>(kv => {
             return {
                 key: kv.key,
-                value: {
-                    updatedOn: new Date(),
-                    value: kv.value
-                }
+                value: createStoredValue(kv.value)
             };
-        }).toArray();
+        });
 
-        this.values = new Dictionary(predefinedValues);
+        this.values = new Dictionary<TKey, IStoredValue<TValue>>(predefinedValues, equalityComparer);
         this.timer = createCountdownTimer(() => {
             this.removeOldValues();
-            this.tryStartTimer();
+            this.startTimer();
         });
     }
 
@@ -43,20 +41,23 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
     public getOrAdd(key: TKey, valueFactory: Func<TValue, TKey>): TValue {
         Argument.isNotNullOrUndefined(valueFactory, 'valueFactory');
 
-        const storedValue = this.values.getOrAdd(key, key => createStoredValue(valueFactory(key)));
+        const storedValue = this.values.getOrAdd(key, k => createStoredValue(valueFactory(k)));
 
         this.tryStartTimer();
 
         return this.getValue(storedValue);
     }
 
-    public getValueOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
-        const storedValue = this.values.getOrDefault(key);
-        if (TypeUtils.isNullOrUndefined(storedValue)) {
-            return defaultValue;
+    public get(key: TKey): TValue {
+        return this.getInternal(key);
+    }
+
+    public getOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
+        if (this.values.containsKey(key)) {
+            return this.getInternal(key);
         }
 
-        return this.getValue(storedValue);
+        return defaultValue;
     }
 
     public set(key: TKey, value: TValue): void {
@@ -73,10 +74,18 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
         return storedValue.value;
     }
 
+    private getInternal(key: TKey): TValue {
+        return this.getValue(this.values.get(key));
+    }
+
     private tryStartTimer(): void {
         if (this.timer.getState() !== TimerState.started) {
-            this.timer.start(this.expirationCheckingPeriodFactory());
+            this.startTimer();
         }
+    }
+
+    private startTimer(): void {
+        this.timer.start(this.expirationCheckingPeriodFactory());
     }
 
     private removeOldValues(): void {
@@ -84,7 +93,8 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
 
         for (let i = 0; i < this.values.length; i++) {
             const keyValuePair = this.values.getElementAt(i);
-            if (keyValuePair.value.updatedOn > expiredOn) {
+
+            if (keyValuePair.value.updatedOn <= expiredOn) {
                 this.values.tryRemove(keyValuePair.key);
             }
         }

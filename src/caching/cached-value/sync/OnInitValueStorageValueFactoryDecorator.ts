@@ -8,7 +8,7 @@ export class OnInitValueStorageValueFactoryDecorator<T> implements IValueFactory
     public constructor(private readonly valueFactory: IValueFactory<T>,
                        private readonly valueStorage: IValueStorage<T>,
                        private readonly minValueCreatedOn?: Date) {
-        this.initialized = true;
+        this.initialized = false;
     }
 
     public createValue(): T {

@@ -66,7 +66,7 @@ describe('TimeSpan', () => {
             it('Should add TimeSpan value to date', () => {
                 const now = new Date();
 
-                expect(timeSpan.addToDate(now)).toEqual(new Date(now.getMilliseconds() + timeSpan.milliseconds));
+                expect(timeSpan.addToDate(now)).toEqual(new Date(now.getTime() + timeSpan.milliseconds));
             });
         });
 
@@ -74,7 +74,7 @@ describe('TimeSpan', () => {
             it('Should subtract TimeSpan value from date', () => {
                 const now = new Date();
 
-                expect(timeSpan.subtractFromDate(now)).toEqual(new Date(now.getMilliseconds() - timeSpan.milliseconds));
+                expect(timeSpan.subtractFromDate(now)).toEqual(new Date(now.getTime() - timeSpan.milliseconds));
             });
         });
     });

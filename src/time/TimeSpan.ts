@@ -69,11 +69,11 @@ export class TimeSpan {
     }
 
     public addToDate(date: Date): Date {
-        return new Date(date.getMilliseconds() + this.value);
+        return new Date(date.getTime() + this.value);
     }
 
     public subtractFromDate(date: Date): Date {
-        return new Date(date.getMilliseconds() - this.value);
+        return new Date(date.getTime() - this.value);
     }
 }
 

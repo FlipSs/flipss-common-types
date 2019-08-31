@@ -13,12 +13,25 @@ export function tryDispose(target: any): void {
     }
 }
 
-export function using(disposable: IDisposable, action?: Action<IDisposable>) {
+export function using<T extends IDisposable>(disposable: T, action?: Action<T>): void {
     Argument.isNotNullOrUndefined(disposable, 'disposable');
 
     try {
         if (!TypeUtils.isNullOrUndefined(action)) {
             action(disposable);
+        }
+    } finally {
+        disposable.dispose();
+    }
+}
+
+export async function usingAsync<T extends IDisposable>(disposable: T, asyncAction: Func<Promise<void>, T>): Promise<void> {
+    Argument.isNotNullOrUndefined(disposable, 'disposable');
+    Argument.isNotNullOrUndefined(asyncAction, 'asyncAction');
+
+    try {
+        if (!TypeUtils.isNullOrUndefined(asyncAction)) {
+            await asyncAction(disposable);
         }
     } finally {
         disposable.dispose();

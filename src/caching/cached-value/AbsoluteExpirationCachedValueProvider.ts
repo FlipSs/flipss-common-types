@@ -1,20 +1,18 @@
 import {createCountdownTimer, ITimer, TimeSpan} from "../../time/internal";
-import {ICachedValueProvider, IValueWrapper} from "../internal";
+import {ICachedValueProvider, IValueFactoryWrapper} from "../internal";
 import {Func} from "../../types/internal";
 
 export class AbsoluteExpirationCachedValueProvider<T> implements ICachedValueProvider<T> {
     private readonly expirationPeriodTimer: ITimer;
 
-    public constructor(private readonly valueWrapper: IValueWrapper<T>,
+    public constructor(private readonly valueFactoryWrapper: IValueFactoryWrapper<T>,
                        private readonly expirationPeriodFactory: Func<TimeSpan>) {
         this.expirationPeriodTimer = createCountdownTimer(() => {
-            valueWrapper.updateValue();
+            this.valueFactoryWrapper.updateValue();
             this.startTimer();
         });
-    }
 
-    protected get expirationPeriod(): TimeSpan {
-        return this.expirationPeriodFactory();
+        this.startTimer();
     }
 
     protected get timer(): ITimer {
@@ -22,7 +20,7 @@ export class AbsoluteExpirationCachedValueProvider<T> implements ICachedValuePro
     }
 
     public getValue(): T {
-        return this.valueWrapper.getValue();
+        return this.valueFactoryWrapper.getValue();
     }
 
     public dispose(): void {
@@ -30,7 +28,7 @@ export class AbsoluteExpirationCachedValueProvider<T> implements ICachedValuePro
     }
 
     private startTimer(): void {
-        this.timer.start(this.expirationPeriod);
+        this.timer.start(this.expirationPeriodFactory());
     }
 }
 

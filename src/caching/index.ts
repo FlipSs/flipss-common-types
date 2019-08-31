@@ -5,7 +5,7 @@ export {
     IAsyncCachedValue,
     IAsyncCachedValueBuilder,
     buildAsyncCachedValue,
+    buildCache,
     ICache,
-    ICacheBuilder,
-    IStoredValue
+    ICacheBuilder
 } from './internal';

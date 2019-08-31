@@ -2,13 +2,13 @@ import {
     AbsoluteExpirationCachedValueProvider,
     AsyncCachedValue,
     DirectValueFactory,
-    DirectValueWrapper,
+    DirectValueFactoryWrapper,
     IAsyncCachedValue,
     IAsyncCachedValueBuilder,
     ICachedValueProviderConstructor,
     IValueFactory,
-    IValueWrapperConstructor,
-    LazyValueWrapper,
+    IValueFactoryWrapperConstructor,
+    LazyValueFactoryWrapper,
     OnFailureValueStorageAsyncValueFactoryDecorator,
     OnInitValueStorageAsyncValueFactoryDecorator,
     SaveValueToStorageAsyncValueFactoryDecorator,
@@ -21,13 +21,13 @@ import {Argument} from "../../../utils/internal";
 
 export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
     private valueFactory: IValueFactory<Promise<T>>;
-    private valueWrapperConstructor: IValueWrapperConstructor<Promise<T>>;
+    private valueWrapperConstructor: IValueFactoryWrapperConstructor<Promise<T>>;
     private cachedValueProviderConstructor: ICachedValueProviderConstructor<Promise<T>>;
 
     public constructor(valueFactory: Func<Promise<T>>,
                        private readonly expirationPeriodFactory: Func<TimeSpan>) {
         this.valueFactory = new DirectValueFactory(valueFactory);
-        this.valueWrapperConstructor = DirectValueWrapper;
+        this.valueWrapperConstructor = DirectValueFactoryWrapper;
         this.cachedValueProviderConstructor = AbsoluteExpirationCachedValueProvider;
     }
 
@@ -39,7 +39,7 @@ export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
     }
 
     public useLazy(): IAsyncCachedValueBuilder<T> {
-        this.valueWrapperConstructor = LazyValueWrapper;
+        this.valueWrapperConstructor = LazyValueFactoryWrapper;
 
         return this;
     }

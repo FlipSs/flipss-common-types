@@ -2,13 +2,13 @@ import {
     AbsoluteExpirationCachedValueProvider,
     CachedValue,
     DirectValueFactory,
-    DirectValueWrapper,
+    DirectValueFactoryWrapper,
     ICachedValue,
     ICachedValueBuilder,
     ICachedValueProviderConstructor,
     IValueFactory,
-    IValueWrapperConstructor,
-    LazyValueWrapper,
+    IValueFactoryWrapperConstructor,
+    LazyValueFactoryWrapper,
     OnFailureValueStorageValueFactoryDecorator,
     OnInitValueStorageValueFactoryDecorator,
     SaveValueToStorageValueFactoryDecorator,
@@ -21,25 +21,25 @@ import {Argument} from "../../../utils/internal";
 
 export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
     private valueFactory: IValueFactory<T>;
-    private valueWrapperConstructor: IValueWrapperConstructor<T>;
+    private valueFactoryWrapperConstructor: IValueFactoryWrapperConstructor<T>;
     private cachedValueProviderConstructor: ICachedValueProviderConstructor<T>;
 
     public constructor(valueFactory: Func<T>,
                        private readonly expirationPeriodFactory: Func<TimeSpan>) {
         this.valueFactory = new DirectValueFactory(valueFactory);
-        this.valueWrapperConstructor = DirectValueWrapper;
+        this.valueFactoryWrapperConstructor = DirectValueFactoryWrapper;
         this.cachedValueProviderConstructor = AbsoluteExpirationCachedValueProvider;
     }
 
     public create(): ICachedValue<T> {
-        const valueWrapper = new this.valueWrapperConstructor(this.valueFactory);
-        const cachedValueProvider = new this.cachedValueProviderConstructor(valueWrapper, this.expirationPeriodFactory);
+        const valueFactoryWrapper = new this.valueFactoryWrapperConstructor(this.valueFactory);
+        const cachedValueProvider = new this.cachedValueProviderConstructor(valueFactoryWrapper, this.expirationPeriodFactory);
 
         return new CachedValue(cachedValueProvider);
     }
 
     public useLazy(): ICachedValueBuilder<T> {
-        this.valueWrapperConstructor = LazyValueWrapper;
+        this.valueFactoryWrapperConstructor = LazyValueFactoryWrapper;
 
         return this;
     }

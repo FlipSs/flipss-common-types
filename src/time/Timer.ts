@@ -3,7 +3,7 @@ import {Argument, TypeUtils} from "../utils/internal";
 import {ITimer, TimerState, TimeSpan} from "./internal";
 import {Action} from "../types/internal";
 
-const intervalPeriod = 250;
+const intervalPeriod = 50;
 
 class TimerManager {
     private readonly timers: IList<Timer>;

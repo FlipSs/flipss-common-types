@@ -1,6 +1,6 @@
-import {IValueFactory, IValueWrapper} from "../internal";
+import {IValueFactory, IValueFactoryWrapper} from "../internal";
 
-export class DirectValueWrapper<T> implements IValueWrapper<T> {
+export class DirectValueFactoryWrapper<T> implements IValueFactoryWrapper<T> {
     private value: T;
 
     public constructor(private readonly valueFactory: IValueFactory<T>) {
