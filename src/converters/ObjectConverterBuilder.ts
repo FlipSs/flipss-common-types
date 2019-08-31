@@ -2,8 +2,8 @@ import {
     ConstantPropertyValueFactory,
     CreatedPropertyValueFactory,
     DirectPropertyTransferringObjectConverter,
+    IgnoreFunctionNullAndUndefinedValueIgnoreStrategy,
     IgnoreFunctionValueIgnoreStrategy,
-    IgnoreNullAndUndefinedValueIgnoreStrategy,
     IObjectConverter,
     IObjectConverterBuilder,
     IObjectConverterContextFactory,
@@ -18,7 +18,7 @@ import {
     TransferredPropertyValueFactory
 } from "./internal";
 import {Func} from "../types/internal";
-import {asEnumerable, Dictionary, Set, IDictionary} from "../collections/internal";
+import {asEnumerable, Dictionary, IDictionary, Set} from "../collections/internal";
 import {Argument} from "../utils/internal";
 
 export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverterBuilder<TSource, TTarget> {
@@ -91,7 +91,7 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
     }
 
     public ignoreNullAndUndefinedValues(): IObjectConverterBuilder<TSource, TTarget> {
-        this.valueIgnoreStrategyConstructor = IgnoreNullAndUndefinedValueIgnoreStrategy;
+        this.valueIgnoreStrategyConstructor = IgnoreFunctionNullAndUndefinedValueIgnoreStrategy;
 
         return this;
     }

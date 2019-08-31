@@ -1,23 +1,15 @@
-export * from './types';
-export * from './ObjectConverterBuilder';
-export * from './ObjectConverter';
-export * from './IValueIgnoreStrategyConstructor';
-export * from './IValueIgnoreStrategy';
-export * from './IObjectConverterBuilder';
-export * from './IObjectConverter';
-export * from './IgnoreNullAndUndefinedValueIgnoreStrategy';
-export * from './IgnoreFunctionValueIgnoreStrategy';
-export * from './helpers';
-export * from './DirectPropertyTransferringObjectConverter';
-export * from './ObjectConverterBuilder';
-
-export * from './value-factories/ConstantPropertyValueFactory';
-export * from './value-factories/CreatedPropertyValueFactory';
-export * from './value-factories/IPropertyValueFactory';
-export * from './value-factories/TransferredPropertyValueFactory';
-
 export * from './errors/PropertyNotAvailableError';
 export * from './errors/ReferenceObjectIsNullOrUndefinedError';
+
+export * from './value-ignore-strategies/IValueIgnoreStrategy';
+export * from './value-ignore-strategies/IValueIgnoreStrategyConstructor';
+export * from './value-ignore-strategies/IgnoreFunctionValueIgnoreStrategy';
+export * from './value-ignore-strategies/IgnoreFunctionNullAndUndefinedValueIgnoreStrategy';
+
+export * from './value-factories/IPropertyValueFactory';
+export * from './value-factories/ConstantPropertyValueFactory';
+export * from './value-factories/CreatedPropertyValueFactory';
+export * from './value-factories/TransferredPropertyValueFactory';
 
 export * from './contexts/IObjectConverterContext';
 export * from './contexts/IObjectConverterContextFactory';
@@ -26,7 +18,13 @@ export * from './contexts/ObjectConverterContextFactory';
 export * from './contexts/OptionalObjectConverterContextFactory';
 export * from './contexts/StrictObjectConverterContextFactory';
 
-
+export * from './types';
+export * from './IObjectConverter';
+export * from './ObjectConverter';
+export * from './DirectPropertyTransferringObjectConverter';
+export * from './IObjectConverterBuilder';
+export * from './ObjectConverterBuilder';
+export * from './helpers';
 
 
 

@@ -22,7 +22,7 @@ export class StrictObjectConverterContextFactory<TSource, TTarget> extends Objec
             .select(kv => kv.key)
             .toReadOnlySet();
 
-        if (notAvailablePropertyNames.length >= 0) {
+        if (notAvailablePropertyNames.length > 0) {
             throw new PropertyNotAvailableError(notAvailablePropertyNames);
         }
 

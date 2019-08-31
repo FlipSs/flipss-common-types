@@ -1,7 +1,5 @@
 import {testEnumerableGeneric, testReadonlyCollection} from "./common";
-import {Dictionary} from "../../src/collections/Dictionary";
-import {IDictionary} from "../../src/collections/IDictionary";
-import {IEqualityComparer} from "../../src/collections/IEqualityComparer";
+import {Dictionary, IDictionary, IEqualityComparer} from "../../src/collections/internal";
 
 describe('Dictionary', () => {
     testEnumerableGeneric(createFromNumberArray, v => v.value, {

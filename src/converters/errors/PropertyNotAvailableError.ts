@@ -3,7 +3,7 @@ import {Argument} from "../../utils/internal";
 
 export class PropertyNotAvailableError extends Error {
     public constructor(private readonly propertyNames: IReadOnlySet<string>) {
-        super('Some properties not available.');
+        super('Some properties are not available.');
 
         Argument.isNotNullOrEmpty(propertyNames, 'propertyNames');
 

@@ -9,7 +9,6 @@ export class ObjectConverter<TSource, TTarget> implements IObjectConverter<TSour
         Argument.isNotNullOrUndefined(source, 'source');
 
         const context = this.contextFactory.create();
-
         const resultValue = this.getReferenceObject(context, source);
 
         for (const propertyValueFactory of context.propertyValueFactories) {

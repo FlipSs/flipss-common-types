@@ -1,4 +1,4 @@
-import {IValueIgnoreStrategy} from "./internal";
+import {IValueIgnoreStrategy} from "../internal";
 
 export class IgnoreFunctionValueIgnoreStrategy implements IValueIgnoreStrategy {
     public needToIgnore(value: any): boolean {
