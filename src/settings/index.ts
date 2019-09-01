@@ -1,5 +1,5 @@
 export {
-    DynamicSettingObject,
+    SettingObject,
     ISettingLoader,
     ISettingObject,
     ISettingStorage,

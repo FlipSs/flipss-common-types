@@ -1,11 +1,11 @@
-import {DynamicSettingObject, ISettingStorage, SettingStorage} from "../../src/settings/internal";
+import {ISettingStorage, SettingObject, SettingStorage} from "../../src/settings/internal";
 import {TestSettingLoader} from "./models/TestSettingLoader";
 import {ITestSettings} from "./models/ITestSettings";
 import {IErrorObserver} from "../../src/common/IErrorObserver";
 
 const defaultValue = 'default';
 
-describe('DynamicSettingObject', () => {
+describe('SettingObject', () => {
     const settings: ITestSettings[] = [
         {value: 'first'},
         {value: 'second'},
@@ -60,7 +60,7 @@ describe('DynamicSettingObject', () => {
     });
 });
 
-class TestSettingObject extends DynamicSettingObject<string, ITestSettings> {
+class TestSettingObject extends SettingObject<string, ITestSettings> {
     public constructor(storage: ISettingStorage<ITestSettings>) {
         super(storage);
     }

@@ -16,22 +16,12 @@ module.exports = {
     optimization: {
         minimize: false
     },
-    entry: {
-        caching: './src/caching/index.ts',
-        collections: './src/collections/index.ts',
-        common: './src/common/index.ts',
-        converters: './src/converters/index.ts',
-        data: './src/data/index.ts',
-        logs: './src/logs/index.ts',
-        settings: './src/settings/index.ts',
-        storages: './src/storages/index.ts',
-        time: './src/time/index.ts',
-        types: './src/types/index.ts',
-        utils: './src/utils/index.ts'
-    },
+    entry: './src/index.ts',
+    devtool: 'source-map',
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name]/index.js'
+        libraryTarget: 'umd',
+        filename: 'index.js'
     },
     module: {
         rules: [
@@ -45,6 +35,6 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.ts']
+        extensions: ['.ts', '.js']
     },
 };
