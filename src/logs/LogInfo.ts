@@ -33,17 +33,19 @@ export function LogInfo(info: ILogInfo) {
             prototype[propertyName] = function (...args: any[]) {
                 try {
                     const result = propertyValue.apply(this, args);
-                    if (!TypeUtils.isNullOrUndefined(result)) {
-                        return Promise.resolve(result).then(undefined, (reason) => {
-                            if (TypeUtils.is(reason, LoggableError)) {
-                                return Promise.reject(reason);
-                            }
-
-                            const logMessage = LogMessageFactory.create(reason, logInfo.category, logInfo.logLevel);
-
-                            return Promise.reject(new LoggableError(logMessage));
-                        });
+                    if (!TypeUtils.is(result, Promise)) {
+                        return result;
                     }
+
+                    return result.then(undefined, (reason) => {
+                        if (TypeUtils.is(reason, LoggableError)) {
+                            return Promise.reject(reason);
+                        }
+
+                        const logMessage = LogMessageFactory.create(reason, logInfo.category, logInfo.logLevel);
+
+                        return Promise.reject(new LoggableError(logMessage));
+                    });
                 } catch (e) {
                     if (TypeUtils.is(e, LoggableError)) {
                         throw e;
