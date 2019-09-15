@@ -18,7 +18,6 @@ export * from './cached-value/IValueFactoryWrapper';
 export * from './cached-value/IValueFactoryWrapperConstructor';
 export * from './cached-value/DirectValueFactoryWrapper';
 export * from './cached-value/LazyValueFactoryWrapper';
-export * from './cached-value/ICachedValueProvider';
 export * from './cached-value/IExpirationValueFactoryWrapperDecoratorConstructor'
 export * from './cached-value/AbsoluteExpirationCachedValueFactoryWrapperDecorator';
 export * from './cached-value/SlidingExpirationCachedValueFactoryWrapperDecorator';
