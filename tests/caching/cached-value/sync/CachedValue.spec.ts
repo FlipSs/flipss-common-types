@@ -1,34 +1,55 @@
-import {CachedValue, ICachedValueProvider} from "../../../../src/caching/internal";
+import {CachedValue, IValueFactoryWrapper} from "../../../../src/caching/internal";
+import {IDisposable} from "../../../../src/common/internal";
 
 describe('CachedValue', () => {
-    it('Should get value from value provider', () => {
-        const valueProvider = new TestValueProvider();
-        const cachedValue = new CachedValue(valueProvider);
+    it('Should get value from value factory wrapper', () => {
+        const valueFactoryWrapper = new TestValueFactoryWrapper();
+        const cachedValue = new CachedValue(valueFactoryWrapper);
 
-        const expectedValue = valueProvider.getValue();
-        const spy = spyOn(valueProvider, 'getValue').and.callThrough();
+        const expectedValue = valueFactoryWrapper.getValue();
+        const spy = spyOn(valueFactoryWrapper, 'getValue').and.callThrough();
 
         expect(cachedValue.getValue()).toEqual(expectedValue);
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it('Should dispose value provider', () => {
-        const valueProvider = new TestValueProvider();
-        const cachedValue = new CachedValue(valueProvider);
-        const spy = spyOn(valueProvider, 'dispose');
+    it('Should dispose value factory wrapper if it disposable', () => {
+        const valueFactoryWrapper = new TestValueFactoryWrapper();
+        const cachedValue = new CachedValue(valueFactoryWrapper);
+        const spy = spyOn(valueFactoryWrapper, 'dispose');
 
         cachedValue.dispose();
         expect(spy).toHaveBeenCalledTimes(1);
     });
+
+    it('Should not throw if value factory wrapper not disposable', () => {
+        const cachedValue = new CachedValue(new NonDisposableTestValueFactoryWrapper());
+
+        expect(() => cachedValue.dispose()).not.toThrow();
+    });
+
+    it('Should call updateValue method of value factory wrapper when reset called', () => {
+        const valueFactoryWrapper = new TestValueFactoryWrapper();
+        const cachedValue = new CachedValue(valueFactoryWrapper);
+        const spy = spyOn(valueFactoryWrapper, 'updateValue');
+
+        cachedValue.reset();
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
 });
 
-class TestValueProvider implements ICachedValueProvider<any> {
-    public dispose(): void {
-    }
-
+class NonDisposableTestValueFactoryWrapper implements IValueFactoryWrapper<any> {
     public getValue(): any {
         return {
             value: 123
         };
+    }
+
+    public updateValue(): void {
+    }
+}
+
+class TestValueFactoryWrapper extends NonDisposableTestValueFactoryWrapper implements IDisposable {
+    public dispose(): void {
     }
 }

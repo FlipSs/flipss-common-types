@@ -1,18 +1,18 @@
 import {
-    AbsoluteExpirationCachedValueProvider,
+    AbsoluteExpirationCachedValueFactoryWrapperDecorator,
     CachedValue,
     DirectValueFactory,
     DirectValueFactoryWrapper,
     ICachedValue,
     ICachedValueBuilder,
-    ICachedValueProviderConstructor,
+    IExpirationValueFactoryWrapperDecoratorConstructor,
     IValueFactory,
     IValueFactoryWrapperConstructor,
     LazyValueFactoryWrapper,
     OnFailureValueStorageValueFactoryDecorator,
     OnInitValueStorageValueFactoryDecorator,
     SaveValueToStorageValueFactoryDecorator,
-    SlidingExpirationCachedValueProvider
+    SlidingExpirationCachedValueFactoryWrapperDecorator
 } from "../../internal";
 import {IValueStorage} from "../../../storages/internal";
 import {Action, Func} from "../../../types/internal";
@@ -22,20 +22,20 @@ import {Argument} from "../../../utils/internal";
 export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
     private valueFactory: IValueFactory<T>;
     private valueFactoryWrapperConstructor: IValueFactoryWrapperConstructor<T>;
-    private cachedValueProviderConstructor: ICachedValueProviderConstructor<T>;
+    private expirationValueFactoryWrapperDecoratorConstructor: IExpirationValueFactoryWrapperDecoratorConstructor<T>;
 
     public constructor(valueFactory: Func<T>,
                        private readonly expirationPeriodFactory: Func<TimeSpan>) {
         this.valueFactory = new DirectValueFactory(valueFactory);
         this.valueFactoryWrapperConstructor = DirectValueFactoryWrapper;
-        this.cachedValueProviderConstructor = AbsoluteExpirationCachedValueProvider;
+        this.expirationValueFactoryWrapperDecoratorConstructor = AbsoluteExpirationCachedValueFactoryWrapperDecorator;
     }
 
     public create(): ICachedValue<T> {
         const valueFactoryWrapper = new this.valueFactoryWrapperConstructor(this.valueFactory);
-        const cachedValueProvider = new this.cachedValueProviderConstructor(valueFactoryWrapper, this.expirationPeriodFactory);
+        const expirationValueFactoryWrapperDecorator = new this.expirationValueFactoryWrapperDecoratorConstructor(valueFactoryWrapper, this.expirationPeriodFactory);
 
-        return new CachedValue(cachedValueProvider);
+        return new CachedValue(expirationValueFactoryWrapperDecorator);
     }
 
     public useLazy(): ICachedValueBuilder<T> {
@@ -45,7 +45,7 @@ export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
     }
 
     public useSlidingExpiration(): ICachedValueBuilder<T> {
-        this.cachedValueProviderConstructor = SlidingExpirationCachedValueProvider;
+        this.expirationValueFactoryWrapperDecoratorConstructor = SlidingExpirationCachedValueFactoryWrapperDecorator;
 
         return this;
     }

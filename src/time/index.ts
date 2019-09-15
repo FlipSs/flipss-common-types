@@ -1,1 +1,1 @@
-export {ITimer, TimeSpan, createCountdownTimer, createContinuousTimer} from './internal';
+export {ITimer, TimeSpan, createCountdownTimer, createContinuousTimer, TimerState} from './internal';

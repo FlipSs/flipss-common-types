@@ -1,14 +1,19 @@
-import {ICachedValue, ICachedValueProvider} from "../../internal";
+import {ICachedValue, IValueFactoryWrapper} from "../../internal";
+import {tryDispose} from "../../../common/internal";
 
 export class CachedValue<T> implements ICachedValue<T> {
-    public constructor(private readonly valueProvider: ICachedValueProvider<T>) {
+    public constructor(private readonly valueFactoryWrapper: IValueFactoryWrapper<T>) {
     }
 
     public getValue(): T {
-        return this.valueProvider.getValue();
+        return this.valueFactoryWrapper.getValue();
+    }
+
+    public reset(): void {
+        this.valueFactoryWrapper.updateValue();
     }
 
     public dispose(): void {
-        this.valueProvider.dispose();
+        tryDispose(this.valueFactoryWrapper);
     }
 }
