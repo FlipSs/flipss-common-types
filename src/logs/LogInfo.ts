@@ -30,7 +30,7 @@ export function LogInfo(info: ILogInfo) {
             const logInfo: ILogInfo = customProperties.getOrDefault(propertyName, info);
 
             const propertyValue = property.descriptor.value;
-            prototype[propertyName] = (...args: any[]) => {
+            prototype[propertyName] = function (...args: any[]) {
                 try {
                     const result = propertyValue.apply(this, args);
                     if (!TypeUtils.isNullOrUndefined(result)) {
