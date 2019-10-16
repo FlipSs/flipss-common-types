@@ -1,7 +1,7 @@
 import {createCountdownTimer, ITimer, TimeSpan} from "../../time/internal";
 import {IValueFactoryWrapper} from "../internal";
 import {Func} from "../../types/internal";
-import {IDisposable} from "../../common/internal";
+import {IDisposable, Observer} from "../../common/internal";
 
 export class AbsoluteExpirationCachedValueFactoryWrapperDecorator<T> implements IValueFactoryWrapper<T>, IDisposable {
     private readonly expirationPeriodTimer: ITimer;
@@ -28,6 +28,10 @@ export class AbsoluteExpirationCachedValueFactoryWrapperDecorator<T> implements 
     public updateValue(): void {
         this.valueFactoryWrapper.updateValue();
         this.restartTimer();
+    }
+
+    public subscribe(observer: Observer): IDisposable {
+        return this.valueFactoryWrapper.subscribe(observer);
     }
 
     private restartTimer(): void {

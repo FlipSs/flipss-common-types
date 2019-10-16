@@ -1,5 +1,5 @@
 import {CachedValue, IValueFactoryWrapper} from "../../../../src/caching/internal";
-import {IDisposable} from "../../../../src/common/internal";
+import {IDisposable, Observer} from "../../../../src/common/internal";
 
 describe('CachedValue', () => {
     it('Should get value from value factory wrapper', () => {
@@ -36,6 +36,15 @@ describe('CachedValue', () => {
         cachedValue.reset();
         expect(spy).toHaveBeenCalledTimes(1);
     });
+
+    it('Should call subscribe method of value factory wrapper when subscribe called', () => {
+        const valueFactoryWrapper = new TestValueFactoryWrapper();
+        const cachedValue = new CachedValue(valueFactoryWrapper);
+        const spy = spyOn(valueFactoryWrapper, 'subscribe');
+
+        cachedValue.subscribe(null);
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
 });
 
 class NonDisposableTestValueFactoryWrapper implements IValueFactoryWrapper<any> {
@@ -46,6 +55,10 @@ class NonDisposableTestValueFactoryWrapper implements IValueFactoryWrapper<any> 
     }
 
     public updateValue(): void {
+    }
+
+    public subscribe(observer: Observer): IDisposable {
+        return null;
     }
 }
 

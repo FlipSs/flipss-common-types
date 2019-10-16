@@ -1,4 +1,5 @@
 import {DirectValueFactory, LazyValueFactoryWrapper} from "../../../src/caching/internal";
+import {testValueFactoryWrapper} from "./common";
 
 describe('LazyValueFactoryWrapper', () => {
     it('Should return value from valueFactory', () => {
@@ -30,5 +31,11 @@ describe('LazyValueFactoryWrapper', () => {
         expect(spy).not.toHaveBeenCalled();
         wrapper.getValue();
         expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    testValueFactoryWrapper(() => {
+        const valueFactory = new DirectValueFactory(() => 17);
+
+        return new LazyValueFactoryWrapper(valueFactory);
     });
 });

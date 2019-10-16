@@ -1,3 +1,3 @@
-export interface IValueObserver<T> {
-    onNext(value: Readonly<T>): void;
+export interface IValueObserver<T = void> {
+    onNext(value?: Readonly<T>): void;
 }

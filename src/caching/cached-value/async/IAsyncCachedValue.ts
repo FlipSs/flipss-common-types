@@ -1,6 +1,6 @@
-import {IDisposable} from "../../../common/internal";
+import {IDisposable, IObservable} from "../../../common/internal";
 
-export interface IAsyncCachedValue<T> extends IDisposable {
+export interface IAsyncCachedValue<T> extends IDisposable, IObservable {
     getValueAsync(): Promise<T>;
 
     reset(): void;

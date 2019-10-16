@@ -1,6 +1,7 @@
 import {
     AbsoluteExpirationCachedValueFactoryWrapperDecorator,
     AsyncCachedValue,
+    CachedValue,
     DirectValueFactory,
     DirectValueFactoryWrapper,
     IAsyncCachedValue,
@@ -35,7 +36,9 @@ export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
         const valueWrapper = new this.valueWrapperConstructor(this.valueFactory);
         const expirationValueFactoryWrapperDecorator = new this.expirationValueFactoryWrapperDecoratorConstructor(valueWrapper, this.expirationPeriodFactory);
 
-        return new AsyncCachedValue(expirationValueFactoryWrapperDecorator);
+        const cachedValue = new CachedValue(expirationValueFactoryWrapperDecorator);
+
+        return new AsyncCachedValue(cachedValue);
     }
 
     public useLazy(): IAsyncCachedValueBuilder<T> {

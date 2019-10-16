@@ -3,7 +3,7 @@ import {Action} from "../types/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {IDisposable, IErrorObserver, IObservable, IValueObserver, Observer} from "./internal";
 
-export abstract class Observable<T> implements IObservable<T>, IDisposable {
+export abstract class Observable<T = void> implements IObservable<T>, IDisposable {
     private readonly observers: ISet<Observer<T>>;
 
     protected constructor() {

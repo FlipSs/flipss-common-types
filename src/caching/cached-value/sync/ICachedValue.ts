@@ -1,6 +1,6 @@
-import {IDisposable} from "../../../common/internal";
+import {IDisposable, IObservable} from "../../../common/internal";
 
-export interface ICachedValue<T> extends IDisposable {
+export interface ICachedValue<T> extends IDisposable, IObservable {
     getValue(): T;
 
     reset(): void;

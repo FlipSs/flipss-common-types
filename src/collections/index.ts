@@ -10,6 +10,7 @@ export {
     IReadOnlyDictionary,
     IDictionary,
     List,
+    DefaultEqualityComparer,
     Set,
     Dictionary,
     asEnumerable,
