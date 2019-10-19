@@ -86,4 +86,6 @@ export interface IEnumerable<T> extends Iterable<T> {
     toDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IDictionary<TKey, TValue>;
 
     toReadOnlyDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IReadOnlyDictionary<TKey, TValue>;
+
+    randomOrDefault(defaultValue?: T): T;
 }

@@ -332,6 +332,17 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         });
     }
 
+    public randomOrDefault(defaultValue?: T): T {
+        const value = this.value;
+        if (isEmpty(value)) {
+            return defaultValue;
+        }
+
+        const randomIndex = Math.floor(Math.random() * value.length);
+
+        return value[randomIndex];
+    }
+
     public defaultIfEmpty(defaultValue: T): IEnumerable<T> {
         return createDeferred(() => {
             const value = this.value;
