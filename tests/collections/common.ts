@@ -1257,7 +1257,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should return item that belongs to collection when collection is not empty',
                     action: (array, enumerable) => {
-                        expect(array.some(i => i === valueProvider(enumerable.randomOrDefault()))).toBeTruthy();
+                        expect(enumerable.any(i => i === enumerable.randomOrDefault())).toBeTruthy();
                     }
                 }
             ]
