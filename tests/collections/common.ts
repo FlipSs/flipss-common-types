@@ -1242,6 +1242,27 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
             ]
         );
     });
+
+    describe('randomOrDefault', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should return default value when collection is empty',
+                    action: () => {
+                        expect(enumerableFactory([]).randomOrDefault()).toBeUndefined();
+                        expect(enumerableFactory([]).randomOrDefault(10)).toBe(10);
+                        expect(enumerableFactory([]).randomOrDefault(null)).toBeNull();
+                    }
+                },
+                {
+                    name: 'Should return item that belongs to collection when collection is not empty',
+                    action: (array, enumerable) => {
+                        expect(array.some(i => i === valueProvider(enumerable.randomOrDefault()))).toBeTruthy();
+                    }
+                }
+            ]
+        );
+    });
 }
 
 function getExpectedKeyValuePairs<T>(array: T[], equalityComparer: IEqualityComparer<T>): IKeyValuePair<T, T>[] {
