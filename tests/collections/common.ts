@@ -1248,9 +1248,9 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
             [
                 {
                     name: 'Should return default value when collection is empty',
-                    action: () => {
+                    action: (array, enumerable) => {
                         expect(enumerableFactory([]).randomOrDefault()).toBeUndefined();
-                        expect(enumerableFactory([]).randomOrDefault(10)).toBe(10);
+                        expect(enumerableFactory([]).randomOrDefault(enumerable.getFirst())).toBe(enumerable.getFirst());
                         expect(enumerableFactory([]).randomOrDefault(null)).toBeNull();
                     }
                 },
