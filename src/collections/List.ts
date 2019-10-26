@@ -1,5 +1,5 @@
 import {IList, ReadOnlyCollection, tryRemoveItem} from "./internal";
-import {TypeUtils} from "../utils/internal";
+import {Argument, TypeUtils} from "../utils/internal";
 
 export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
     private items: T[];
@@ -22,12 +22,24 @@ export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
         this.items.push(value);
     }
 
-    public clear(): void {
+    public clear(): ReadonlyArray<T> {
+        const result = this.items;
+
         this.items = [];
+
+        return result;
     }
 
     public tryRemove(value: T): boolean {
         return tryRemoveItem(this.items, i => i === value);
+    }
+
+    public addRange(values: Iterable<T>): void {
+        Argument.isNotNullOrUndefined(values, 'values');
+
+        for (const value of values) {
+            this.add(value);
+        }
     }
 
     protected getValue(): T[] {

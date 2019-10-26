@@ -7,7 +7,7 @@ describe('List', () => {
     testReadonlyCollection(createFromNumberArray);
 
     describe('add', () => {
-        it('Should add item to list', () => {
+        it('Should add value to list', () => {
             const list = new List();
 
             list.add(10);
@@ -17,6 +17,25 @@ describe('List', () => {
 
             expect(list.toArray()).toEqual([10, null, undefined, NaN]);
         })
+    });
+
+    describe('addRange', () => {
+        it('Should throw error when values are null or undefined', () => {
+            const list = new List();
+
+            expect(() => list.addRange(null)).toThrow();
+            expect(() => list.addRange(undefined)).toThrow();
+        });
+
+        it('Should add values to list', () => {
+            const list = new List();
+
+            const values = [1, 2, 3, 4, 5];
+
+            list.addRange(values);
+            expect(list.length).toBe(values.length);
+            expect(list.toArray()).toEqual(values);
+        });
     });
 
     describe('tryRemove', () => {
@@ -36,12 +55,15 @@ describe('List', () => {
     });
 
     describe('clear', () => {
-        it('Should clear list', () => {
-            const list = new List([10, 0, 17]);
+        it('Should clear list and return elements', () => {
+            const referenceElements = [10, 0, 17];
+            const list = new List(referenceElements);
 
-            list.clear();
+            const elements = list.clear();
+            expect(elements).toEqual(referenceElements);
+            expect(list.length).toBe(0);
             expect(list.toArray()).toEqual([]);
-        })
+        });
     });
 });
 
