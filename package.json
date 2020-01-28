@@ -30,6 +30,7 @@
     "@types/node": "^13.5.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
+    "handlebars": "^4.7.2",
     "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "^4.2.1",
     "karma": "^4.4.1",
@@ -39,9 +40,8 @@
     "karma-typescript": "^4.1.1",
     "karma-webpack": "^4.0.2",
     "ts-loader": "^6.2.1",
-    "typescript": "^3.7.5",
+    "typescript": "^3.4.1",
     "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
-    "handlebars": "^4.7.2"
+    "webpack-cli": "^3.3.10"
   }
 }
