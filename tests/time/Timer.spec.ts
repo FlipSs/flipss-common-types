@@ -334,7 +334,7 @@ function testTimer(timerFactory: Func<ITimer, Action>): void {
         it('Should continue when suspended', async () => {
             timer.start(TimeSpan.fromMilliseconds(500));
 
-            await delay(250);
+            await delay(300);
 
             timer.suspend();
 
