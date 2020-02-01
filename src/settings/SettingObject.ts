@@ -3,20 +3,20 @@ import {Argument, TypeUtils} from "../utils/internal";
 import {IDisposable, IValueObserver, Observable} from "../common/internal";
 
 export abstract class SettingObject<TSettings, TStorageSettings> extends Observable<TSettings> implements ISettingObject<TSettings>, IValueObserver<TStorageSettings> {
-    private readonly subscription: IDisposable;
+    private readonly _subscription: IDisposable;
 
-    private currentValue: TSettings;
+    private _currentValue: TSettings;
 
     protected constructor(storage: ISettingStorage<TStorageSettings>) {
         super();
 
         Argument.isNotNullOrUndefined(storage, 'storage');
 
-        this.subscription = storage.subscribe(this);
+        this._subscription = storage.subscribe(this);
     }
 
     public get value(): Readonly<TSettings> {
-        return this.currentValue;
+        return this._currentValue;
     }
 
     public onNext(value: Readonly<TStorageSettings>): void {
@@ -26,7 +26,7 @@ export abstract class SettingObject<TSettings, TStorageSettings> extends Observa
         if (!this.isValid(settingFromStorage)) {
             this.error(new Error('Settings from storage is not valid.'));
 
-            if (!TypeUtils.isNullOrUndefined(this.currentValue)) {
+            if (!TypeUtils.isNullOrUndefined(this._currentValue)) {
                 return;
             }
 
@@ -35,14 +35,14 @@ export abstract class SettingObject<TSettings, TStorageSettings> extends Observa
             settings = settingFromStorage;
         }
 
-        this.currentValue = settings;
+        this._currentValue = settings;
         this.next(settings);
     }
 
     public dispose(): void {
         super.dispose();
 
-        this.subscription.dispose();
+        this._subscription.dispose();
     }
 
     protected abstract getFromStorage(storageSettings: TStorageSettings): TSettings;

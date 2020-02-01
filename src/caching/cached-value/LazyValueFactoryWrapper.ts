@@ -3,20 +3,20 @@ import {IValueFactory, IValueFactoryWrapper} from "../internal";
 import {Observable} from "../../common/Observable";
 
 export class LazyValueFactoryWrapper<T> extends Observable implements IValueFactoryWrapper<T> {
-    private readonly lazyValue: ILazy<T>;
+    private readonly _lazyValue: ILazy<T>;
 
     public constructor(valueFactory: IValueFactory<T>) {
         super();
 
-        this.lazyValue = new Lazy(() => valueFactory.createValue());
+        this._lazyValue = new Lazy(() => valueFactory.createValue());
     }
 
     public getValue(): T {
-        return this.lazyValue.value;
+        return this._lazyValue.value;
     }
 
     public updateValue(): void {
-        this.lazyValue.reset();
+        this._lazyValue.reset();
         this.next();
     }
 }

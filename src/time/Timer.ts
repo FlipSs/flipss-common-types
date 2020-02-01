@@ -3,23 +3,23 @@ import {Argument, TypeUtils} from "../utils/internal";
 import {ITimer, TimerState, TimeSpan} from "./internal";
 import {Action} from "../types/internal";
 
-const intervalPeriod = 50;
+const timeout = 50;
 
 class TimerManager {
-    private readonly timers: IList<Timer>;
-    private intervalId: number | null;
+    private readonly _timers!: IList<Timer>;
+    private _intervalId: number | null;
 
     public constructor() {
-        this.timers = new List<Timer>();
-        this.intervalId = null;
+        this._timers = new List<Timer>();
+        this._intervalId = null;
     }
 
     private get isIntervalSet(): boolean {
-        return !TypeUtils.isNullOrUndefined(this.intervalId);
+        return !TypeUtils.isNullOrUndefined(this._intervalId);
     }
 
     public add(timer: Timer): void {
-        this.timers.add(timer);
+        this._timers.add(timer);
 
         if (!this.isIntervalSet) {
             this.setInterval();
@@ -27,26 +27,26 @@ class TimerManager {
     }
 
     public remove(timer: Timer): void {
-        this.timers.tryRemove(timer);
+        this._timers.tryRemove(timer);
 
-        if (this.timers.isEmpty) {
+        if (this._timers.isEmpty) {
             this.clearInterval();
         }
     }
 
     private setInterval(): void {
-        this.intervalId = window.setInterval(() => {
-            for (const timer of this.timers) {
-                timer.update(TimeSpan.fromMilliseconds(intervalPeriod));
+        this._intervalId = window.setInterval(() => {
+            for (const timer of this._timers) {
+                timer.update(TimeSpan.fromMilliseconds(timeout));
             }
-        }, intervalPeriod);
+        }, timeout);
     }
 
     private clearInterval(): void {
         if (this.isIntervalSet) {
-            clearInterval(this.intervalId);
+            clearInterval(this._intervalId);
 
-            this.intervalId = null;
+            this._intervalId = null;
         }
     }
 }
@@ -54,18 +54,18 @@ class TimerManager {
 const manager = new TimerManager();
 
 abstract class Timer implements ITimer {
-    private state: TimerState;
-    private timeLeft: TimeSpan | undefined;
-    private period: TimeSpan | undefined;
+    private _state!: TimerState;
+    private _timeLeft: TimeSpan | undefined;
+    private _period: TimeSpan | undefined;
 
     protected constructor() {
-        this.state = TimerState.stopped;
+        this._state = TimerState.stopped;
     }
 
     public update(period: TimeSpan): void {
-        const timeLeft = this.timeLeft.subtract(period);
+        const timeLeft = this._timeLeft.subtract(period);
 
-        this.timeLeft = timeLeft;
+        this._timeLeft = timeLeft;
 
         this.onUpdate(timeLeft);
     }
@@ -73,7 +73,7 @@ abstract class Timer implements ITimer {
     public start(period: TimeSpan): void {
         Argument.isNotNullOrUndefined(period, 'period');
 
-        if (this.state !== TimerState.stopped) {
+        if (this._state !== TimerState.stopped) {
             throw new Error('Timer is in progress.');
         }
 
@@ -81,7 +81,7 @@ abstract class Timer implements ITimer {
     }
 
     public stop(): void {
-        if (this.state === TimerState.stopped) {
+        if (this._state === TimerState.stopped) {
             throw new Error('Timer already stopped.');
         }
 
@@ -89,7 +89,7 @@ abstract class Timer implements ITimer {
     }
 
     public getState(): TimerState {
-        return this.state;
+        return this._state;
     }
 
     public restart(period: TimeSpan): void {
@@ -100,21 +100,21 @@ abstract class Timer implements ITimer {
     }
 
     public resume(): void {
-        if (this.state !== TimerState.suspended) {
+        if (this._state !== TimerState.suspended) {
             throw new Error('Timer is not suspended.');
         }
 
         manager.add(this);
-        this.state = TimerState.started;
+        this._state = TimerState.started;
     }
 
     public suspend(): void {
-        if (this.state !== TimerState.started) {
+        if (this._state !== TimerState.started) {
             throw new Error('Timer is not started.');
         }
 
         manager.remove(this);
-        this.state = TimerState.suspended;
+        this._state = TimerState.suspended;
     }
 
     public dispose(): void {
@@ -122,7 +122,7 @@ abstract class Timer implements ITimer {
     }
 
     public resetTime(): void {
-        if (this.state === TimerState.stopped) {
+        if (this._state === TimerState.stopped) {
             throw new Error('Timer is stopped.');
         }
 
@@ -130,13 +130,13 @@ abstract class Timer implements ITimer {
     }
 
     protected tryStop(): void {
-        if (this.state !== TimerState.stopped) {
+        if (this._state !== TimerState.stopped) {
             this.stopInternal();
         }
     }
 
     protected tryResetTime(): void {
-        if (this.state !== TimerState.stopped) {
+        if (this._state !== TimerState.stopped) {
             this.resetTimeInternal();
         }
     }
@@ -144,26 +144,26 @@ abstract class Timer implements ITimer {
     protected abstract onUpdate(timeLeft: TimeSpan): void;
 
     private resetTimeInternal(): void {
-        this.timeLeft = this.period;
+        this._timeLeft = this._period;
     }
 
     private stopInternal(): void {
-        if (this.state === TimerState.started) {
+        if (this._state === TimerState.started) {
             manager.remove(this);
         }
 
-        this.timeLeft = undefined;
-        this.period = undefined;
-        this.state = TimerState.stopped;
+        this._timeLeft = undefined;
+        this._period = undefined;
+        this._state = TimerState.stopped;
     }
 
     private startInternal(period: TimeSpan): void {
-        this.period = period;
-        this.timeLeft = period;
+        this._period = period;
+        this._timeLeft = period;
 
         manager.add(this);
 
-        this.state = TimerState.started;
+        this._state = TimerState.started;
     }
 }
 

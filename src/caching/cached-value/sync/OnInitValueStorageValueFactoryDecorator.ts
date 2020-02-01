@@ -3,24 +3,24 @@ import {IValueStorage} from "../../../storages/internal";
 import {TypeUtils} from "../../../utils/internal";
 
 export class OnInitValueStorageValueFactoryDecorator<T> implements IValueFactory<T> {
-    private initialized: boolean;
+    private _initialized: boolean;
 
-    public constructor(private readonly valueFactory: IValueFactory<T>,
-                       private readonly valueStorage: IValueStorage<T>,
-                       private readonly minValueCreatedOn?: Date) {
-        this.initialized = false;
+    public constructor(private readonly _valueFactory: IValueFactory<T>,
+                       private readonly _valueStorage: IValueStorage<T>,
+                       private readonly _minValueCreatedOn?: Date) {
+        this._initialized = false;
     }
 
     public createValue(): T {
-        if (!this.initialized) {
-            const valueFromStorage = getValueFromStorageOrDefault(this.valueStorage, this.minValueCreatedOn);
+        if (!this._initialized) {
+            const valueFromStorage = getValueFromStorageOrDefault(this._valueStorage, this._minValueCreatedOn);
             if (!TypeUtils.isNullOrUndefined(valueFromStorage)) {
                 return valueFromStorage;
             }
 
-            this.initialized = true;
+            this._initialized = true;
         }
 
-        return this.valueFactory.createValue();
+        return this._valueFactory.createValue();
     }
 }

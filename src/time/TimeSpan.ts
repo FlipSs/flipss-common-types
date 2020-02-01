@@ -6,12 +6,12 @@ const minutesPerHour = 60;
 const hoursPerDay = 24;
 
 export class TimeSpan {
-    private constructor(private readonly value: number) {
-        Argument.isNotNullOrUndefined(this.value, 'value');
+    private constructor(private readonly _value: number) {
+        Argument.isNotNullOrUndefined(this._value, 'value');
     }
 
     public get milliseconds(): number {
-        return this.value;
+        return this._value;
     }
 
     public get seconds(): number {
@@ -53,27 +53,27 @@ export class TimeSpan {
     public add(other: TimeSpan): TimeSpan {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        return new TimeSpan(this.value + other.value);
+        return new TimeSpan(this._value + other._value);
     }
 
     public subtract(other: TimeSpan): TimeSpan {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        return new TimeSpan(this.value - other.value);
+        return new TimeSpan(this._value - other._value);
     }
 
     public equals(other: TimeSpan): boolean {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        return this.value === other.value;
+        return this._value === other._value;
     }
 
     public addToDate(date: Date): Date {
-        return new Date(date.getTime() + this.value);
+        return new Date(date.getTime() + this._value);
     }
 
     public subtractFromDate(date: Date): Date {
-        return new Date(date.getTime() - this.value);
+        return new Date(date.getTime() - this._value);
     }
 }
 

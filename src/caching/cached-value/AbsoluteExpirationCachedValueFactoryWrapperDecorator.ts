@@ -4,38 +4,38 @@ import {Func} from "../../types/internal";
 import {IDisposable, Observer} from "../../common/internal";
 
 export class AbsoluteExpirationCachedValueFactoryWrapperDecorator<T> implements IValueFactoryWrapper<T>, IDisposable {
-    private readonly expirationPeriodTimer: ITimer;
+    private readonly _expirationPeriodTimer!: ITimer;
 
-    public constructor(private readonly valueFactoryWrapper: IValueFactoryWrapper<T>,
-                       private readonly expirationPeriodFactory: Func<TimeSpan>) {
-        this.expirationPeriodTimer = createCountdownTimer(() => this.updateValue());
+    public constructor(private readonly _valueFactoryWrapper: IValueFactoryWrapper<T>,
+                       private readonly _expirationPeriodFactory: Func<TimeSpan>) {
+        this._expirationPeriodTimer = createCountdownTimer(() => this.updateValue());
 
         this.restartTimer();
     }
 
     protected get timer(): ITimer {
-        return this.expirationPeriodTimer;
+        return this._expirationPeriodTimer;
     }
 
     public getValue(): T {
-        return this.valueFactoryWrapper.getValue();
+        return this._valueFactoryWrapper.getValue();
     }
 
     public dispose(): void {
-        this.timer.dispose();
+        this._expirationPeriodTimer.dispose();
     }
 
     public updateValue(): void {
-        this.valueFactoryWrapper.updateValue();
+        this._valueFactoryWrapper.updateValue();
         this.restartTimer();
     }
 
     public subscribe(observer: Observer): IDisposable {
-        return this.valueFactoryWrapper.subscribe(observer);
+        return this._valueFactoryWrapper.subscribe(observer);
     }
 
     private restartTimer(): void {
-        this.timer.restart(this.expirationPeriodFactory());
+        this._expirationPeriodTimer.restart(this._expirationPeriodFactory());
     }
 }
 

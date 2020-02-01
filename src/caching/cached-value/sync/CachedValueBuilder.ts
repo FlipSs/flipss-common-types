@@ -20,32 +20,32 @@ import {TimeSpan} from "../../../time/internal";
 import {Argument} from "../../../utils/internal";
 
 export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
-    private valueFactory: IValueFactory<T>;
-    private valueFactoryWrapperConstructor: IValueFactoryWrapperConstructor<T>;
-    private expirationValueFactoryWrapperDecoratorConstructor: IExpirationValueFactoryWrapperDecoratorConstructor<T>;
+    private _valueFactory!: IValueFactory<T>;
+    private _valueFactoryWrapperConstructor!: IValueFactoryWrapperConstructor<T>;
+    private _expirationValueFactoryWrapperDecoratorConstructor!: IExpirationValueFactoryWrapperDecoratorConstructor<T>;
 
     public constructor(valueFactory: Func<T>,
-                       private readonly expirationPeriodFactory: Func<TimeSpan>) {
-        this.valueFactory = new DirectValueFactory(valueFactory);
-        this.valueFactoryWrapperConstructor = DirectValueFactoryWrapper;
-        this.expirationValueFactoryWrapperDecoratorConstructor = AbsoluteExpirationCachedValueFactoryWrapperDecorator;
+                       private readonly _expirationPeriodFactory: Func<TimeSpan>) {
+        this._valueFactory = new DirectValueFactory(valueFactory);
+        this._valueFactoryWrapperConstructor = DirectValueFactoryWrapper;
+        this._expirationValueFactoryWrapperDecoratorConstructor = AbsoluteExpirationCachedValueFactoryWrapperDecorator;
     }
 
     public create(): ICachedValue<T> {
-        const valueFactoryWrapper = new this.valueFactoryWrapperConstructor(this.valueFactory);
-        const expirationValueFactoryWrapperDecorator = new this.expirationValueFactoryWrapperDecoratorConstructor(valueFactoryWrapper, this.expirationPeriodFactory);
+        const valueFactoryWrapper = new this._valueFactoryWrapperConstructor(this._valueFactory);
+        const expirationValueFactoryWrapperDecorator = new this._expirationValueFactoryWrapperDecoratorConstructor(valueFactoryWrapper, this._expirationPeriodFactory);
 
         return new CachedValue(expirationValueFactoryWrapperDecorator);
     }
 
     public useLazy(): ICachedValueBuilder<T> {
-        this.valueFactoryWrapperConstructor = LazyValueFactoryWrapper;
+        this._valueFactoryWrapperConstructor = LazyValueFactoryWrapper;
 
         return this;
     }
 
     public useSlidingExpiration(): ICachedValueBuilder<T> {
-        this.expirationValueFactoryWrapperDecoratorConstructor = SlidingExpirationCachedValueFactoryWrapperDecorator;
+        this._expirationValueFactoryWrapperDecoratorConstructor = SlidingExpirationCachedValueFactoryWrapperDecorator;
 
         return this;
     }
@@ -53,7 +53,7 @@ export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
     public saveValueToValueStorage(valueStorage: IValueStorage<T>): ICachedValueBuilder<T> {
         Argument.isNotNullOrUndefined(valueStorage, 'valueStorage');
 
-        this.valueFactory = new SaveValueToStorageValueFactoryDecorator(this.valueFactory, valueStorage);
+        this._valueFactory = new SaveValueToStorageValueFactoryDecorator(this._valueFactory, valueStorage);
 
         return this;
     }
@@ -61,7 +61,7 @@ export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
     public useValueStorageOnFailure(valueStorage: IValueStorage<T>, minStorageValueCreatedOn?: Date, onFailure?: Action<any>): ICachedValueBuilder<T> {
         Argument.isNotNullOrUndefined(valueStorage, 'valueStorage');
 
-        this.valueFactory = new OnFailureValueStorageValueFactoryDecorator(this.valueFactory, valueStorage, minStorageValueCreatedOn, onFailure);
+        this._valueFactory = new OnFailureValueStorageValueFactoryDecorator(this._valueFactory, valueStorage, minStorageValueCreatedOn, onFailure);
 
         return this;
     }
@@ -69,7 +69,7 @@ export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
     public useValueStorageOnInit(valueStorage: IValueStorage<T>, minStorageValueCreatedOn?: Date): ICachedValueBuilder<T> {
         Argument.isNotNullOrUndefined(valueStorage, 'valueStorage');
 
-        this.valueFactory = new OnInitValueStorageValueFactoryDecorator(this.valueFactory, valueStorage, minStorageValueCreatedOn);
+        this._valueFactory = new OnInitValueStorageValueFactoryDecorator(this._valueFactory, valueStorage, minStorageValueCreatedOn);
 
         return this;
     }

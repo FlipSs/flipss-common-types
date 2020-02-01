@@ -168,6 +168,35 @@ describe('TypeUtils', () => {
         });
     });
 
+    describe('isFunction', () => {
+        it('Should be true on function', () => {
+            expect(TypeUtils.isFunction(function () {
+            })).toBeTruthy();
+
+            expect(TypeUtils.isFunction(() => {
+            })).toBeTruthy();
+
+            expect(new Function()).toBeTruthy();
+        });
+
+        it('Should be false on object', () => {
+            expect(TypeUtils.isFunction({})).toBeFalsy();
+        });
+
+        it('Should be false on number', () => {
+            expect(TypeUtils.isFunction(123)).toBeFalsy();
+        });
+
+        it('Should be false on array of strings', () => {
+            expect(TypeUtils.isFunction(['test1'])).toBeFalsy();
+        });
+
+        it('Should be false on null or undefined', () => {
+            expect(TypeUtils.isFunction(null)).toBeFalsy();
+            expect(TypeUtils.isFunction(undefined)).toBeFalsy();
+        });
+    });
+
     describe('isNumber', () => {
         it('Should be true on number', () => {
             expect(TypeUtils.isNumber(7)).toBeTruthy();

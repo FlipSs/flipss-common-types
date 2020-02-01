@@ -1,27 +1,27 @@
-import {Set, ISet} from "../collections/internal";
+import {ISet, Set} from "../collections/internal";
 import {Action} from "../types/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {IDisposable, IErrorObserver, IObservable, IValueObserver, Observer} from "./internal";
 
 export abstract class Observable<T = void> implements IObservable<T>, IDisposable {
-    private readonly observers: ISet<Observer<T>>;
+    private readonly _observers: ISet<Observer<T>>;
 
     protected constructor() {
-        this.observers = new Set<IValueObserver<Readonly<T>>>();
+        this._observers = new Set<IValueObserver<Readonly<T>>>();
     }
 
     protected static isValueObserver<T>(observer: Observer<T>): observer is IValueObserver<T> {
-        return !TypeUtils.isNullOrUndefined((observer as IValueObserver<T>).onNext);
+        return TypeUtils.isFunction((observer as IValueObserver<T>).onNext);
     }
 
     protected static isErrorObserver(observer: Observer<any>): observer is IErrorObserver {
-        return !TypeUtils.isNullOrUndefined((observer as IErrorObserver).onError);
+        return TypeUtils.isFunction((observer as IErrorObserver).onError);
     }
 
     public subscribe(observer: Observer<T>): IDisposable {
         Argument.isNotNullOrUndefined(observer, 'observer');
 
-        if (!this.observers.tryAdd(observer)) {
+        if (!this._observers.tryAdd(observer)) {
             throw new Error('Observer already subscribed');
         }
 
@@ -29,11 +29,11 @@ export abstract class Observable<T = void> implements IObservable<T>, IDisposabl
     }
 
     public dispose(): void {
-        this.observers.clear();
+        this._observers.clear();
     }
 
     protected next(value: Readonly<T>): void {
-        for (const observer of this.observers) {
+        for (const observer of this._observers) {
             if (Observable.isValueObserver(observer)) {
                 observer.onNext(value);
             }
@@ -41,7 +41,7 @@ export abstract class Observable<T = void> implements IObservable<T>, IDisposabl
     }
 
     protected error(error: Readonly<Error>): void {
-        for (const observer of this.observers) {
+        for (const observer of this._observers) {
             if (Observable.isErrorObserver(observer)) {
                 observer.onError(error);
             }
@@ -49,17 +49,17 @@ export abstract class Observable<T = void> implements IObservable<T>, IDisposabl
     }
 
     private unsubscribe(observer: Observer<T>): void {
-        if (!this.observers.tryRemove(observer)) {
+        if (!this._observers.tryRemove(observer)) {
             throw new Error('Observer already unsubscribed');
         }
     }
 }
 
 class Subscription implements IDisposable {
-    public constructor(private readonly unsubscribeAction: Action) {
+    public constructor(private readonly _unsubscribeAction: Action) {
     }
 
     public dispose(): void {
-        this.unsubscribeAction();
+        this._unsubscribeAction();
     }
 }

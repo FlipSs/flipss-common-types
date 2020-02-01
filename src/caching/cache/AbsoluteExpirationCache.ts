@@ -5,11 +5,11 @@ import {Func} from "../../types/internal";
 import {Argument} from "../../utils/internal";
 
 export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValue> {
-    private readonly timer: ITimer;
-    private readonly values: IDictionary<TKey, IStoredValue<TValue>>;
+    private readonly _timer: ITimer;
+    private readonly _values: IDictionary<TKey, IStoredValue<TValue>>;
 
-    public constructor(private readonly expirationPeriodFactory: Func<TimeSpan>,
-                       private readonly expirationCheckingPeriodFactory: Func<TimeSpan>,
+    public constructor(private readonly _expirationPeriodFactory: Func<TimeSpan>,
+                       private readonly _expirationCheckingPeriodFactory: Func<TimeSpan>,
                        values?: IKeyValuePair<TKey, TValue>[],
                        equalityComparer?: IEqualityComparer<TKey>) {
         const predefinedValues = values && values.map<IKeyValuePair<TKey, IStoredValue<TValue>>>(kv => {
@@ -19,29 +19,29 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
             };
         });
 
-        this.values = new Dictionary<TKey, IStoredValue<TValue>>(predefinedValues, equalityComparer);
-        this.timer = createCountdownTimer(() => {
+        this._values = new Dictionary<TKey, IStoredValue<TValue>>(predefinedValues, equalityComparer);
+        this._timer = createCountdownTimer(() => {
             this.removeOldValues();
             this.startTimer();
         });
     }
 
     public clear(): void {
-        this.values.clear();
+        this._values.clear();
 
-        if (this.timer.getState() !== TimerState.stopped) {
-            this.timer.stop();
+        if (this._timer.getState() !== TimerState.stopped) {
+            this._timer.stop();
         }
     }
 
     public containsKey(key: TKey): boolean {
-        return this.values.containsKey(key);
+        return this._values.containsKey(key);
     }
 
     public getOrAdd(key: TKey, valueFactory: Func<TValue, TKey>): TValue {
         Argument.isNotNullOrUndefined(valueFactory, 'valueFactory');
 
-        const storedValue = this.values.getOrAdd(key, k => createStoredValue(valueFactory(k)));
+        const storedValue = this._values.getOrAdd(key, k => createStoredValue(valueFactory(k)));
 
         this.tryStartTimer();
 
@@ -53,7 +53,7 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
     }
 
     public getOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
-        if (this.values.containsKey(key)) {
+        if (this._values.containsKey(key)) {
             return this.getInternal(key);
         }
 
@@ -61,13 +61,13 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
     }
 
     public set(key: TKey, value: TValue): void {
-        this.values.set(key, createStoredValue(value));
+        this._values.set(key, createStoredValue(value));
 
         this.tryStartTimer();
     }
 
     public dispose(): void {
-        this.timer.dispose();
+        this._timer.dispose();
     }
 
     protected getValue(storedValue: IStoredValue<TValue>): TValue {
@@ -75,27 +75,27 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
     }
 
     private getInternal(key: TKey): TValue {
-        return this.getValue(this.values.get(key));
+        return this.getValue(this._values.get(key));
     }
 
     private tryStartTimer(): void {
-        if (this.timer.getState() !== TimerState.started) {
+        if (this._timer.getState() !== TimerState.started) {
             this.startTimer();
         }
     }
 
     private startTimer(): void {
-        this.timer.start(this.expirationCheckingPeriodFactory());
+        this._timer.start(this._expirationCheckingPeriodFactory());
     }
 
     private removeOldValues(): void {
-        const expiredOn = this.expirationPeriodFactory().subtractFromDate(new Date());
+        const expiredOn = this._expirationPeriodFactory().subtractFromDate(new Date());
 
-        for (let i = 0; i < this.values.length; i++) {
-            const keyValuePair = this.values.getElementAt(i);
+        for (let i = 0; i < this._values.length; i++) {
+            const keyValuePair = this._values.getElementAt(i);
 
             if (keyValuePair.value.updatedOn <= expiredOn) {
-                this.values.tryRemove(keyValuePair.key);
+                this._values.tryRemove(keyValuePair.key);
             }
         }
     }

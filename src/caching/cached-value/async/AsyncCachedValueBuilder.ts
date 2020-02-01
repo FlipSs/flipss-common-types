@@ -21,20 +21,20 @@ import {IValueStorage} from "../../../storages/internal";
 import {Argument} from "../../../utils/internal";
 
 export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
-    private valueFactory: IValueFactory<Promise<T>>;
-    private valueWrapperConstructor: IValueFactoryWrapperConstructor<Promise<T>>;
-    private expirationValueFactoryWrapperDecoratorConstructor: IExpirationValueFactoryWrapperDecoratorConstructor<Promise<T>>;
+    private _valueFactory!: IValueFactory<Promise<T>>;
+    private _valueWrapperConstructor!: IValueFactoryWrapperConstructor<Promise<T>>;
+    private _expirationValueFactoryWrapperDecoratorConstructor!: IExpirationValueFactoryWrapperDecoratorConstructor<Promise<T>>;
 
     public constructor(valueFactory: Func<Promise<T>>,
-                       private readonly expirationPeriodFactory: Func<TimeSpan>) {
-        this.valueFactory = new DirectValueFactory(valueFactory);
-        this.valueWrapperConstructor = DirectValueFactoryWrapper;
-        this.expirationValueFactoryWrapperDecoratorConstructor = AbsoluteExpirationCachedValueFactoryWrapperDecorator;
+                       private readonly _expirationPeriodFactory: Func<TimeSpan>) {
+        this._valueFactory = new DirectValueFactory(valueFactory);
+        this._valueWrapperConstructor = DirectValueFactoryWrapper;
+        this._expirationValueFactoryWrapperDecoratorConstructor = AbsoluteExpirationCachedValueFactoryWrapperDecorator;
     }
 
     public create(): IAsyncCachedValue<T> {
-        const valueWrapper = new this.valueWrapperConstructor(this.valueFactory);
-        const expirationValueFactoryWrapperDecorator = new this.expirationValueFactoryWrapperDecoratorConstructor(valueWrapper, this.expirationPeriodFactory);
+        const valueWrapper = new this._valueWrapperConstructor(this._valueFactory);
+        const expirationValueFactoryWrapperDecorator = new this._expirationValueFactoryWrapperDecoratorConstructor(valueWrapper, this._expirationPeriodFactory);
 
         const cachedValue = new CachedValue(expirationValueFactoryWrapperDecorator);
 
@@ -42,13 +42,13 @@ export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
     }
 
     public useLazy(): IAsyncCachedValueBuilder<T> {
-        this.valueWrapperConstructor = LazyValueFactoryWrapper;
+        this._valueWrapperConstructor = LazyValueFactoryWrapper;
 
         return this;
     }
 
     public useSlidingExpiration(): IAsyncCachedValueBuilder<T> {
-        this.expirationValueFactoryWrapperDecoratorConstructor = SlidingExpirationCachedValueFactoryWrapperDecorator;
+        this._expirationValueFactoryWrapperDecoratorConstructor = SlidingExpirationCachedValueFactoryWrapperDecorator;
 
         return this;
     }
@@ -56,7 +56,7 @@ export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
     public saveValueToValueStorage(valueStorage: IValueStorage<T>): IAsyncCachedValueBuilder<T> {
         Argument.isNotNullOrUndefined(valueStorage, 'valueStorage');
 
-        this.valueFactory = new SaveValueToStorageAsyncValueFactoryDecorator(this.valueFactory, valueStorage);
+        this._valueFactory = new SaveValueToStorageAsyncValueFactoryDecorator(this._valueFactory, valueStorage);
 
         return this;
     }
@@ -64,7 +64,7 @@ export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
     public useValueStorageOnFailure(valueStorage: IValueStorage<T>, minStorageValueCreatedOn?: Date, onFailure?: Action<any>): IAsyncCachedValueBuilder<T> {
         Argument.isNotNullOrUndefined(valueStorage, 'valueStorage');
 
-        this.valueFactory = new OnFailureValueStorageAsyncValueFactoryDecorator(this.valueFactory, valueStorage, minStorageValueCreatedOn, onFailure);
+        this._valueFactory = new OnFailureValueStorageAsyncValueFactoryDecorator(this._valueFactory, valueStorage, minStorageValueCreatedOn, onFailure);
 
         return this;
     }
@@ -72,7 +72,7 @@ export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
     public useValueStorageOnInit(valueStorage: IValueStorage<T>, minStorageValueCreatedOn?: Date): IAsyncCachedValueBuilder<T> {
         Argument.isNotNullOrUndefined(valueStorage, 'valueStorage');
 
-        this.valueFactory = new OnInitValueStorageAsyncValueFactoryDecorator(this.valueFactory, valueStorage, minStorageValueCreatedOn);
+        this._valueFactory = new OnInitValueStorageAsyncValueFactoryDecorator(this._valueFactory, valueStorage, minStorageValueCreatedOn);
 
         return this;
     }

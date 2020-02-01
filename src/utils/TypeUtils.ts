@@ -1,6 +1,10 @@
 import {TypeConstructor} from "../types/internal";
 
 export class TypeUtils {
+    public static isFunction(argument: any): argument is Function {
+        return typeof argument === 'function' || this.is(argument, Function);
+    }
+
     public static isNullOrUndefined(argument: any): boolean {
         return argument == undefined;
     }

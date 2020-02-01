@@ -14,24 +14,24 @@ export function buildCache<TKey, TValue>(expirationPeriod: TimeSpan | Func<TimeS
 }
 
 export class CacheBuilder<TKey, TValue> implements ICacheBuilder<TKey, TValue> {
-    private expirationCheckingPeriodFactory: Func<TimeSpan>;
-    private cacheConstructor: ICacheConstructor<TKey, TValue>;
-    private predefinedValues: IKeyValuePair<TKey, TValue>[];
-    private equalityComparer: IEqualityComparer<TKey>;
+    private _expirationCheckingPeriodFactory!: Func<TimeSpan>;
+    private _cacheConstructor!: ICacheConstructor<TKey, TValue>;
+    private _predefinedValues: IKeyValuePair<TKey, TValue>[];
+    private _equalityComparer: IEqualityComparer<TKey>;
 
-    public constructor(private readonly expirationPeriodFactory: Func<TimeSpan>) {
-        this.expirationCheckingPeriodFactory = () => defaultExpirationCheckingPeriod;
-        this.cacheConstructor = AbsoluteExpirationCache;
+    public constructor(private readonly _expirationPeriodFactory: Func<TimeSpan>) {
+        this._expirationCheckingPeriodFactory = () => defaultExpirationCheckingPeriod;
+        this._cacheConstructor = AbsoluteExpirationCache;
     }
 
     public create(): ICache<TKey, TValue> {
-        return new this.cacheConstructor(this.expirationPeriodFactory, this.expirationCheckingPeriodFactory, this.predefinedValues, this.equalityComparer);
+        return new this._cacheConstructor(this._expirationPeriodFactory, this._expirationCheckingPeriodFactory, this._predefinedValues, this._equalityComparer);
     }
 
     public setExpirationCheckingPeriod(expirationCheckingPeriod: TimeSpan | Func<TimeSpan>): ICacheBuilder<TKey, TValue> {
         Argument.isNotNullOrUndefined(expirationCheckingPeriod, 'expirationCheckingPeriod');
 
-        this.expirationCheckingPeriodFactory = toFactory(TimeSpan, expirationCheckingPeriod);
+        this._expirationCheckingPeriodFactory = toFactory(TimeSpan, expirationCheckingPeriod);
 
         return this;
     }
@@ -39,13 +39,13 @@ export class CacheBuilder<TKey, TValue> implements ICacheBuilder<TKey, TValue> {
     public setPredefinedValues(values: IKeyValuePair<TKey, TValue>[]): ICacheBuilder<TKey, TValue> {
         Argument.isNotNullOrEmpty(values, 'values');
 
-        this.predefinedValues = values;
+        this._predefinedValues = values;
 
         return this;
     }
 
     public useSlidingExpiration(): ICacheBuilder<TKey, TValue> {
-        this.cacheConstructor = SlidingExpirationCache;
+        this._cacheConstructor = SlidingExpirationCache;
 
         return this;
     }
@@ -53,7 +53,7 @@ export class CacheBuilder<TKey, TValue> implements ICacheBuilder<TKey, TValue> {
     public setEqualityComparer(equalityComparer: IEqualityComparer<TKey>): ICacheBuilder<TKey, TValue> {
         Argument.isNotNullOrUndefined(equalityComparer, 'equalityComparer');
 
-        this.equalityComparer = equalityComparer;
+        this._equalityComparer = equalityComparer;
 
         return this;
     }

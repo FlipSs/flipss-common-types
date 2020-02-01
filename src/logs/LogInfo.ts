@@ -1,5 +1,5 @@
 import {TypeUtils} from "../utils/internal";
-import {ILogInfo, LoggableError, LogMessageFactory} from "./internal";
+import {ILogInfo, LogMessageContainerError, LogMessageFactory} from "./internal";
 import {asEnumerable, Dictionary, IDictionary, ISet, Set} from "../collections/internal";
 
 const customLogInfoDictionary: IDictionary<Object, IDictionary<string, ILogInfo>> = new Dictionary<Object, IDictionary<string, ILogInfo>>();
@@ -38,22 +38,22 @@ export function LogInfo(info: ILogInfo) {
                     }
 
                     return result.then(undefined, (reason) => {
-                        if (TypeUtils.is(reason, LoggableError)) {
+                        if (TypeUtils.is(reason, LogMessageContainerError)) {
                             return Promise.reject(reason);
                         }
 
                         const logMessage = LogMessageFactory.create(reason, logInfo.category, logInfo.logLevel);
 
-                        return Promise.reject(new LoggableError(logMessage));
+                        return Promise.reject(new LogMessageContainerError(logMessage));
                     });
                 } catch (e) {
-                    if (TypeUtils.is(e, LoggableError)) {
+                    if (TypeUtils.is(e, LogMessageContainerError)) {
                         throw e;
                     }
 
                     const logMessage = LogMessageFactory.create(e, logInfo.category, logInfo.logLevel);
 
-                    throw new LoggableError(logMessage);
+                    throw new LogMessageContainerError(logMessage);
                 }
             }
         }

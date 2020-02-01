@@ -5,6 +5,6 @@ export * from './ILogSender';
 export * from './LogInfo';
 export * from './ILogInfo';
 export * from './CreateLogger';
-export * from './LoggableError';
+export * from './LogMessageContainerError';
 export * from './Logger';
 export * from './LogMessageFactory';

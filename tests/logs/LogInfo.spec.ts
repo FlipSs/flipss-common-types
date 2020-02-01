@@ -1,4 +1,4 @@
-import {CustomLogInfo, LoggableError, LogInfo, LogInfoDisable, LogLevel} from "../../src/logs/internal";
+import {CustomLogInfo, LogMessageContainerError, LogInfo, LogInfoDisable, LogLevel} from "../../src/logs/internal";
 import {TypeUtils} from "../../src/utils/internal";
 
 const category = 'Class';
@@ -15,27 +15,27 @@ describe('LogInfo', () => {
     });
 
     it('Should ignore getters', function () {
-        expect(() => type.test).not.toThrowMatching(e => TypeUtils.is(e, LoggableError));
+        expect(() => type.test).not.toThrowMatching(e => TypeUtils.is(e, LogMessageContainerError));
     });
 
     it('Should ignore constructors', () => {
-        expect(() => new ErrorInConstructor()).not.toThrowMatching(e => TypeUtils.is(e, LoggableError));
+        expect(() => new ErrorInConstructor()).not.toThrowMatching(e => TypeUtils.is(e, LogMessageContainerError));
     });
 
     it('Should ignore methods with LogInfoDisable decorator', () => {
-        expect(() => type.logInfoDisable()).not.toThrowMatching(e => TypeUtils.is(e, LoggableError));
+        expect(() => type.logInfoDisable()).not.toThrowMatching(e => TypeUtils.is(e, LogMessageContainerError));
     });
 
     it('Should throw LoggableError when error thrown', () => {
         expect(() => type.getTest()).toThrowMatching(e =>
-            TypeUtils.is(e, LoggableError) &&
+            TypeUtils.is(e, LogMessageContainerError) &&
             e.log.category === category &&
             e.log.level === logLevel &&
             e.log.message === message);
     });
 
     it('Should throw LoggableError when promise rejected', async () => {
-        await expectAsync(type.getTestPromise()).toBeRejectedWith(new LoggableError({
+        await expectAsync(type.getTestPromise()).toBeRejectedWith(new LogMessageContainerError({
             category: category,
             message: message,
             data: undefined,
@@ -45,17 +45,17 @@ describe('LogInfo', () => {
 
     it('Should use custom log info in methods with CustomLogInfo decorator', () => {
         expect(() => type.methodLogInfo()).toThrowMatching(e =>
-            TypeUtils.is(e, LoggableError) &&
+            TypeUtils.is(e, LogMessageContainerError) &&
             e.log.category === customLogInfoCategory &&
             e.log.level === customLogInfoLogLevel);
     });
 
     it('Should ignore non writable properties', () => {
-        expect(() => type.nonWritable()).not.toThrowMatching(e => TypeUtils.is(e, LoggableError));
+        expect(() => type.nonWritable()).not.toThrowMatching(e => TypeUtils.is(e, LogMessageContainerError));
     });
 
     it('Should do nothing when LoggableErrorThrown', () => {
-        const error = new LoggableError(undefined);
+        const error = new LogMessageContainerError(undefined);
 
         expect(() => type.throwLoggableError(error)).toThrow(error);
     });
@@ -101,7 +101,7 @@ class Test {
         throw new Error('test');
     }
 
-    public throwLoggableError(error: LoggableError): never {
+    public throwLoggableError(error: LogMessageContainerError): never {
         throw error;
     }
 }

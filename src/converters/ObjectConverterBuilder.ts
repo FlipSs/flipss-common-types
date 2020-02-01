@@ -35,24 +35,24 @@ export function buildObjectConverter<TSource, TTarget>(referenceObjectFactory: F
 }
 
 export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverterBuilder<TSource, TTarget> {
-    private readonly propertyValueFactories: IDictionary<string, IPropertyValueFactory<TSource, any>>;
+    private readonly _propertyValueFactories!: IDictionary<string, IPropertyValueFactory<TSource, any>>;
 
-    private converterFactory: Func<IObjectConverter<TSource, TTarget>, IObjectConverterContextFactory<TSource, TTarget>>;
-    private contextFactoryConstructor: IObjectConverterContextFactoryConstructor<TSource, TTarget>;
-    private valueIgnoreStrategyConstructor: IValueIgnoreStrategyConstructor;
+    private _converterFactory!: Func<IObjectConverter<TSource, TTarget>, IObjectConverterContextFactory<TSource, TTarget>>;
+    private _contextFactoryConstructor!: IObjectConverterContextFactoryConstructor<TSource, TTarget>;
+    private _valueIgnoreStrategyConstructor!: IValueIgnoreStrategyConstructor;
 
-    public constructor(private readonly referenceObjectFactory: Func<TTarget>) {
-        this.propertyValueFactories = new Dictionary<string, IPropertyValueFactory<TSource, any>>();
-        this.converterFactory = f => new ObjectConverter(f);
-        this.contextFactoryConstructor = OptionalObjectConverterContextFactory;
-        this.valueIgnoreStrategyConstructor = IgnoreFunctionValueIgnoreStrategy;
+    public constructor(private readonly _referenceObjectFactory: Func<TTarget>) {
+        this._propertyValueFactories = new Dictionary<string, IPropertyValueFactory<TSource, any>>();
+        this._converterFactory = f => new ObjectConverter(f);
+        this._contextFactoryConstructor = OptionalObjectConverterContextFactory;
+        this._valueIgnoreStrategyConstructor = IgnoreFunctionValueIgnoreStrategy;
     }
 
     public create(): IObjectConverter<TSource, TTarget> {
-        const valueIgnoreStrategy = new this.valueIgnoreStrategyConstructor();
-        const contextFactory = new this.contextFactoryConstructor(this.referenceObjectFactory, valueIgnoreStrategy, this.propertyValueFactories);
+        const valueIgnoreStrategy = new this._valueIgnoreStrategyConstructor();
+        const contextFactory = new this._contextFactoryConstructor(this._referenceObjectFactory, valueIgnoreStrategy, this._propertyValueFactories);
 
-        return this.converterFactory(contextFactory);
+        return this._converterFactory(contextFactory);
     }
 
     public set<TValue>(valueFactory: Func<TValue, Readonly<TSource>>, targetPropertyName: ObjectConverterTypedConvertiblePropertyNames<TTarget, TValue>): IObjectConverterBuilder<TSource, TTarget> {
@@ -61,7 +61,7 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
         Argument.isNotNullOrUndefined(valueFactory, 'valueFactory');
         Argument.isNotNullOrEmpty(targetPropertyNameString, 'targetPropertyName');
 
-        this.propertyValueFactories.set(targetPropertyNameString, new CreatedPropertyValueFactory(valueFactory));
+        this._propertyValueFactories.set(targetPropertyNameString, new CreatedPropertyValueFactory(valueFactory));
 
         return this;
     }
@@ -72,7 +72,7 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
         Argument.isNotNullOrUndefined(value, 'value');
         Argument.isNotNullOrEmpty(targetPropertyNameString, 'targetPropertyName');
 
-        this.propertyValueFactories.set(targetPropertyNameString, new ConstantPropertyValueFactory(value));
+        this._propertyValueFactories.set(targetPropertyNameString, new ConstantPropertyValueFactory(value));
 
         return this;
     }
@@ -84,7 +84,7 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
         Argument.isNotNullOrEmpty(sourcePropertyNameString, 'sourcePropertyName');
         Argument.isNotNullOrEmpty(targetPropertyNameString, 'targetPropertyName');
 
-        this.propertyValueFactories.set(targetPropertyNameString, new TransferredPropertyValueFactory(sourcePropertyNameString));
+        this._propertyValueFactories.set(targetPropertyNameString, new TransferredPropertyValueFactory(sourcePropertyNameString));
 
         return this;
     }
@@ -92,19 +92,19 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
     public useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[]): IObjectConverterBuilder<TSource, TTarget> {
         const excludedPropertySet = excludedProperties && asEnumerable(excludedProperties).select(p => p as string).toReadOnlySet() || new Set<string>();
 
-        this.converterFactory = f => new DirectPropertyTransferringObjectConverter(f, excludedPropertySet);
+        this._converterFactory = f => new DirectPropertyTransferringObjectConverter(f, excludedPropertySet);
 
         return this;
     }
 
     public enableStrictMode(): IObjectConverterBuilder<TSource, TTarget> {
-        this.contextFactoryConstructor = StrictObjectConverterContextFactory;
+        this._contextFactoryConstructor = StrictObjectConverterContextFactory;
 
         return this;
     }
 
     public ignoreNullAndUndefinedValues(): IObjectConverterBuilder<TSource, TTarget> {
-        this.valueIgnoreStrategyConstructor = IgnoreFunctionNullAndUndefinedValueIgnoreStrategy;
+        this._valueIgnoreStrategyConstructor = IgnoreFunctionNullAndUndefinedValueIgnoreStrategy;
 
         return this;
     }

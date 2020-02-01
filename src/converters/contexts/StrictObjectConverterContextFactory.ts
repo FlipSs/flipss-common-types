@@ -10,12 +10,12 @@ import {
 export class StrictObjectConverterContextFactory<TSource, TTarget> extends ObjectConverterContextFactory<TSource, TTarget> {
     public constructor(referenceObjectFactory: Func<TTarget>,
                        valueIgnoreStrategy: IValueIgnoreStrategy,
-                       private readonly propertyValueFactories: IReadOnlyDictionary<string, IPropertyValueFactory<TSource, any>>) {
+                       private readonly _propertyValueFactories: IReadOnlyDictionary<string, IPropertyValueFactory<TSource, any>>) {
         super(referenceObjectFactory, valueIgnoreStrategy);
     }
 
     protected getPropertyValueFactories(availablePropertyNames: IReadOnlySet<string>): IReadOnlyDictionary<string, IPropertyValueFactory<TSource, any>> {
-        const propertyValueFactories = this.propertyValueFactories;
+        const propertyValueFactories = this._propertyValueFactories;
 
         const notAvailablePropertyNames = propertyValueFactories
             .where(kv => !availablePropertyNames.has(kv.key))

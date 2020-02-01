@@ -8,9 +8,9 @@ export function isLocalStorageSupported(): boolean {
 }
 
 export class LocalStorage<T> implements IValueStorage<T> {
-    private static readonly storageList: IList<LocalStorage<any>> = new List<LocalStorage<any>>();
+    private static readonly _storageList: IList<LocalStorage<any>> = new List<LocalStorage<any>>();
 
-    private readonly serializer: LocalStorageJsonSerializer<T>;
+    private readonly _serializer: LocalStorageJsonSerializer<T>;
 
     public constructor(private readonly key: string, valueSerializer?: IJsonSerializer) {
         if (!isLocalStorageSupported()) {
@@ -19,17 +19,17 @@ export class LocalStorage<T> implements IValueStorage<T> {
 
         Argument.isNotNullOrEmpty(key, 'key');
 
-        this.serializer = new LocalStorageJsonSerializer<T>(valueSerializer);
+        this._serializer = new LocalStorageJsonSerializer<T>(valueSerializer);
 
-        LocalStorage.storageList.add(this);
+        LocalStorage._storageList.add(this);
     }
 
     public static clearAll(till?: Date): void {
         let toClear: IEnumerable<LocalStorage<any>>;
         if (TypeUtils.isNullOrUndefined(till)) {
-            toClear = this.storageList;
+            toClear = this._storageList;
         } else {
-            toClear = this.storageList.where(s => {
+            toClear = this._storageList.where(s => {
                 const value = s.get();
 
                 return value && value.createdOn <= till;
@@ -45,7 +45,7 @@ export class LocalStorage<T> implements IValueStorage<T> {
             return null;
         }
 
-        return this.serializer.deserialize(json);
+        return this._serializer.deserialize(json);
     }
 
     public set(value: T): void {
@@ -54,7 +54,7 @@ export class LocalStorage<T> implements IValueStorage<T> {
             value: value,
         };
 
-        const json = this.serializer.serialize(item);
+        const json = this._serializer.serialize(item);
 
         localStorage.setItem(this.key, json);
     }
@@ -65,18 +65,18 @@ export class LocalStorage<T> implements IValueStorage<T> {
 }
 
 class LocalStorageJsonSerializer<T> extends JsonSerializer {
-    private readonly valueSerializer: IJsonSerializer;
+    private readonly _valueSerializer: IJsonSerializer;
 
     public constructor(valueSerializer?: IJsonSerializer) {
         super();
 
-        this.valueSerializer = valueSerializer || new JsonSerializer();
+        this._valueSerializer = valueSerializer || new JsonSerializer();
     }
 
     public serialize(storedValue: IStorageValue<T>): string {
         const serializableStoredValue: ISerializableStoredValue = {
             createdOn: storedValue.createdOn.toJSON(),
-            value: this.valueSerializer.serialize(storedValue.value)
+            value: this._valueSerializer.serialize(storedValue.value)
         };
 
         return super.serialize(serializableStoredValue);
@@ -87,7 +87,7 @@ class LocalStorageJsonSerializer<T> extends JsonSerializer {
 
         return {
             createdOn: new Date(serializableStoredValue.createdOn),
-            value: this.valueSerializer.deserialize(serializableStoredValue.value)
+            value: this._valueSerializer.deserialize(serializableStoredValue.value)
         };
     }
 }

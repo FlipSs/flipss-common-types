@@ -10,7 +10,7 @@ import {TypeUtils} from "../utils/internal";
 
 export class DirectPropertyTransferringObjectConverter<TSource, TTarget> extends ObjectConverter<TSource, TTarget> {
     public constructor(contextFactory: IObjectConverterContextFactory<TSource, TTarget>,
-                       private readonly excludedPropertyNames: IReadOnlySet<string>) {
+                       private readonly _excludedPropertyNames: IReadOnlySet<string>) {
         super(contextFactory);
     }
 
@@ -18,7 +18,7 @@ export class DirectPropertyTransferringObjectConverter<TSource, TTarget> extends
         const referenceObject = super.getReferenceObject(context, source);
 
         context.availablePropertyNames
-            .where(k => !this.excludedPropertyNames.has(k))
+            .where(k => !this._excludedPropertyNames.has(k))
             .forEach(p => setPropertyValueRecursive(p, source, referenceObject, context.valueIgnoreStrategy));
 
         return referenceObject;

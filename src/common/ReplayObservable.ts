@@ -1,20 +1,20 @@
-import {List, IList} from "../collections/internal";
+import {IList, List} from "../collections/internal";
 import {IDisposable, Observable, Observer} from "./internal";
 
 export abstract class ReplayObservable<T> extends Observable<T> {
-    private values: IList<Readonly<T>>;
+    private _values: IList<Readonly<T>>;
 
-    protected constructor(private readonly replayCount: number) {
+    protected constructor(private readonly _replayCount: number) {
         super();
 
-        this.values = new List<T>();
+        this._values = new List<T>();
     }
 
     public subscribe(observer: Observer<T>): IDisposable {
         const subscription = super.subscribe(observer);
 
         if (Observable.isValueObserver(observer)) {
-            for (const value of this.values) {
+            for (const value of this._values) {
                 observer.onNext(value);
             }
         }
@@ -25,9 +25,9 @@ export abstract class ReplayObservable<T> extends Observable<T> {
     protected next(value: Readonly<T>): void {
         super.next(value);
 
-        this.values.add(value);
-        if (this.values.length > this.replayCount) {
-            this.values = this.values.skip(this.values.length - this.replayCount).toList();
+        this._values.add(value);
+        if (this._values.length > this._replayCount) {
+            this._values = this._values.skip(this._values.length - this._replayCount).toList();
         }
     }
 }

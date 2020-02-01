@@ -4,7 +4,7 @@ import {
     ILogger,
     ILogMessage,
     ILogSender,
-    LoggableError,
+    LogMessageContainerError,
     LogLevel,
     LogMessageFactory
 } from "../../src/logs/internal";
@@ -100,7 +100,7 @@ describe('Logger', () => {
 
         it('Should take log message from LoggableError', () => {
             const message: ILogMessage = LogMessageFactory.create(new Error('test'), 'test', LogLevel.fatal);
-            const loggableError = new LoggableError(message);
+            const loggableError = new LogMessageContainerError(message);
 
             logger.raw(loggableError);
 

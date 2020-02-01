@@ -1,12 +1,12 @@
-import {ILogger, ILogMessage, ILogSender, LoggableError, LogLevel, LogMessageFactory} from "./internal";
+import {ILogger, ILogMessage, ILogSender, LogLevel, LogMessageContainerError, LogMessageFactory} from "./internal";
 import {Argument, TypeUtils} from "../utils/internal";
 
 const defaultCategory = 'unknown';
 const defaultLogLevel = LogLevel.error;
 
 export class Logger implements ILogger {
-    public constructor(private readonly sender: ILogSender) {
-        Argument.isNotNullOrUndefined(sender, 'sender');
+    public constructor(private readonly _sender: ILogSender) {
+        Argument.isNotNullOrUndefined(this._sender, 'sender');
     }
 
     public debug(rawMessage: string | Error, category?: string, data?: any): void {
@@ -39,7 +39,7 @@ export class Logger implements ILogger {
         Argument.isNotNullOrUndefined(rawMessage, 'rawMessage');
 
         let logMessage: ILogMessage;
-        if (TypeUtils.is(rawMessage, LoggableError)) {
+        if (TypeUtils.is(rawMessage, LogMessageContainerError)) {
             logMessage = rawMessage.log;
         } else {
             const logLevel = TypeUtils.isNullOrUndefined(level) ? defaultLogLevel : level;
@@ -52,6 +52,6 @@ export class Logger implements ILogger {
     }
 
     private sendMessage(logMessage: ILogMessage): void {
-        this.sender.enqueue(logMessage);
+        this._sender.enqueue(logMessage);
     }
 }
