@@ -75,13 +75,13 @@ class TestSettingObject extends SettingObject<string, ITestSettings> {
 }
 
 class TestSettingObjectErrorObserver implements IErrorObserver {
-    private isCalled = false;
+    private _isCalled = false;
 
     public get called(): boolean {
-        return this.isCalled;
+        return this._isCalled;
     }
 
     public onError(error: Readonly<Error>): void {
-        this.isCalled = true;
+        this._isCalled = true;
     }
 }

@@ -30,14 +30,14 @@ describe('ReplayObservable', () => {
 });
 
 class TestObserver implements IValueObserver<string> {
-    private receivedValues: string[] = [];
+    private _receivedValues: string[] = [];
 
     public get values(): string[] {
-        return this.receivedValues;
+        return this._receivedValues;
     }
 
     public onNext(value: Readonly<string>): void {
-        this.receivedValues.push(value);
+        this._receivedValues.push(value);
     }
 }
 

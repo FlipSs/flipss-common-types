@@ -10,13 +10,13 @@ import {
 import {Argument, TypeUtils} from "../../utils/internal";
 
 export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrderedEnumerable<T> {
-    private readonly comparerArray: ISortItemComparer<T>[];
+    private readonly _comparerArray!: ISortItemComparer<T>[];
 
     public constructor(valueFactory: Func<T[]>,
                        comparer: ISortItemComparer<T>) {
         super(valueFactory);
 
-        this.comparerArray = [comparer];
+        this._comparerArray = [comparer];
     }
 
     public thenBy<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
@@ -42,7 +42,7 @@ export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrde
         }
 
         return value.sort((left, right) => {
-            for (const comparer of this.comparerArray) {
+            for (const comparer of this._comparerArray) {
                 const compareResult = comparer.compare(left, right);
                 if (compareResult !== 0) {
                     return compareResult;
@@ -54,6 +54,6 @@ export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrde
     }
 
     private addComparer(comparer: ISortItemComparer<T>): void {
-        this.comparerArray.push(comparer);
+        this._comparerArray.push(comparer);
     }
 }

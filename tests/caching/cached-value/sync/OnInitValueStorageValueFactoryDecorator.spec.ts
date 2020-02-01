@@ -32,7 +32,7 @@ class TestValueFactory implements IValueFactory<string> {
 }
 
 class TestValueStorage implements IValueStorage<string> {
-    private readonly values: IStorageValue<string>[] = [{
+    private readonly _values: IStorageValue<string>[] = [{
         createdOn: new Date(new Date().getTime() / 2),
         value: 'test'
     }];
@@ -41,7 +41,7 @@ class TestValueStorage implements IValueStorage<string> {
     }
 
     get(): IStorageValue<string> | null {
-        return this.values.shift();
+        return this._values.shift();
     }
 
     set(value: string): void {

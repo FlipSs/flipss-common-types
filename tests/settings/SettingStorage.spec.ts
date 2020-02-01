@@ -29,13 +29,13 @@ describe('SettingStorage', () => {
 });
 
 class TestSettingStorageObserver implements IValueObserver<ITestSettings> {
-    private lastValue: ITestSettings;
+    private _lastValue: ITestSettings;
 
     public get value(): ITestSettings {
-        return this.lastValue;
+        return this._lastValue;
     }
 
     public onNext(value: Readonly<ITestSettings>): void {
-        this.lastValue = value;
+        this._lastValue = value;
     }
 }

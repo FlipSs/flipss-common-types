@@ -129,13 +129,13 @@ class Test {
 }
 
 class TestDisposable implements IDisposable {
-    private isDisposed = false;
+    private _isDisposed = false;
 
     public get disposed(): boolean {
-        return this.isDisposed;
+        return this._isDisposed;
     }
 
     public dispose(): void {
-        this.isDisposed = true;
+        this._isDisposed = true;
     }
 }

@@ -2,36 +2,36 @@ import {IList, ReadOnlyCollection, tryRemoveItem} from "./internal";
 import {Argument, TypeUtils} from "../utils/internal";
 
 export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
-    private items: T[];
+    private _items: T[];
 
     public constructor(items?: Iterable<T>) {
         super();
 
         if (TypeUtils.isNullOrUndefined(items)) {
-            this.items = [];
+            this._items = [];
         } else {
-            this.items = [...items];
+            this._items = [...items];
         }
     }
 
     public get length(): number {
-        return this.items.length;
+        return this._items.length;
     }
 
     public add(value: T): void {
-        this.items.push(value);
+        this._items.push(value);
     }
 
     public clear(): ReadonlyArray<T> {
-        const result = this.items;
+        const result = this._items;
 
-        this.items = [];
+        this._items = [];
 
         return result;
     }
 
     public tryRemove(value: T): boolean {
-        return tryRemoveItem(this.items, i => i === value);
+        return tryRemoveItem(this._items, i => i === value);
     }
 
     public addRange(values: Iterable<T>): void {
@@ -43,6 +43,6 @@ export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
     }
 
     protected getValue(): T[] {
-        return this.items;
+        return this._items;
     }
 }

@@ -1,7 +1,6 @@
 import {TypeUtils} from "../../src/utils/internal";
 
 describe('TypeUtils', () => {
-
     describe('isNullOrUndefined', () => {
         it('Should be true if undefined', () => {
             expect(TypeUtils.isNullOrUndefined(undefined)).toBeTruthy();
@@ -233,5 +232,4 @@ describe('TypeUtils', () => {
 });
 
 class Test {
-
 }

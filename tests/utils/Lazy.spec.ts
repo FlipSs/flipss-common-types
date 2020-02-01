@@ -34,10 +34,10 @@ describe('Lazy', () => {
 });
 
 class TestValueProvider {
-    public constructor(private readonly values: string[]) {
+    public constructor(private readonly _values: string[]) {
     }
 
     public getValue(): string {
-        return this.values.shift();
+        return this._values.shift();
     }
 }

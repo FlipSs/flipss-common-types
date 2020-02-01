@@ -79,25 +79,25 @@ class TestObservable extends Observable<number> {
 }
 
 class TestValueObserver implements IValueObserver<number> {
-    private lastValue: Readonly<number>;
+    private _lastValue: Readonly<number>;
 
     public get value(): Readonly<number> {
-        return this.lastValue;
+        return this._lastValue;
     }
 
     public onNext(value: Readonly<number>): void {
-        this.lastValue = value;
+        this._lastValue = value;
     }
 }
 
 class TestErrorObserver implements IErrorObserver {
-    private lastError: Readonly<Error>;
+    private _lastError: Readonly<Error>;
 
     public get error(): Readonly<Error> {
-        return this.lastError;
+        return this._lastError;
     }
 
     public onError(error: Readonly<Error>): void {
-        this.lastError = error;
+        this._lastError = error;
     }
 }

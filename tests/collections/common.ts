@@ -1365,11 +1365,11 @@ interface ITestCase<T> {
 }
 
 class TestEqualityComparer<T> implements IEqualityComparer<T> {
-    public constructor(private readonly valueProvider: Func<number, T>) {
+    public constructor(private readonly _valueProvider: Func<number, T>) {
     }
 
     public equals(obj1: T, obj2: T): boolean {
-        return new TestNumberEqualityComparer().equals(this.valueProvider(obj1), this.valueProvider(obj2));
+        return new TestNumberEqualityComparer().equals(this._valueProvider(obj1), this._valueProvider(obj2));
     }
 }
 
