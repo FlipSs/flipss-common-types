@@ -5,6 +5,14 @@ export abstract class ReadOnlyCollection<T> extends Enumerable<T> implements IRe
         return this.length === 0;
     }
 
-    public abstract get length(): number;
+    public get length(): number {
+        return this.getArray().length;
+    }
+
+    public abstract getArray(): T[];
+
+    protected getValues(): T[] {
+        return this.getArray();
+    }
 }
 

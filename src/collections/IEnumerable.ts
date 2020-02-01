@@ -39,7 +39,7 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     select<TResult>(selector: Func<TResult, T>): IEnumerable<TResult>;
 
-    selectMany<TResult>(selector: Func<TResult[], T>): IEnumerable<TResult>;
+    selectMany<TResult>(selector: Func<Iterable<TResult>, T>): IEnumerable<TResult>;
 
     concat(other: Iterable<T>): IEnumerable<T>;
 
@@ -88,4 +88,6 @@ export interface IEnumerable<T> extends Iterable<T> {
     toReadOnlyDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IReadOnlyDictionary<TKey, TValue>;
 
     randomOrDefault(defaultValue?: T): T;
+
+    shuffle(): IEnumerable<T>;
 }

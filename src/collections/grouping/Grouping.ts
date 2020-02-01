@@ -1,7 +1,7 @@
-import {Enumerable, IGrouping} from "../internal";
+import {Enumerable, IGrouping, IReadOnlyCollection} from "../internal";
 
 export class Grouping<TKey, TValue> extends Enumerable<TValue> implements IGrouping<TKey, TValue> {
-    public constructor(private readonly _groupKey: TKey, private readonly _items: TValue[]) {
+    public constructor(private readonly _groupKey: TKey, private readonly _values: IReadOnlyCollection<TValue>) {
         super();
     }
 
@@ -9,7 +9,11 @@ export class Grouping<TKey, TValue> extends Enumerable<TValue> implements IGroup
         return this._groupKey;
     }
 
-    protected getValue(): TValue[] {
-        return this._items;
+    public get values(): IReadOnlyCollection<TValue> {
+        return this._values;
+    }
+
+    protected getValues(): Iterable<TValue> {
+        return this._values;
     }
 }

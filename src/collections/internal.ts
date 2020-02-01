@@ -2,7 +2,7 @@ export * from './Enumerable';
 export * from './ReadOnlyCollection';
 export * from './Dictionary';
 export * from './Set';
-export * from './DeferredEnumerable';
+export * from './IterableAsEnumerable';
 export * from './IReadOnlySet';
 export * from './IReadOnlyCollection';
 export * from './IList';
@@ -18,6 +18,7 @@ export * from './sorting/ISortItemComparer';
 export * from './sorting/SortItemComparer';
 export * from './sorting/AscendingSortItemComparer';
 export * from './sorting/DescendingSortItemComparer';
+export * from './sorting/RandomSortItemComparer';
 export * from './sorting/OrderedEnumerable';
 
 export * from './grouping/Grouping';

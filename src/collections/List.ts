@@ -1,37 +1,33 @@
-import {IList, ReadOnlyCollection, tryRemoveItem} from "./internal";
+import {IList, ReadOnlyCollection, tryRemoveValueFromArray} from "./internal";
 import {Argument, TypeUtils} from "../utils/internal";
 
 export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
-    private _items: T[];
+    private _values: T[];
 
-    public constructor(items?: Iterable<T>) {
+    public constructor(values?: Iterable<T>) {
         super();
 
-        if (TypeUtils.isNullOrUndefined(items)) {
-            this._items = [];
+        if (TypeUtils.isNullOrUndefined(values)) {
+            this._values = [];
         } else {
-            this._items = [...items];
+            this._values = [...values];
         }
     }
 
-    public get length(): number {
-        return this._items.length;
-    }
-
     public add(value: T): void {
-        this._items.push(value);
+        this._values.push(value);
     }
 
     public clear(): ReadonlyArray<T> {
-        const result = this._items;
+        const result = this._values;
 
-        this._items = [];
+        this._values = [];
 
         return result;
     }
 
     public tryRemove(value: T): boolean {
-        return tryRemoveItem(this._items, i => i === value);
+        return tryRemoveValueFromArray(this._values, i => i === value);
     }
 
     public addRange(values: Iterable<T>): void {
@@ -42,7 +38,11 @@ export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
         }
     }
 
-    protected getValue(): T[] {
-        return this._items;
+    public getArray(): T[] {
+        return this._values;
+    }
+
+    protected getValues(): T[] {
+        return this._values;
     }
 }

@@ -1,19 +1,24 @@
-import {DefaultEqualityComparer, IEqualityComparer} from "./internal";
+import {DefaultEqualityComparer, IEqualityComparer, ReadOnlyCollection} from "./internal";
 import {Predicate} from "../types/internal";
+import {TypeUtils} from "../utils/TypeUtils";
+
+export function isArrayOrCollection<T>(values: Iterable<T>): values is Array<T> | ReadOnlyCollection<T> {
+    return isArray(values) || isCollection(values);
+}
+
+export function isArray<T>(values: Iterable<T>): values is Array<T> {
+    return TypeUtils.is(values, Array);
+}
+
+export function isCollection<T>(values: Iterable<T>): values is ReadOnlyCollection<T> {
+    return TypeUtils.is(values, ReadOnlyCollection);
+}
 
 export function getEqualityComparer<T>(comparer?: IEqualityComparer<T>): IEqualityComparer<T> {
     return comparer || new DefaultEqualityComparer<T>();
 }
 
-export function containsValue<T>(array: T[], value: T, equalityComparer: IEqualityComparer<T>): boolean {
-    return contains(array, i => equalityComparer.equals(i, value));
-}
-
-export function contains<T>(array: T[], predicate: Predicate<T>): boolean {
-    return array.some(v => predicate(v));
-}
-
-export function tryRemoveItem<T>(array: T[], predicate: Predicate<T>): boolean {
+export function tryRemoveValueFromArray<T>(array: T[], predicate: Predicate<T>): boolean {
     const itemIndex = array.findIndex(i => predicate(i));
     if (itemIndex < 0) {
         return false;

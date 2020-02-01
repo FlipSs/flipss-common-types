@@ -1,20 +1,20 @@
 import {Func} from "../../types/internal";
 import {
     AscendingSortItemComparer,
-    DeferredEnumerable,
     DescendingSortItemComparer,
     IComparer,
     IOrderedEnumerable,
-    ISortItemComparer
+    ISortItemComparer,
+    IterableAsEnumerable
 } from "../internal";
-import {Argument, TypeUtils} from "../../utils/internal";
+import {Argument} from "../../utils/internal";
 
-export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrderedEnumerable<T> {
+export class OrderedEnumerable<T> extends IterableAsEnumerable<T> implements IOrderedEnumerable<T> {
     private readonly _comparerArray!: ISortItemComparer<T>[];
 
-    public constructor(valueFactory: Func<T[]>,
+    public constructor(values: Iterable<T>,
                        comparer: ISortItemComparer<T>) {
-        super(valueFactory);
+        super(values);
 
         this._comparerArray = [comparer];
     }
@@ -35,25 +35,84 @@ export class OrderedEnumerable<T> extends DeferredEnumerable<T> implements IOrde
         return this;
     }
 
-    protected getValue(): T[] {
-        const value = super.getValue();
-        if (TypeUtils.isNullOrUndefined(value)) {
-            return value;
-        }
-
-        return value.sort((left, right) => {
+    protected* getValues(): Iterable<T> {
+        const values = Array.from(super.getValues());
+        if (values.length > 0) {
             for (const comparer of this._comparerArray) {
-                const compareResult = comparer.compare(left, right);
-                if (compareResult !== 0) {
-                    return compareResult;
-                }
+                comparer.initialize(values);
             }
 
-            return 0;
-        });
+            const count = values.length;
+            const indices = [];
+            for (let i = 0; i < count; i++) {
+                indices.push(i);
+            }
+
+            this.quickSort(indices, 0, count - 1);
+
+            for (const index of indices) {
+                yield values[index];
+            }
+        }
     }
 
     private addComparer(comparer: ISortItemComparer<T>): void {
         this._comparerArray.push(comparer);
+    }
+
+    private compareIndices(left: number, right: number): number {
+        let result = 0;
+        for (const comparer of this._comparerArray) {
+            result = comparer.compare(left, right);
+            if (result !== 0) {
+                return result;
+            }
+        }
+
+        return result === 0 ? left - right : result;
+    }
+
+    private quickSort(indices: number[], left: number, right: number): void {
+        do {
+            let i = left;
+            let j = right;
+            let x = indices[i + ((j - i) >> 1)];
+            do {
+                while (i < indices.length && this.compareIndices(x, indices[i]) > 0) {
+                    i++;
+                }
+
+                while (j >= 0 && this.compareIndices(x, indices[j]) < 0) {
+                    j--;
+                }
+
+                if (i > j) {
+                    break;
+                }
+
+                if (i < j) {
+                    let temp = indices[i];
+                    indices[i] = indices[j];
+                    indices[j] = temp;
+                }
+
+                i++;
+                j--;
+            } while (i <= j);
+
+            if (j - left <= right - i) {
+                if (left < j) {
+                    this.quickSort(indices, left, j);
+                }
+
+                left = i;
+            } else {
+                if (i < right) {
+                    this.quickSort(indices, i, right);
+                }
+
+                right = j;
+            }
+        } while (left < right);
     }
 }

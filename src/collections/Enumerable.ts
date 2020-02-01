@@ -2,8 +2,6 @@ import {Action, Func, Predicate} from "../types/internal";
 import {Argument, TypeUtils} from "../utils/internal";
 import {
     AscendingSortItemComparer,
-    containsValue,
-    DeferredEnumerable,
     DescendingSortItemComparer,
     Dictionary,
     getEqualityComparer,
@@ -13,170 +11,164 @@ import {
     IEnumerable,
     IEqualityComparer,
     IGrouping,
-    IKeyValuePair,
     IList,
     IOrderedEnumerable,
     IReadOnlyDictionary,
     IReadOnlyList,
     IReadOnlySet,
+    isArray,
+    isArrayOrCollection,
+    isCollection,
     ISet,
+    IterableAsEnumerable,
     List,
     OrderedEnumerable,
+    RandomSortItemComparer,
     Set
 } from "./internal";
 
-export function asEnumerable<T>(items: T[]): IEnumerable<T> {
+export function asEnumerable<T>(items: Iterable<T>): IEnumerable<T> {
     Argument.isNotNullOrUndefined(items, 'items');
 
-    return new ArrayAsEnumerable([...items]);
+    return new IterableAsEnumerable(items);
 }
 
 export abstract class Enumerable<T> implements IEnumerable<T> {
-    private get value(): T[] {
-        return this.getValue() || [];
-    }
-
     public all(predicate: Predicate<T>): boolean {
         Argument.isNotNullOrUndefined(predicate, 'predicate');
 
-        return this.value.every(i => predicate(i));
+        for (const value of this.getValues()) {
+            if (!predicate(value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public any(predicate?: Predicate<T>): boolean {
         if (TypeUtils.isNullOrUndefined(predicate)) {
-            return this.value.length > 0;
+            const values = this.getValues();
+            if (isArrayOrCollection(values)) {
+                return values.length > 0;
+            }
+
+            return !values[Symbol.iterator]()
+                .next()
+                .done;
         }
 
-        return this.value.some(v => predicate(v));
+        for (const value of this.getValues()) {
+            if (predicate(value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public append(value: T): IEnumerable<T> {
-        return createDeferred(() => [...this.value, value]);
+        return create(append(this.getValues(), value));
     }
 
     public concat(other: Iterable<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        return createDeferred(() => {
-            if (TypeUtils.isNullOrUndefined(other)) {
-                return this.value;
-            }
-
-            return [...this.value, ...other];
-        });
+        return create(concat(this.getValues(), other));
     }
 
     public contains(value: T, comparer?: IEqualityComparer<T>): boolean {
         const equalityComparer = getEqualityComparer(comparer);
+        for (const sourceValue of this.getValues()) {
+            if (equalityComparer.equals(sourceValue, value)) {
+                return true;
+            }
+        }
 
-        return containsValue(this.value, value, equalityComparer);
+        return false;
     }
 
     public count(predicate?: Predicate<T>): number {
+        const values = this.getValues();
+        let result = 0;
         if (TypeUtils.isNullOrUndefined(predicate)) {
-            return this.value.length;
+            if (isArrayOrCollection(values)) {
+                result = values.length;
+            } else {
+                const iterator = values[Symbol.iterator]();
+                while (!iterator.next().done) {
+                    result++;
+                }
+            }
+        } else {
+            for (const value of this.getValues()) {
+                if (predicate(value)) {
+                    result++;
+                }
+            }
         }
 
-        return this.value.filter(i => predicate(i)).length;
+        return result;
     }
 
     public getElementAt(index: number): T {
-        const value = this.value;
-        if (isIndexOutOfRange(value, index)) {
-            throw new RangeError(`The argument must be between 0 and ${value.length}.`);
+        const values = this.getValues();
+        if (isArray(values)) {
+            return values[index];
         }
 
-        return value[index];
+        if (isCollection(values)) {
+            return values.getArray()[index];
+        }
+
+        return getElementAtOrDefault(values, index, () => {
+            throw new RangeError('The argument out of range')
+        });
     }
 
     public getElementAtOrDefault(index: number, defaultValue?: T): T | undefined {
-        const value = this.value;
-        if (isIndexOutOfRange(value, index)) {
-            return defaultValue;
+        const values = this.getValues();
+        if (isArray(values)) {
+            return getElementOrDefaultFromArray(values, index, defaultValue);
         }
 
-        return value[index];
+        if (isCollection(values)) {
+            return getElementOrDefaultFromArray(values.getArray(), index, defaultValue);
+        }
+
+        return getElementAtOrDefault(values, index, () => defaultValue);
     }
 
     public except(other: Iterable<T>, comparer?: IEqualityComparer<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        return createDeferred(() => {
-            if (TypeUtils.isNullOrUndefined(other)) {
-                return this.value;
-            }
-
-            const equalityComparer = getEqualityComparer(comparer);
-            const otherItems = Array.from(other);
-
-            return this.value.filter(item => !containsValue(otherItems, item, equalityComparer));
-        });
+        return create(except(this.getValues(), other, getEqualityComparer(comparer)));
     }
 
     public getFirst(predicate?: Predicate<T>): T {
-        const value = this.value;
-
-        ensureNotEmpty(value);
-
-        return getFirstOrDefault(value, () => {
-            throw new Error('Item not found');
+        return getFirstOrDefault(this.getValues(), () => {
+            throw new Error('Value not found');
         }, predicate);
     }
 
     public getFirstOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined {
-        const value = this.value;
-
-        if (isEmpty(value)) {
-            return defaultValue;
-        }
-
-        return getFirstOrDefault(value, () => defaultValue, predicate);
+        return getFirstOrDefault(this.getValues(), () => defaultValue, predicate);
     }
 
     public groupBy<TKey>(keySelector: Func<TKey, T>, comparer?: IEqualityComparer<TKey>): IEnumerable<IGrouping<TKey, T>> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        return createDeferred(() => {
-            const value = this.value;
-
-            const equalityComparer = getEqualityComparer(comparer);
-            const groupings: { key: TKey, value: T[] }[] = [];
-            for (const item of value) {
-                const key = keySelector(item);
-
-                const grouping = groupings.find(i => equalityComparer.equals(i.key, key));
-                if (TypeUtils.isNullOrUndefined(grouping)) {
-                    groupings.push({
-                        key: key,
-                        value: [item]
-                    })
-                } else {
-                    grouping.value.push(item);
-                }
-            }
-
-            return groupings.map(g => new Grouping(g.key, g.value));
-        });
+        return create(groupBy(this.getValues(), keySelector, getEqualityComparer(comparer)));
     }
 
     public getLast(predicate?: Predicate<T>): T {
-        const value = this.value;
-
-        ensureNotEmpty(value);
-
-        return getLastOrDefault(value, () => {
+        return getLastOrDefault(this.getValues(), () => {
             throw new Error('Item not found');
         }, predicate);
     }
 
     public getLastOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined {
-        const value = this.value;
-
-        if (isEmpty(value)) {
-            return defaultValue;
-        }
-
-        return getLastOrDefault(value, () => defaultValue, predicate);
+        return getLastOrDefault(this.getValues(), () => defaultValue, predicate);
     }
 
     public orderBy<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
@@ -184,7 +176,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
 
         const sortItemSelector = new AscendingSortItemComparer(keySelector, comparer);
 
-        return new OrderedEnumerable(() => this.value, sortItemSelector);
+        return new OrderedEnumerable(this.getValues(), sortItemSelector);
     }
 
     public orderByDescending<TKey>(keySelector: Func<TKey, T>, comparer?: IComparer<TKey>): IOrderedEnumerable<T> {
@@ -192,58 +184,53 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
 
         const sortItemSelector = new DescendingSortItemComparer(keySelector, comparer);
 
-        return new OrderedEnumerable(() => this.value, sortItemSelector);
+        return new OrderedEnumerable(this.getValues(), sortItemSelector);
     }
 
     public prepend(value: T): IEnumerable<T> {
-        return createDeferred(() => [value, ...this.value]);
+        return create(prepend(this.getValues(), value));
     }
 
     public select<TResult>(selector: Func<TResult, T>): IEnumerable<TResult> {
         Argument.isNotNullOrUndefined(selector, 'selector');
 
-        return createDeferred(() => this.value.map(i => selector(i)));
+        return create(select(this.getValues(), selector));
     }
 
-    public selectMany<TResult>(selector: Func<TResult[], T>): IEnumerable<TResult> {
+    public selectMany<TResult>(selector: Func<Iterable<TResult>, T>): IEnumerable<TResult> {
         Argument.isNotNullOrUndefined(selector, 'selector');
 
-        return createDeferred(() => {
-            const resultItems = [];
-            this.value.map(i => selector(i)).forEach(i => {
-                resultItems.push(...i);
-            });
-
-            return resultItems;
-        });
+        return create(selectMany(this.getValues(), selector));
     }
 
     public where(predicate: Predicate<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(predicate, 'predicate');
 
-        return createDeferred(() => this.value.filter(i => predicate(i)));
+        return create(where(this.getValues(), predicate));
     }
 
     public toArray(): T[] {
-        return this.value;
+        return Array.from(this.getValues());
     }
 
     public forEach(action: Action<T, number>): void {
         Argument.isNotNullOrUndefined(action, 'action');
 
-        this.value.forEach((e, i) => action(e, i));
+        for (const value of this.getValues()) {
+            action(value);
+        }
     }
 
     public [Symbol.iterator](): Iterator<T> {
-        return this.value[Symbol.iterator]();
+        return this.getValues()[Symbol.iterator]();
     }
 
     public reverse(): IEnumerable<T> {
-        return createDeferred(() => this.value.reverse());
+        return create(reverse(this.getValues()));
     }
 
     public toList(): IList<T> {
-        return new List(this.value);
+        return new List(this.getValues());
     }
 
     public toReadOnlyList(): IReadOnlyList<T> {
@@ -251,7 +238,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public toSet(comparer?: IEqualityComparer<T>): ISet<T> {
-        return new Set(this.value, comparer);
+        return new Set(this.getValues(), comparer);
     }
 
     public toReadOnlySet(comparer?: IEqualityComparer<T>): IReadOnlySet<T> {
@@ -262,14 +249,12 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
         Argument.isNotNullOrUndefined(valueSelector, 'valueSelector');
 
-        const keyValuePairs: IKeyValuePair<TKey, TValue>[] = this.value.map(v => {
+        return new Dictionary(select(this.getValues(), v => {
             return {
                 key: keySelector(v),
                 value: valueSelector(v)
             };
-        });
-
-        return new Dictionary(keyValuePairs, comparer);
+        }), comparer);
     }
 
     public toReadOnlyDictionary<TKey, TValue>(keySelector: Func<TKey, T>, valueSelector: Func<TValue, T>, comparer?: IEqualityComparer<TKey>): IReadOnlyDictionary<TKey, TValue> {
@@ -277,168 +262,313 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public skip(count: number): IEnumerable<T> {
-        return createDeferred(() => this.value.slice(count));
+        ensureCountIsValid(count);
+
+        const values = this.getValues();
+        let result: Iterable<T>;
+        if (isArray(values)) {
+            result = values.slice(count);
+        } else {
+            result = skip(values, count);
+        }
+
+        return create(result);
     }
 
     public take(count: number): IEnumerable<T> {
-        return createDeferred(() => this.value.slice(0, count));
+        ensureCountIsValid(count);
+
+        const values = this.getValues();
+        let result: Iterable<T>;
+        if (isArray(values)) {
+            result = values.slice(0, count);
+        } else {
+            result = take(values, count);
+        }
+
+        return create(result);
     }
 
     public average(valueProvider: Func<number, T>): number {
         Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
 
-        const value = this.value;
+        let count = 0;
+        let total = 0;
+        for (const value of this.getValues()) {
+            count++;
+            total += valueProvider(value);
+        }
 
-        return calculateSum(value, valueProvider) / value.length;
+        if (count === 0) {
+            throw new Error('Collection is empty');
+        }
+
+        return total / count;
     }
 
     public min(valueProvider: Func<number, T>): number {
         Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
 
-        const value = this.value;
-
-        return findBestMatchingValue(value, valueProvider, (n, o) => n < o);
+        return findBestMatchingValue(this.getValues(), valueProvider, (n, o) => n < o);
     }
 
     public sum(valueProvider: Func<number, T>): number {
         Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
 
-        const value = this.value;
+        const iterator = this.getValues()[Symbol.iterator]();
+        let iterationResult = iterator.next();
+        if (iterationResult.done) {
+            throw new Error('Collection is empty');
+        }
 
-        return calculateSum(value, valueProvider);
+        let sum = valueProvider(iterationResult.value);
+        iterationResult = iterator.next();
+        while (!iterationResult.done) {
+            sum += valueProvider(iterationResult.value);
+        }
+
+        return sum;
     }
 
     public max(valueProvider: Func<number, T>): number {
         Argument.isNotNullOrUndefined(valueProvider, 'valueProvider');
 
-        const value = this.value;
-
-        return findBestMatchingValue(value, valueProvider, (n, o) => n > o);
+        return findBestMatchingValue(this.getValues(), valueProvider, (n, o) => n > o);
     }
 
     public distinct(comparer?: IEqualityComparer<T>): IEnumerable<T> {
-        return createDeferred(() => {
-            const value = this.value;
-
-            const equalityComparer = getEqualityComparer(comparer);
-            const result: T[] = [];
-            for (const item of value) {
-                if (!containsValue(result, item, equalityComparer)) {
-                    result.push(item);
-                }
-            }
-
-            return result;
-        });
+        return create(distinct(this.getValues(), getEqualityComparer(comparer)));
     }
 
     public randomOrDefault(defaultValue?: T): T {
-        const value = this.value;
-        if (isEmpty(value)) {
-            return defaultValue;
-        }
+        return this.shuffle().getFirstOrDefault(null, defaultValue);
+    }
 
-        const randomIndex = Math.floor(Math.random() * value.length);
-
-        return value[randomIndex];
+    public shuffle(): IEnumerable<T> {
+        return new OrderedEnumerable(this.getValues(), new RandomSortItemComparer());
     }
 
     public defaultIfEmpty(defaultValue: T): IEnumerable<T> {
-        return createDeferred(() => {
-            const value = this.value;
-            if (isEmpty(value)) {
-                return [defaultValue];
+        return create(defaultIfEmpty(this.getValues(), defaultValue));
+    }
+
+    protected abstract getValues(): Iterable<T>;
+}
+
+function* append<T>(values: Iterable<T>, valueToAppend: T): Iterable<T> {
+    for (const value of values) {
+        yield value;
+    }
+
+    yield valueToAppend;
+}
+
+function* concat<T>(values: Iterable<T>, otherValues: Iterable<T>): Iterable<T> {
+    for (const value of values) {
+        yield value;
+    }
+
+    for (const value of otherValues) {
+        yield value;
+    }
+}
+
+function getElementAtOrDefault<T>(values: Iterable<T>, index: number, defaultValueProvider: Func<T>): T {
+    let currentIndex = 0;
+    const iterator = this.getValues()[Symbol.iterator]();
+    const iteratorResult = iterator.next();
+    while (!iteratorResult.done) {
+        if (currentIndex === index) {
+            return iteratorResult.value;
+        }
+
+        currentIndex++;
+    }
+
+    return defaultValueProvider();
+}
+
+function* except<T>(values: Iterable<T>, otherValues: Iterable<T>, comparer: IEqualityComparer<T>): Iterable<T> {
+    const otherItemSet = new Set(otherValues, comparer);
+    for (const value of values) {
+        if (!otherItemSet.has(value)) {
+            yield value;
+        }
+    }
+}
+
+function getFirstOrDefault<T>(values: Iterable<T>, defaultValueProvider: Func<T>, predicate?: Predicate<T>): T {
+    if (TypeUtils.isNullOrUndefined(predicate)) {
+        const iterator = values[Symbol.iterator]();
+        const iterationResult = iterator.next();
+
+        if (!iterationResult.done) {
+            return iterationResult.value;
+        }
+    } else {
+        for (const value of values) {
+            if (predicate(value)) {
+                return value;
             }
-
-            return value;
-        });
+        }
     }
 
-    protected abstract getValue(): T[];
+    return defaultValueProvider();
 }
 
-class ArrayAsEnumerable<T> extends Enumerable<T> {
-    public constructor(private readonly items: T[]) {
-        super();
+function* groupBy<T, TKey>(values: Iterable<T>, keySelector: Func<TKey, T>, comparer: IEqualityComparer<TKey>): Iterable<IGrouping<TKey, T>> {
+    const groupings = new Dictionary<TKey, IList<T>>(null, comparer);
+    for (const value of values) {
+        const key = keySelector(value);
+
+        groupings.getOrAdd(key, () => new List<T>()).add(value);
     }
 
-    protected getValue(): T[] {
-        return this.items;
+    for (const keyValue of groupings) {
+        yield new Grouping(keyValue.key, keyValue.value);
     }
 }
 
-function createDeferred<T>(valueFactory: Func<T[]>): IEnumerable<T> {
-    return new DeferredEnumerable(valueFactory);
-}
-
-function getFirstOrDefault<T>(value: T[], defaultValueFactory: Func<T>, predicate?: Predicate<T>): T {
+function getLastOrDefault<T>(values: Iterable<T>, defaultValueProvider: Func<T>, predicate?: Predicate<T>): T {
     if (TypeUtils.isNullOrUndefined(predicate)) {
-        return value[0];
-    }
-
-    for (const item of value) {
-        if (predicate(item)) {
-            return item;
+        const iterationResult = reverse(values)[Symbol.iterator]().next();
+        if (!iterationResult.done) {
+            return iterationResult.value;
+        }
+    } else {
+        for (const value of reverse(values)) {
+            if (predicate(value)) {
+                return value;
+            }
         }
     }
 
-    return defaultValueFactory();
+    return defaultValueProvider();
 }
 
-function getLastOrDefault<T>(value: T[], defaultValueFactory: Func<T>, predicate?: Predicate<T>): T {
-    if (TypeUtils.isNullOrUndefined(predicate)) {
-        return value[getLastIndex(value)];
-    }
+function* prepend<T>(values: Iterable<T>, valueToPrepend: T): Iterable<T> {
+    yield valueToPrepend;
 
-    for (let i = getLastIndex(value); i >= 0; i--) {
-        const item = value[i];
-        if (predicate(item)) {
-            return item;
+    for (const value of values) {
+        yield value;
+    }
+}
+
+function* select<T, TResult>(values: Iterable<T>, selector: Func<TResult, T>): Iterable<TResult> {
+    for (const value of values) {
+        yield selector(value);
+    }
+}
+
+function* selectMany<T, TResult>(values: Iterable<T>, selector: Func<Iterable<TResult>, T>): Iterable<TResult> {
+    for (const value of values) {
+        for (const selectedValue of selector(value)) {
+            yield selectedValue;
         }
     }
-
-    return defaultValueFactory();
 }
 
-function getLastIndex<T>(value: T[]): number {
-    return value.length - 1;
-}
-
-function isIndexOutOfRange<T>(value: T[], index: number): boolean {
-    return index < 0 || index >= value.length;
-}
-
-function findBestMatchingValue<T, TValue>(array: T[], valueProvider: Func<TValue, T>, predicate: Predicate<TValue, TValue>): TValue {
-    ensureNotEmpty(array);
-
-    let result = valueProvider(array[0]);
-    for (let i = 1; i < array.length; i++) {
-        const item = valueProvider(array[i]);
-        if (predicate(item, result)) {
-            result = item;
+function* where<T>(values: Iterable<T>, predicate: Predicate<T>): Iterable<T> {
+    for (const value of values) {
+        if (predicate(value)) {
+            yield value;
         }
+    }
+}
+
+function* skip<T>(values: Iterable<T>, count: number): Iterable<T> {
+    for (const value of values) {
+        if (count === 0) {
+            yield value;
+        } else {
+            count--;
+        }
+    }
+}
+
+function* take<T>(values: Iterable<T>, count: number): Iterable<T> {
+    for (const value of values) {
+        if (count > 0) {
+            yield value;
+
+            count--;
+        }
+    }
+}
+
+function findBestMatchingValue<T, TValue>(values: Iterable<T>, valueProvider: Func<TValue, T>, predicate: Predicate<TValue, TValue>): TValue {
+    const iterator = values[Symbol.iterator]();
+    let iterationResult = iterator.next();
+    if (iterationResult.done) {
+        throw new Error('Collection is empty');
+    }
+
+    let result = valueProvider(iterationResult.value);
+    iterationResult = iterator.next();
+    while (!iterationResult.done) {
+        const preparedValue = valueProvider(iterationResult.value);
+        if (predicate(preparedValue, result)) {
+            result = preparedValue;
+        }
+
+        iterationResult = iterator.next();
     }
 
     return result;
 }
 
-function calculateSum<T>(array: T[], valueProvider: Func<number, T>): number {
-    ensureNotEmpty(array);
-
-    let result = 0;
-    for (const item of array) {
-        result += valueProvider(item);
+function* reverse<T>(values: Iterable<T>): Iterable<T> {
+    let array: Array<T>;
+    if (isArray(values)) {
+        array = values;
+    } else if (isCollection(values)) {
+        array = values.getArray();
+    } else {
+        array = Array.from(values);
     }
 
-    return result;
-}
-
-function ensureNotEmpty<T>(value: T[]): void {
-    if (isEmpty(value)) {
-        throw new RangeError('Enumerable is empty.');
+    for (let i = array.length - 1; i > 0; i--) {
+        yield array[i];
     }
 }
 
-function isEmpty<T>(value: T[]): boolean {
-    return value.length === 0;
+function* distinct<T>(values: Iterable<T>, comparer: IEqualityComparer<T>): Iterable<T> {
+    const set = new Set(null, comparer);
+    for (const value of values) {
+        if (set.tryAdd(value)) {
+            yield value;
+        }
+    }
+}
+
+function* defaultIfEmpty<T>(values: Iterable<T>, defaultValue: T): Iterable<T> {
+    const iterator = values[Symbol.iterator]();
+    let iterationResult = iterator.next();
+    if (iterationResult.done) {
+        yield defaultValue;
+    } else {
+        do {
+            yield iterationResult.value;
+
+            iterationResult = iterator.next();
+        } while (!iterationResult.done);
+    }
+}
+
+function getElementOrDefaultFromArray<T>(values: T[], index: number, defaultValue: T): T {
+    if (index >= 0 && index < values.length) {
+        return values[index];
+    }
+
+    return defaultValue;
+}
+
+function ensureCountIsValid(count: number): void {
+    if (count < 0) {
+        throw  new RangeError('Count must be >= 0');
+    }
+}
+
+function create<T>(values: Iterable<T>): IEnumerable<T> {
+    return new IterableAsEnumerable(values);
 }

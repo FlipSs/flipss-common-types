@@ -1,3 +1,5 @@
 export interface ISortItemComparer<T> {
-    compare(left: T, right: T): number;
+    initialize(values: T[]): void;
+
+    compare(left: number, right: number): number;
 }
