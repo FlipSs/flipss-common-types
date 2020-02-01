@@ -92,7 +92,7 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
         const expiredOn = this._expirationPeriodFactory().subtractFromDate(new Date());
 
         for (let i = 0; i < this._values.length; i++) {
-            const keyValuePair = this._values[i];
+            const keyValuePair = this._values.getElementAt(i);
 
             if (keyValuePair.value.updatedOn <= expiredOn) {
                 this._values.tryRemove(keyValuePair.key);

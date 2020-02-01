@@ -114,26 +114,24 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     public getElementAt(index: number): T {
         const values = this.getValues();
         if (isArray(values)) {
-            return values[index];
+            return getElementOrDefaultFromArray(values, index, outOfRangeError);
         }
 
         if (isCollection(values)) {
-            return values.getArray()[index];
+            getElementOrDefaultFromArray(values.getArray(), index, outOfRangeError);
         }
 
-        return getElementAtOrDefault(values, index, () => {
-            throw new RangeError('The argument out of range')
-        });
+        return getElementAtOrDefault(values, index, outOfRangeError);
     }
 
     public getElementAtOrDefault(index: number, defaultValue?: T): T | undefined {
         const values = this.getValues();
         if (isArray(values)) {
-            return getElementOrDefaultFromArray(values, index, defaultValue);
+            return getElementOrDefaultFromArray(values, index, () => defaultValue);
         }
 
         if (isCollection(values)) {
-            return getElementOrDefaultFromArray(values.getArray(), index, defaultValue);
+            return getElementOrDefaultFromArray(values.getArray(), index, () => defaultValue);
         }
 
         return getElementAtOrDefault(values, index, () => defaultValue);
@@ -527,7 +525,7 @@ function* reverse<T>(values: Iterable<T>): Iterable<T> {
         array = Array.from(values);
     }
 
-    for (let i = array.length - 1; i > 0; i--) {
+    for (let i = array.length - 1; i >= 0; i--) {
         yield array[i];
     }
 }
@@ -555,12 +553,16 @@ function* defaultIfEmpty<T>(values: Iterable<T>, defaultValue: T): Iterable<T> {
     }
 }
 
-function getElementOrDefaultFromArray<T>(values: T[], index: number, defaultValue: T): T {
+function outOfRangeError(): never {
+    throw new RangeError('Index out of range');
+}
+
+function getElementOrDefaultFromArray<T>(values: T[], index: number, defaultValueProvider: Func<T>): T {
     if (index >= 0 && index < values.length) {
         return values[index];
     }
 
-    return defaultValue;
+    return defaultValueProvider();
 }
 
 function ensureCountIsValid(count: number): void {
