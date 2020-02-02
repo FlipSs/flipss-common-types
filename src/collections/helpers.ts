@@ -18,6 +18,19 @@ export function getEqualityComparer<T>(comparer?: IEqualityComparer<T>): IEquali
     return comparer || new DefaultEqualityComparer<T>();
 }
 
+export function toArray<T>(values: Iterable<T>): T[] {
+    let result: T[];
+    if (isArray(values)) {
+        result = values;
+    } else if (isCollection(values)) {
+        result = values.getArray();
+    } else {
+        result = Array.from(values);
+    }
+
+    return result;
+}
+
 export function tryRemoveValueFromArray<T>(array: T[], predicate: Predicate<T>): boolean {
     const itemIndex = array.findIndex(i => predicate(i));
     if (itemIndex < 0) {

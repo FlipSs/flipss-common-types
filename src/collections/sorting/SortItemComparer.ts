@@ -2,8 +2,8 @@ import {DefaultComparer, IComparer, IList, ISortItemComparer, List} from "../int
 import {Func} from "../../types/internal";
 
 export abstract class SortItemComparer<TKey, TValue> implements ISortItemComparer<TValue> {
-    private readonly _keys: IList<TKey>;
-    private readonly _comparer: IComparer<TKey>;
+    private readonly _keys!: IList<TKey>;
+    private readonly _comparer!: IComparer<TKey>;
 
     protected constructor(private readonly _keySelector: Func<TKey, TValue>,
                           comparer?: IComparer<TKey>) {
@@ -12,7 +12,7 @@ export abstract class SortItemComparer<TKey, TValue> implements ISortItemCompare
     }
 
     public compare(left: number, right: number): number {
-        return this.compareKeys(this._comparer, this._keys[left], this._keys[right]);
+        return this.compareKeys(this._comparer, this._keys.get(left), this._keys.get(right));
     }
 
     public initialize(values: TValue[]): void {

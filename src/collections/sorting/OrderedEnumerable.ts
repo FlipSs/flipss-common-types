@@ -5,7 +5,8 @@ import {
     IComparer,
     IOrderedEnumerable,
     ISortItemComparer,
-    IterableAsEnumerable
+    IterableAsEnumerable,
+    toArray
 } from "../internal";
 import {Argument} from "../../utils/internal";
 
@@ -36,7 +37,7 @@ export class OrderedEnumerable<T> extends IterableAsEnumerable<T> implements IOr
     }
 
     protected* getValues(): Iterable<T> {
-        const values = Array.from(super.getValues());
+        const values = toArray(super.getValues());
         if (values.length > 0) {
             for (const comparer of this._comparerArray) {
                 comparer.initialize(values);
@@ -48,9 +49,7 @@ export class OrderedEnumerable<T> extends IterableAsEnumerable<T> implements IOr
                 indices.push(i);
             }
 
-            this.quickSort(indices, 0, count - 1);
-
-            for (const index of indices) {
+            for (const index of indices.sort((a, b) => this.compareIndices(a, b))) {
                 yield values[index];
             }
         }
@@ -69,50 +68,6 @@ export class OrderedEnumerable<T> extends IterableAsEnumerable<T> implements IOr
             }
         }
 
-        return result === 0 ? left - right : result;
-    }
-
-    private quickSort(indices: number[], left: number, right: number): void {
-        do {
-            let i = left;
-            let j = right;
-            let x = indices[i + ((j - i) >> 1)];
-            do {
-                while (i < indices.length && this.compareIndices(x, indices[i]) > 0) {
-                    i++;
-                }
-
-                while (j >= 0 && this.compareIndices(x, indices[j]) < 0) {
-                    j--;
-                }
-
-                if (i > j) {
-                    break;
-                }
-
-                if (i < j) {
-                    let temp = indices[i];
-                    indices[i] = indices[j];
-                    indices[j] = temp;
-                }
-
-                i++;
-                j--;
-            } while (i <= j);
-
-            if (j - left <= right - i) {
-                if (left < j) {
-                    this.quickSort(indices, left, j);
-                }
-
-                left = i;
-            } else {
-                if (i < right) {
-                    this.quickSort(indices, i, right);
-                }
-
-                right = j;
-            }
-        } while (left < right);
+        return result;
     }
 }

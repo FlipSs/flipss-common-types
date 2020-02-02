@@ -42,6 +42,10 @@ export class List<T> extends ReadOnlyCollection<T> implements IList<T> {
         return this._values;
     }
 
+    public get(index: number): T {
+        return this._values[index];
+    }
+
     protected getValues(): T[] {
         return this._values;
     }

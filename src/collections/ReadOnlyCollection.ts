@@ -11,7 +11,7 @@ export abstract class ReadOnlyCollection<T> extends Enumerable<T> implements IRe
 
     public abstract getArray(): T[];
 
-    protected getValues(): T[] {
+    protected getValues(): Iterable<T> {
         return this.getArray();
     }
 }

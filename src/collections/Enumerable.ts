@@ -23,8 +23,8 @@ import {
     IterableAsEnumerable,
     List,
     OrderedEnumerable,
-    RandomSortItemComparer,
-    Set
+    Set,
+    toArray
 } from "./internal";
 
 export function asEnumerable<T>(items: Iterable<T>): IEnumerable<T> {
@@ -214,8 +214,9 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     public forEach(action: Action<T, number>): void {
         Argument.isNotNullOrUndefined(action, 'action');
 
+        let index = 0;
         for (const value of this.getValues()) {
-            action(value);
+            action(value, index++);
         }
     }
 
@@ -323,6 +324,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         iterationResult = iterator.next();
         while (!iterationResult.done) {
             sum += valueProvider(iterationResult.value);
+            iterationResult = iterator.next();
         }
 
         return sum;
@@ -343,7 +345,9 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public shuffle(): IEnumerable<T> {
-        return new OrderedEnumerable(this.getValues(), new RandomSortItemComparer());
+        const values = toArray(this.getValues());
+
+        return create(shuffle(values));
     }
 
     public defaultIfEmpty(defaultValue: T): IEnumerable<T> {
@@ -374,13 +378,14 @@ function* concat<T>(values: Iterable<T>, otherValues: Iterable<T>): Iterable<T> 
 function getElementAtOrDefault<T>(values: Iterable<T>, index: number, defaultValueProvider: Func<T>): T {
     let currentIndex = 0;
     const iterator = this.getValues()[Symbol.iterator]();
-    const iteratorResult = iterator.next();
+    let iteratorResult = iterator.next();
     while (!iteratorResult.done) {
         if (currentIndex === index) {
             return iteratorResult.value;
         }
 
         currentIndex++;
+        iteratorResult = iterator.next();
     }
 
     return defaultValueProvider();
@@ -568,6 +573,26 @@ function getElementOrDefaultFromArray<T>(values: T[], index: number, defaultValu
 function ensureCountIsValid(count: number): void {
     if (count < 0) {
         throw  new RangeError('Count must be >= 0');
+    }
+}
+
+function* shuffle<T>(values: T[]): Iterable<T> {
+    const indices = [];
+    for (let i = 0; i < values.length; i++) {
+        indices.push(i);
+    }
+    let currentIndex = indices.length;
+    while (currentIndex > 0) {
+        const randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        const temp = indices[currentIndex];
+        indices[currentIndex] = indices[randomIndex];
+        indices[randomIndex] = temp;
+    }
+
+    for (const index of indices) {
+        yield values[index];
     }
 }
 

@@ -56,8 +56,9 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                 {
                     name: 'Should iterate through collection',
                     action: (array, enumerable) => {
-                        for (const item of enumerable) {
-                            expect(valueProvider(item)).toBe(array.shift());
+                        let index = 0;
+                        for (const value of enumerable) {
+                            expect(valueProvider(value)).toBe(array[index++]);
                         }
                     }
                 }
@@ -709,9 +710,11 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                     }
                 },
                 {
-                    name: 'Should cut off collection from the end if value less than zero',
+                    name: 'Should throw RangeError if N < 0',
                     action: (array, enumerable) => {
-                        expect(enumerable.take(-1).select(i => valueProvider(i)).toArray()).toEqual(array.slice(0, array.length - 1));
+                        expect(() => enumerable.take(-1).toArray()).toThrow();
+                        expect(() => enumerable.take(0).toArray()).not.toThrow();
+                        expect(() => enumerable.take(1).toArray()).not.toThrow();
                     }
                 }
             ]
@@ -736,9 +739,11 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                     }
                 },
                 {
-                    name: 'Should take elements from the end of collection if value less than zero',
+                    name: 'Should throw RangeError if N < 0',
                     action: (array, enumerable) => {
-                        expect(enumerable.skip(-1).select(i => valueProvider(i)).toArray()).toEqual([array[array.length - 1]]);
+                        expect(() => enumerable.skip(-1).toArray()).toThrow();
+                        expect(() => enumerable.skip(0).toArray()).not.toThrow();
+                        expect(() => enumerable.skip(1).toArray()).not.toThrow();
                     }
                 }
             ]
@@ -1259,6 +1264,20 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                     action: (array, enumerable) => {
                         const randomValue = enumerable.randomOrDefault();
                         expect(enumerable.any(i => i === randomValue)).toBeTruthy();
+                    }
+                }
+            ]
+        );
+    });
+
+    describe('shuffle', () => {
+        testCases(enumerableFactory,
+            [
+                {
+                    name: 'Should return collection with the same values',
+                    action: (array, enumerable) => {
+                        expect(enumerableFactory([]).shuffle().toArray()).toEqual([]);
+                        expect(enumerable.shuffle().select(v => valueProvider(v)).toArray().sort()).toEqual(array.sort());
                     }
                 }
             ]

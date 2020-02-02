@@ -18,7 +18,6 @@ export * from './sorting/ISortItemComparer';
 export * from './sorting/SortItemComparer';
 export * from './sorting/AscendingSortItemComparer';
 export * from './sorting/DescendingSortItemComparer';
-export * from './sorting/RandomSortItemComparer';
 export * from './sorting/OrderedEnumerable';
 
 export * from './grouping/Grouping';

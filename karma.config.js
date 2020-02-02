@@ -26,6 +26,7 @@ module.exports = function (config) {
             clearContext: false
         },
         webpack: {
+            devtool: 'inline-source-map',
             mode: 'none',
             module: {
                 rules: [
