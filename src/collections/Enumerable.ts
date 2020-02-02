@@ -33,6 +33,12 @@ export function asEnumerable<T>(items: Iterable<T>): IEnumerable<T> {
     return new IterableAsEnumerable(items);
 }
 
+export function funcAsEnumerable<T>(iteratorProvider: Func<Iterator<T>>): IEnumerable<T> {
+    Argument.isNotNullOrUndefined(iteratorProvider, 'iteratorProvider');
+
+    return new IterableAsEnumerable(new IteratorProviderWrapper(iteratorProvider));
+}
+
 export abstract class Enumerable<T> implements IEnumerable<T> {
     public all(predicate: Predicate<T>): boolean {
         Argument.isNotNullOrUndefined(predicate, 'predicate');
@@ -68,13 +74,13 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public append(value: T): IEnumerable<T> {
-        return create(append(this.getValues(), value));
+        return create(() => append(this.getValues(), value));
     }
 
     public concat(other: Iterable<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        return create(concat(this.getValues(), other));
+        return create(() => concat(this.getValues(), other));
     }
 
     public contains(value: T, comparer?: IEqualityComparer<T>): boolean {
@@ -140,7 +146,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     public except(other: Iterable<T>, comparer?: IEqualityComparer<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(other, 'other');
 
-        return create(except(this.getValues(), other, getEqualityComparer(comparer)));
+        return create(() => except(this.getValues(), other, getEqualityComparer(comparer)));
     }
 
     public getFirst(predicate?: Predicate<T>): T {
@@ -156,7 +162,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     public groupBy<TKey>(keySelector: Func<TKey, T>, comparer?: IEqualityComparer<TKey>): IEnumerable<IGrouping<TKey, T>> {
         Argument.isNotNullOrUndefined(keySelector, 'keySelector');
 
-        return create(groupBy(this.getValues(), keySelector, getEqualityComparer(comparer)));
+        return create(() => groupBy(this.getValues(), keySelector, getEqualityComparer(comparer)));
     }
 
     public getLast(predicate?: Predicate<T>): T {
@@ -186,25 +192,25 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public prepend(value: T): IEnumerable<T> {
-        return create(prepend(this.getValues(), value));
+        return create(() => prepend(this.getValues(), value));
     }
 
     public select<TResult>(selector: Func<TResult, T>): IEnumerable<TResult> {
         Argument.isNotNullOrUndefined(selector, 'selector');
 
-        return create(select(this.getValues(), selector));
+        return create(() => select(this.getValues(), selector));
     }
 
     public selectMany<TResult>(selector: Func<Iterable<TResult>, T>): IEnumerable<TResult> {
         Argument.isNotNullOrUndefined(selector, 'selector');
 
-        return create(selectMany(this.getValues(), selector));
+        return create(() => selectMany(this.getValues(), selector));
     }
 
     public where(predicate: Predicate<T>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(predicate, 'predicate');
 
-        return create(where(this.getValues(), predicate));
+        return create(() => where(this.getValues(), predicate));
     }
 
     public toArray(): T[] {
@@ -225,7 +231,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public reverse(): IEnumerable<T> {
-        return create(reverse(this.getValues()));
+        return create(() => reverse(this.getValues()));
     }
 
     public toList(): IList<T> {
@@ -261,31 +267,19 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public skip(count: number): IEnumerable<T> {
-        ensureCountIsValid(count);
+        return create(() => {
+            ensureCountIsValid(count);
 
-        const values = this.getValues();
-        let result: Iterable<T>;
-        if (isArray(values)) {
-            result = values.slice(count);
-        } else {
-            result = skip(values, count);
-        }
-
-        return create(result);
+            return skip(this.getValues(), count);
+        });
     }
 
     public take(count: number): IEnumerable<T> {
-        ensureCountIsValid(count);
+        return create(() => {
+            ensureCountIsValid(count);
 
-        const values = this.getValues();
-        let result: Iterable<T>;
-        if (isArray(values)) {
-            result = values.slice(0, count);
-        } else {
-            result = take(values, count);
-        }
-
-        return create(result);
+            return take(this.getValues(), count);
+        });
     }
 
     public average(valueProvider: Func<number, T>): number {
@@ -337,7 +331,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public distinct(comparer?: IEqualityComparer<T>): IEnumerable<T> {
-        return create(distinct(this.getValues(), getEqualityComparer(comparer)));
+        return create(() => distinct(this.getValues(), getEqualityComparer(comparer)));
     }
 
     public randomOrDefault(defaultValue?: T): T {
@@ -345,19 +339,17 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
     }
 
     public shuffle(): IEnumerable<T> {
-        const values = toArray(this.getValues());
-
-        return create(shuffle(values));
+        return create(() => shuffle(toArray(this.getValues())));
     }
 
     public defaultIfEmpty(defaultValue: T): IEnumerable<T> {
-        return create(defaultIfEmpty(this.getValues(), defaultValue));
+        return create(() => defaultIfEmpty(this.getValues(), defaultValue));
     }
 
     protected abstract getValues(): Iterable<T>;
 }
 
-function* append<T>(values: Iterable<T>, valueToAppend: T): Iterable<T> {
+function* append<T>(values: Iterable<T>, valueToAppend: T): IterableIterator<T> {
     for (const value of values) {
         yield value;
     }
@@ -365,7 +357,7 @@ function* append<T>(values: Iterable<T>, valueToAppend: T): Iterable<T> {
     yield valueToAppend;
 }
 
-function* concat<T>(values: Iterable<T>, otherValues: Iterable<T>): Iterable<T> {
+function* concat<T>(values: Iterable<T>, otherValues: Iterable<T>): IterableIterator<T> {
     for (const value of values) {
         yield value;
     }
@@ -377,7 +369,7 @@ function* concat<T>(values: Iterable<T>, otherValues: Iterable<T>): Iterable<T> 
 
 function getElementAtOrDefault<T>(values: Iterable<T>, index: number, defaultValueProvider: Func<T>): T {
     let currentIndex = 0;
-    const iterator = this.getValues()[Symbol.iterator]();
+    const iterator = values[Symbol.iterator]();
     let iteratorResult = iterator.next();
     while (!iteratorResult.done) {
         if (currentIndex === index) {
@@ -391,7 +383,7 @@ function getElementAtOrDefault<T>(values: Iterable<T>, index: number, defaultVal
     return defaultValueProvider();
 }
 
-function* except<T>(values: Iterable<T>, otherValues: Iterable<T>, comparer: IEqualityComparer<T>): Iterable<T> {
+function* except<T>(values: Iterable<T>, otherValues: Iterable<T>, comparer: IEqualityComparer<T>): IterableIterator<T> {
     const otherItemSet = new Set(otherValues, comparer);
     for (const value of values) {
         if (!otherItemSet.has(value)) {
@@ -419,7 +411,7 @@ function getFirstOrDefault<T>(values: Iterable<T>, defaultValueProvider: Func<T>
     return defaultValueProvider();
 }
 
-function* groupBy<T, TKey>(values: Iterable<T>, keySelector: Func<TKey, T>, comparer: IEqualityComparer<TKey>): Iterable<IGrouping<TKey, T>> {
+function* groupBy<T, TKey>(values: Iterable<T>, keySelector: Func<TKey, T>, comparer: IEqualityComparer<TKey>): IterableIterator<IGrouping<TKey, T>> {
     const groupings = new Dictionary<TKey, IList<T>>(null, comparer);
     for (const value of values) {
         const key = keySelector(value);
@@ -449,7 +441,7 @@ function getLastOrDefault<T>(values: Iterable<T>, defaultValueProvider: Func<T>,
     return defaultValueProvider();
 }
 
-function* prepend<T>(values: Iterable<T>, valueToPrepend: T): Iterable<T> {
+function* prepend<T>(values: Iterable<T>, valueToPrepend: T): IterableIterator<T> {
     yield valueToPrepend;
 
     for (const value of values) {
@@ -457,13 +449,13 @@ function* prepend<T>(values: Iterable<T>, valueToPrepend: T): Iterable<T> {
     }
 }
 
-function* select<T, TResult>(values: Iterable<T>, selector: Func<TResult, T>): Iterable<TResult> {
+function* select<T, TResult>(values: Iterable<T>, selector: Func<TResult, T>): IterableIterator<TResult> {
     for (const value of values) {
         yield selector(value);
     }
 }
 
-function* selectMany<T, TResult>(values: Iterable<T>, selector: Func<Iterable<TResult>, T>): Iterable<TResult> {
+function* selectMany<T, TResult>(values: Iterable<T>, selector: Func<Iterable<TResult>, T>): IterableIterator<TResult> {
     for (const value of values) {
         for (const selectedValue of selector(value)) {
             yield selectedValue;
@@ -471,7 +463,7 @@ function* selectMany<T, TResult>(values: Iterable<T>, selector: Func<Iterable<TR
     }
 }
 
-function* where<T>(values: Iterable<T>, predicate: Predicate<T>): Iterable<T> {
+function* where<T>(values: Iterable<T>, predicate: Predicate<T>): IterableIterator<T> {
     for (const value of values) {
         if (predicate(value)) {
             yield value;
@@ -479,7 +471,7 @@ function* where<T>(values: Iterable<T>, predicate: Predicate<T>): Iterable<T> {
     }
 }
 
-function* skip<T>(values: Iterable<T>, count: number): Iterable<T> {
+function* skip<T>(values: Iterable<T>, count: number): IterableIterator<T> {
     for (const value of values) {
         if (count === 0) {
             yield value;
@@ -489,7 +481,7 @@ function* skip<T>(values: Iterable<T>, count: number): Iterable<T> {
     }
 }
 
-function* take<T>(values: Iterable<T>, count: number): Iterable<T> {
+function* take<T>(values: Iterable<T>, count: number): IterableIterator<T> {
     for (const value of values) {
         if (count > 0) {
             yield value;
@@ -520,7 +512,7 @@ function findBestMatchingValue<T, TValue>(values: Iterable<T>, valueProvider: Fu
     return result;
 }
 
-function* reverse<T>(values: Iterable<T>): Iterable<T> {
+function* reverse<T>(values: Iterable<T>): IterableIterator<T> {
     let array: Array<T>;
     if (isArray(values)) {
         array = values;
@@ -535,7 +527,7 @@ function* reverse<T>(values: Iterable<T>): Iterable<T> {
     }
 }
 
-function* distinct<T>(values: Iterable<T>, comparer: IEqualityComparer<T>): Iterable<T> {
+function* distinct<T>(values: Iterable<T>, comparer: IEqualityComparer<T>): IterableIterator<T> {
     const set = new Set(null, comparer);
     for (const value of values) {
         if (set.tryAdd(value)) {
@@ -544,7 +536,7 @@ function* distinct<T>(values: Iterable<T>, comparer: IEqualityComparer<T>): Iter
     }
 }
 
-function* defaultIfEmpty<T>(values: Iterable<T>, defaultValue: T): Iterable<T> {
+function* defaultIfEmpty<T>(values: Iterable<T>, defaultValue: T): IterableIterator<T> {
     const iterator = values[Symbol.iterator]();
     let iterationResult = iterator.next();
     if (iterationResult.done) {
@@ -576,7 +568,7 @@ function ensureCountIsValid(count: number): void {
     }
 }
 
-function* shuffle<T>(values: T[]): Iterable<T> {
+function* shuffle<T>(values: T[]): IterableIterator<T> {
     const indices = [];
     for (let i = 0; i < values.length; i++) {
         indices.push(i);
@@ -596,6 +588,15 @@ function* shuffle<T>(values: T[]): Iterable<T> {
     }
 }
 
-function create<T>(values: Iterable<T>): IEnumerable<T> {
-    return new IterableAsEnumerable(values);
+function create<T>(func: Func<Iterator<T>>): IEnumerable<T> {
+    return new IterableAsEnumerable(new IteratorProviderWrapper(func));
+}
+
+class IteratorProviderWrapper<T> implements Iterable<T> {
+    public constructor(private readonly _iteratorProvider: Func<Iterator<T>>) {
+    }
+
+    public [Symbol.iterator](): Iterator<T> {
+        return this._iteratorProvider();
+    }
 }
