@@ -6,29 +6,23 @@ import {
     IKeyValuePair,
     IReadOnlyCollection,
     List,
-    Set as MySet
+    Set
 } from "../../src/collections/internal";
 import {Action, Func} from "../../src/types/internal";
 import {TypeUtils} from "../../src/utils/TypeUtils";
-/*import {performance} from 'perf_hooks';
 
-const smallArrayLength = 10;*/
-
-const normalArrayLength = 100;
-
-/*const bigArrayLength = 1000;
-const hugeArrayLength = 10000;*/
+const arrayLength = 1000;
 
 export function testEnumerable(enumerableFactory: Func<IEnumerable<number>, number[]>) {
     return testEnumerableGeneric(enumerableFactory, v => v, 17);
 }
 
-export function testReadonlyCollection<T>(collectionFactory: Func<IReadOnlyCollection<T>, number[]>): void {
+export function testReadonlyCollection<T>(enumerableFactory: Func<IReadOnlyCollection<T>, number[]>): void {
     describe('length', () => {
         it('Should return actual length', () => {
-            const expectedLength = Math.floor(Math.random() * normalArrayLength);
+            const expectedLength = Math.floor(Math.random() * arrayLength);
             const source = createArray(expectedLength);
-            const collection = collectionFactory(source);
+            const collection = enumerableFactory(source);
 
             expect(collection.length).toEqual(expectedLength);
         });
@@ -36,16 +30,16 @@ export function testReadonlyCollection<T>(collectionFactory: Func<IReadOnlyColle
 
     describe('isEmpty', () => {
         it('Should be true when no items', () => {
-            const collection = collectionFactory([]);
+            const collection = enumerableFactory([]);
 
             expect(collection.isEmpty).toBeTruthy();
         });
 
         it('Should be false if not empty', () => {
-            const collection = collectionFactory(createArray(normalArrayLength));
+            const collection = enumerableFactory(createArray(arrayLength));
 
             expect(collection.isEmpty).toBeFalsy();
-        })
+        });
     });
 }
 
@@ -1088,7 +1082,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                     action: (array, enumerable) => {
                         const set = enumerable.toSet();
 
-                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+                        expect(TypeUtils.is(set, Set)).toBeTruthy();
                         expect(set.select(i => valueProvider(i)).toArray()).toEqual(Array.from(new Set(array)));
                     }
                 },
@@ -1104,7 +1098,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                         }
 
                         const set = enumerable.select(i => valueProvider(i)).toSet(equalityComparer);
-                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+                        expect(TypeUtils.is(set, Set)).toBeTruthy();
 
                         expect(set.toArray()).toEqual(expectedResult);
                     }
@@ -1121,7 +1115,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                     action: (array, enumerable) => {
                         const set = enumerable.toReadOnlySet();
 
-                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+                        expect(TypeUtils.is(set, Set)).toBeTruthy();
                         expect(set.select(i => valueProvider(i)).toArray()).toEqual(Array.from(new Set(array)));
                     }
                 },
@@ -1137,7 +1131,7 @@ export function testEnumerableGeneric<T>(enumerableFactory: Func<IEnumerable<T>,
                         }
 
                         const set = enumerable.select(i => valueProvider(i)).toReadOnlySet(equalityComparer);
-                        expect(TypeUtils.is(set, MySet)).toBeTruthy();
+                        expect(TypeUtils.is(set, Set)).toBeTruthy();
 
                         expect(set.toArray()).toEqual(expectedResult);
                     }
@@ -1311,7 +1305,7 @@ function testCases<T>(enumerableFactory: Func<IEnumerable<T>, number[]>, testCas
         let enumerable: IEnumerable<T>;
 
         beforeEach(() => {
-            array = createArray(normalArrayLength);
+            array = createArray(arrayLength);
             enumerable = enumerableFactory(array);
         });
 
@@ -1322,48 +1316,6 @@ function testCases<T>(enumerableFactory: Func<IEnumerable<T>, number[]>, testCas
         }
     });
 }
-
-// todo for each collection
-/*function testPerformance<T>(enumerableFactory: Func<IEnumerable<T>, number[]>,
-                            arrayAction: Action<number[], number>,
-                            enumerableAction: Action<IEnumerable<T>, number>): void {
-    describe('Performance', () => {
-        testPerformanceByLength(smallArrayLength, enumerableFactory, arrayAction, enumerableAction);
-        testPerformanceByLength(normalArrayLength, enumerableFactory, arrayAction, enumerableAction);
-        testPerformanceByLength(bigArrayLength, enumerableFactory, arrayAction, enumerableAction);
-        testPerformanceByLength(hugeArrayLength, enumerableFactory, arrayAction, enumerableAction);
-    });
-}
-
-function testPerformanceByLength<T>(length: number,
-                                    enumerableFactory: Func<IEnumerable<T>, number[]>,
-                                    arrayAction: Action<number[], number>,
-                                    enumerableAction: Action<IEnumerable<T>, number>) {
-    it(`${length} elements`, () => {
-        const array = createArray(length);
-        const arrayExecutionTime = getActionExecutionTime(() => arrayAction(array, length));
-
-        const enumerable = enumerableFactory(array);
-        const enumerableExecutionTime = getActionExecutionTime(() => enumerableAction(enumerable, length));
-
-        expect(enumerableExecutionTime).toBeLessThan(arrayExecutionTime + getAllowableError(length));
-    });
-}
-
-function getAllowableError(length: number): number {
-    return length > 100 ? length / 100 : length / 10;
-}
-
-function getActionExecutionTime(action: Action): number {
-    const start = performance.now();
-
-    action();
-
-    const end = performance.now();
-
-    return end - start;
-}
-*/
 
 function createArray(length: number): number[] {
     const result = [];
