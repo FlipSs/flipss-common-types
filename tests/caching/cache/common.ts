@@ -72,6 +72,32 @@ export function testCache(cacheConstructor: ICacheConstructor<string, any>): voi
         });
     });
 
+    describe('getOrAddAsync', () => {
+        let spy: Spy;
+        let valueFactory: ValueFactory;
+
+        beforeEach(() => {
+            valueFactory = new ValueFactory();
+
+            spy = spyOn(valueFactory, 'create').and.callThrough();
+        });
+
+        it('Should throw error when valueFactory is null or undefined', async () => {
+            await expectAsync(cache.getOrAddAsync('test', null)).toBeRejected();
+            await expectAsync(cache.getOrAddAsync('test', undefined)).toBeRejected();
+        });
+
+        it('Should return existing value if key exists', async () => {
+            await expectAsync(cache.getOrAddAsync('test', () => Promise.resolve(valueFactory.create()))).toBeResolvedTo(10);
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('Should return value from value factory if key does not exists', async () => {
+            await expectAsync(cache.getOrAddAsync('1', () => Promise.resolve(valueFactory.create()))).toBeResolvedTo(12);
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
     describe('containsKey', () => {
         it('Should return true if contains key', () => {
             expect(cache.containsKey('test')).toBeTruthy();

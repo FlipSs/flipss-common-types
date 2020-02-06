@@ -6,6 +6,8 @@ export interface ICache<TKey, TValue> extends IDisposable {
 
     getOrAdd(key: TKey, valueFactory: Func<TValue, TKey>): TValue;
 
+    getOrAddAsync(key: TKey, asyncValueFactory: Func<Promise<TValue>, TKey>): Promise<TValue>;
+
     get(key: TKey): TValue;
 
     containsKey(key: TKey): boolean;

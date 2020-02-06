@@ -423,6 +423,68 @@ describe('Dictionary', () => {
         });
     });
 
+    describe('getOrAddAsync', () => {
+        it('Should return existing value and not call value factory if key exists', async () => {
+            const dictionary = new Dictionary<number, number>([{
+                key: 0,
+                value: 0
+            }]);
+
+            let isCalled = false;
+            await expectAsync(dictionary.getOrAddAsync(0, () => {
+                isCalled = true;
+
+                return Promise.resolve(4);
+            })).toBeResolvedTo(0);
+
+            expect(isCalled).toBeFalsy();
+        });
+
+        it('Should return existing value and not call value factory if key exists with equality comparer', async () => {
+            const dictionary = new Dictionary<number, number>([{
+                key: 0,
+                value: 0
+            }], new TestEqualityComparer());
+
+            let isCalled = false;
+            await expectAsync(dictionary.getOrAddAsync(1, () => {
+                isCalled = true;
+
+                return Promise.resolve(5);
+            })).toBeResolvedTo(0);
+
+            expect(isCalled).toBeFalsy();
+        });
+
+        it('Should add value if key does not exists', async () => {
+            const dictionary = new Dictionary<number, number>();
+
+            await expectAsync(dictionary.getOrAddAsync(1, k => Promise.resolve(k * 2))).toBeResolvedTo(2);
+            expect(dictionary.toArray()).toEqual([{
+                key: 1,
+                value: 2
+            }]);
+        });
+
+        it('Should add value if key does not exists with equality comparer', async () => {
+            const dictionary = new Dictionary<number, number>([
+                {
+                    key: 0,
+                    value: 1
+                }
+            ], new TestEqualityComparer());
+
+            await expectAsync(dictionary.getOrAddAsync(2, k => Promise.resolve( k * 5))).toBeResolvedTo(10);
+            expect(dictionary.toArray()).toEqual([{
+                key: 0,
+                value: 1
+            }, {
+                key: 2,
+                value: 10
+            }]);
+        });
+    });
+
     describe('clear', () => {
         it('Should clear dictionary', () => {
             const dictionary = new Dictionary([

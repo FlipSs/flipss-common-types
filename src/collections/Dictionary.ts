@@ -58,6 +58,21 @@ export class Dictionary<TKey, TValue> extends ReadOnlyCollection<IKeyValuePair<T
         return item.value;
     }
 
+    public async getOrAddAsync(key: TKey, asyncValueFactory: Func<Promise<TValue>, TKey>): Promise<TValue> {
+        Argument.isNotNullOrUndefined(asyncValueFactory, 'asyncValueFactory');
+
+        const item = this.find(key);
+        if (TypeUtils.isNullOrUndefined(item)) {
+            const value = await asyncValueFactory(key);
+
+            this.add(key, value);
+
+            return value;
+        }
+
+        return item.value;
+    }
+
     public getOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined {
         const item = this.find(key);
         if (TypeUtils.isNullOrUndefined(item)) {

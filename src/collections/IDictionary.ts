@@ -10,5 +10,7 @@ export interface IDictionary<TKey, TValue> extends IReadOnlyDictionary<TKey, TVa
 
     getOrAdd(key: TKey, valueFactory: Func<TValue, TKey>): TValue;
 
+    getOrAddAsync(key: TKey, asyncValueFactory: Func<Promise<TValue>, TKey>): Promise<TValue>;
+
     clear(): void;
 }

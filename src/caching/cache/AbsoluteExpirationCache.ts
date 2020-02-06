@@ -48,6 +48,18 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
         return this.getValue(storedValue);
     }
 
+    public async getOrAddAsync(key: TKey, asyncValueFactory: Func<Promise<TValue>, TKey>): Promise<TValue> {
+        Argument.isNotNullOrUndefined(asyncValueFactory, 'asyncValueFactory');
+
+        const storedValue = await this._values.getOrAddAsync(key,
+            async k => createStoredValue(await asyncValueFactory(k))
+        );
+
+        this.tryStartTimer();
+
+        return this.getValue(storedValue);
+    }
+
     public get(key: TKey): TValue {
         return this.getInternal(key);
     }
