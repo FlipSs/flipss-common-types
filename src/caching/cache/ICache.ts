@@ -14,5 +14,7 @@ export interface ICache<TKey, TValue> extends IDisposable {
 
     getOrDefault(key: TKey, defaultValue?: TValue): TValue | undefined;
 
+    tryRemove(key: TKey): boolean;
+
     clear(): void;
 }

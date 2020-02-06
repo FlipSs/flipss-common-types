@@ -125,6 +125,16 @@ export function testCache(cacheConstructor: ICacheConstructor<string, any>): voi
             expect(cache.containsKey('test')).toBeFalsy();
         });
     });
+
+    describe('tryRemove', () => {
+        it('Should remove value when exists', () => {
+            cache.set('test', 0);
+
+            expect(cache.tryRemove('test')).toBeTruthy();
+            expect(cache.tryRemove('test')).toBeFalsy();
+            expect(cache.tryRemove('t')).toBeFalsy();
+        });
+    });
 }
 
 class ValueFactory {

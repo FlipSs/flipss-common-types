@@ -82,6 +82,10 @@ export class AbsoluteExpirationCache<TKey, TValue> implements ICache<TKey, TValu
         this._timer.dispose();
     }
 
+    public tryRemove(key: TKey): boolean {
+        return this._values.tryRemove(key);
+    }
+
     protected getValue(storedValue: IStoredValue<TValue>): TValue {
         return storedValue.value;
     }
