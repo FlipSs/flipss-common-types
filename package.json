@@ -22,7 +22,7 @@
     "url": "https://github.com/FlipSs/flipss-common-types/issues"
   },
   "homepage": "https://github.com/FlipSs/flipss-common-types#readme",
-  "dependencies": {
+  "peerDependencies": {
     "tslib": "^1.10.0"
   },
   "devDependencies": {
