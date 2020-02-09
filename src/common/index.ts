@@ -8,5 +8,6 @@ export {
     IErrorObserver,
     Observer,
     IConstructorWithoutParameters,
-    toFactory
+    toFactory,
+    tryDispose
 } from './internal';
