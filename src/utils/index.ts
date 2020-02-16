@@ -1,1 +1,1 @@
-export {Argument, TypeUtils, Lazy, ILazy} from './internal';
+export {Argument, TypeUtils, Lazy, ILazy, IResolvablePromiseContainer, ResolvablePromiseContainer} from './internal';
