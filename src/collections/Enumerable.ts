@@ -195,7 +195,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return create(() => prepend(this.getValues(), value));
     }
 
-    public select<TResult>(selector: Func<TResult, T>): IEnumerable<TResult> {
+    public select<TResult>(selector: Func<TResult, T, number>): IEnumerable<TResult> {
         Argument.isNotNullOrUndefined(selector, 'selector');
 
         return create(() => select(this.getValues(), selector));
@@ -449,9 +449,10 @@ function* prepend<T>(values: Iterable<T>, valueToPrepend: T): IterableIterator<T
     }
 }
 
-function* select<T, TResult>(values: Iterable<T>, selector: Func<TResult, T>): IterableIterator<TResult> {
+function* select<T, TResult>(values: Iterable<T>, selector: Func<TResult, T, number>): IterableIterator<TResult> {
+    let index = 0;
     for (const value of values) {
-        yield selector(value);
+        yield selector(value, index++);
     }
 }
 

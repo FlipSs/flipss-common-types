@@ -37,7 +37,7 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     where(predicate: Predicate<T>): IEnumerable<T>;
 
-    select<TResult>(selector: Func<TResult, T>): IEnumerable<TResult>;
+    select<TResult>(selector: Func<TResult, T, number>): IEnumerable<TResult>;
 
     selectMany<TResult>(selector: Func<Iterable<TResult>, T>): IEnumerable<TResult>;
 
