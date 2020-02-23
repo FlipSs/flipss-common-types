@@ -35,7 +35,7 @@ export interface IEnumerable<T> extends Iterable<T> {
 
     getFirstOrDefault(predicate?: Predicate<T>, defaultValue?: T): T | undefined;
 
-    where(predicate: Predicate<T>): IEnumerable<T>;
+    where(predicate: Predicate<T, number>): IEnumerable<T>;
 
     select<TResult>(selector: Func<TResult, T, number>): IEnumerable<TResult>;
 

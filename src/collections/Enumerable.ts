@@ -207,7 +207,7 @@ export abstract class Enumerable<T> implements IEnumerable<T> {
         return create(() => selectMany(this.getValues(), selector));
     }
 
-    public where(predicate: Predicate<T>): IEnumerable<T> {
+    public where(predicate: Predicate<T, number>): IEnumerable<T> {
         Argument.isNotNullOrUndefined(predicate, 'predicate');
 
         return create(() => where(this.getValues(), predicate));
@@ -464,9 +464,10 @@ function* selectMany<T, TResult>(values: Iterable<T>, selector: Func<Iterable<TR
     }
 }
 
-function* where<T>(values: Iterable<T>, predicate: Predicate<T>): IterableIterator<T> {
+function* where<T>(values: Iterable<T>, predicate: Predicate<T, number>): IterableIterator<T> {
+    let index = 0;
     for (const value of values) {
-        if (predicate(value)) {
+        if (predicate(value, index++)) {
             yield value;
         }
     }
