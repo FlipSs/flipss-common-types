@@ -9,3 +9,4 @@ export * from './converters/index';
 export * from './data/index';
 export * from './storages/index';
 export * from './caching/index';
+export * from './performance/index';
