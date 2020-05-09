@@ -1,6 +1,6 @@
 {
   "name": "flipss-common-types",
-  "version": "1.0.49",
+  "version": "1.0.50",
   "description": "Common types for FlipSs projects",
   "scripts": {
     "test": "karma start karma.config.js",
