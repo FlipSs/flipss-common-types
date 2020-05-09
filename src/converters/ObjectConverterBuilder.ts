@@ -89,10 +89,10 @@ export class ObjectConverterBuilder<TSource, TTarget> implements IObjectConverte
         return this;
     }
 
-    public useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[]): IObjectConverterBuilder<TSource, TTarget> {
+    public useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[], sourcePropertyNameFactory?: Func<string, string>): IObjectConverterBuilder<TSource, TTarget> {
         const excludedPropertySet = excludedProperties && asEnumerable(excludedProperties).select(p => p as string).toReadOnlySet() || new Set<string>();
 
-        this._converterFactory = f => new DirectPropertyTransferringObjectConverter(f, excludedPropertySet);
+        this._converterFactory = f => new DirectPropertyTransferringObjectConverter(f, excludedPropertySet, sourcePropertyNameFactory);
 
         return this;
     }

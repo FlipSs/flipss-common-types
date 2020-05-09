@@ -105,6 +105,21 @@ describe('DirectPropertyTransferringObjectConverter', () => {
             property1: 10
         })).toEqual(expected);
     });
+
+    it('Should transfer using custom source name provider function', () => {
+        const converter = new DirectPropertyTransferringObjectConverter(new StrictObjectConverterContextFactory(
+            () => new TestReferenceObject(),
+            new IgnoreFunctionNullAndUndefinedValueIgnoreStrategy(),
+            new Dictionary()
+        ), new Set<string>(), n => `test${n}`);
+
+        const expected = new TestReferenceObject();
+        expected.property1 = 10;
+
+        expect(converter.convert({
+            testproperty1: 10
+        })).toEqual(expected);
+    });
 });
 
 class TestReferenceObject {

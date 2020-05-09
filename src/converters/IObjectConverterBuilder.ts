@@ -6,7 +6,7 @@ import {
 } from "./internal";
 
 export interface IObjectConverterBuilder<TSource, TTarget> {
-    useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[]): IObjectConverterBuilder<TSource, TTarget>;
+    useDirectPropertyTransferring(excludedProperties?: ObjectConverterConvertiblePropertyNames<TSource>[], sourcePropertyNameFactory?: Func<string, string>): IObjectConverterBuilder<TSource, TTarget>;
 
     setProperty<TValue>(sourcePropertyName: ObjectConverterTypedConvertiblePropertyNames<TSource, TValue>, targetPropertyName: ObjectConverterTypedConvertiblePropertyNames<TTarget, TValue>): IObjectConverterBuilder<TSource, TTarget>;
 
