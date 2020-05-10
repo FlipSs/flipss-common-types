@@ -17,7 +17,7 @@ import {
 } from "../../internal";
 import {Action, Func} from "../../../types/internal";
 import {TimeSpan} from "../../../time/internal";
-import {IValueStorage} from "../../../storages/internal";
+import {IValueStorage, MemoryStorage} from "../../../storages/internal";
 import {Argument} from "../../../utils/internal";
 
 export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
@@ -67,6 +67,12 @@ export class AsyncCachedValueBuilder<T> implements IAsyncCachedValueBuilder<T> {
         this._valueFactory = new OnFailureValueStorageAsyncValueFactoryDecorator(this._valueFactory, valueStorage, minStorageValueCreatedOn, onFailure);
 
         return this;
+    }
+
+    public useMemoryStorageOnFailure(onFailure?: Action<any>): IAsyncCachedValueBuilder<T> {
+        const storage = new MemoryStorage<T>();
+
+        return this.saveValueToValueStorage(storage).useValueStorageOnFailure(storage, null, onFailure);
     }
 
     public useValueStorageOnInit(valueStorage: IValueStorage<T>, minStorageValueCreatedOn?: Date): IAsyncCachedValueBuilder<T> {

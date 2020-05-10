@@ -13,5 +13,7 @@ export interface ICachedValueBuilder<T> {
 
     useValueStorageOnFailure(valueStorage: IValueStorage<T>, minValueCreatedOn?: Date, onFailure?: Action<any>): ICachedValueBuilder<T>;
 
+    useMemoryStorageOnFailure(onFailure?: Action<any>): ICachedValueBuilder<T>;
+
     create(): ICachedValue<T>;
 }

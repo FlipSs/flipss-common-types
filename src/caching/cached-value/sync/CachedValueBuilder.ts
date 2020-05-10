@@ -14,7 +14,7 @@ import {
     SaveValueToStorageValueFactoryDecorator,
     SlidingExpirationCachedValueFactoryWrapperDecorator
 } from "../../internal";
-import {IValueStorage} from "../../../storages/internal";
+import {IValueStorage, MemoryStorage} from "../../../storages/internal";
 import {Action, Func} from "../../../types/internal";
 import {TimeSpan} from "../../../time/internal";
 import {Argument} from "../../../utils/internal";
@@ -48,6 +48,12 @@ export class CachedValueBuilder<T> implements ICachedValueBuilder<T> {
         this._expirationValueFactoryWrapperDecoratorConstructor = SlidingExpirationCachedValueFactoryWrapperDecorator;
 
         return this;
+    }
+
+    public useMemoryStorageOnFailure(onFailure?: Action<any>): ICachedValueBuilder<T> {
+        const storage = new MemoryStorage<T>();
+
+        return this.saveValueToValueStorage(storage).useValueStorageOnFailure(storage, null, onFailure);
     }
 
     public saveValueToValueStorage(valueStorage: IValueStorage<T>): ICachedValueBuilder<T> {

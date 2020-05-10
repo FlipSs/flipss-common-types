@@ -1,1 +1,1 @@
-export {IStorageValue, IValueStorage, LocalStorage, isLocalStorageSupported} from './internal';
+export {IStorageValue, IValueStorage, LocalStorage, isLocalStorageSupported, MemoryStorage} from './internal';

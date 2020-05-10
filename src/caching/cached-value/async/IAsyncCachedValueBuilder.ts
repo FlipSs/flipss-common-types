@@ -13,6 +13,8 @@ export interface IAsyncCachedValueBuilder<T> {
 
     useValueStorageOnFailure(valueStorage: IValueStorage<T>, minValueCreatedOn?: Date, onFailure?: Action<any>): IAsyncCachedValueBuilder<T>;
 
+    useMemoryStorageOnFailure(onFailure?: Action<any>): IAsyncCachedValueBuilder<T>;
+
     create(): IAsyncCachedValue<T>;
 }
 

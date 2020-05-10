@@ -6,8 +6,14 @@ export class AsyncCachedValue<T> implements IAsyncCachedValue<T> {
     public constructor(private readonly _cachedValue: ICachedValue<Promise<T>>) {
     }
 
-    public getValueAsync(): Promise<T> {
-        return this._cachedValue.getValue();
+    public async getValueAsync(): Promise<T> {
+        try {
+            return await this._cachedValue.getValue();
+        } catch (e) {
+            this.reset();
+
+            throw e;
+        }
     }
 
     public reset(): void {
