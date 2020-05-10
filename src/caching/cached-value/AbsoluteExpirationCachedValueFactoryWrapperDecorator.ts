@@ -25,8 +25,8 @@ export class AbsoluteExpirationCachedValueFactoryWrapperDecorator<T> implements 
         this._expirationPeriodTimer.dispose();
     }
 
-    public updateValue(): void {
-        this._valueFactoryWrapper.updateValue();
+    public updateValue(silent?: boolean): void {
+        this._valueFactoryWrapper.updateValue(silent);
         this.restartTimer();
     }
 

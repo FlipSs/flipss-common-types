@@ -14,8 +14,11 @@ export class DirectValueFactoryWrapper<T> extends Observable implements IValueFa
         return this._value;
     }
 
-    public updateValue(): void {
+    public updateValue(silent?: boolean): void {
         this._value = this._valueFactory.createValue();
-        this.next();
+
+        if (!silent) {
+            this.next();
+        }
     }
 }

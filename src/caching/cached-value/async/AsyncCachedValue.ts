@@ -10,14 +10,14 @@ export class AsyncCachedValue<T> implements IAsyncCachedValue<T> {
         try {
             return await this._cachedValue.getValue();
         } catch (e) {
-            this.reset();
+            this.reset(true);
 
             throw e;
         }
     }
 
-    public reset(): void {
-        this._cachedValue.reset();
+    public reset(silent?: boolean): void {
+        this._cachedValue.reset(silent);
     }
 
     public dispose(): void {

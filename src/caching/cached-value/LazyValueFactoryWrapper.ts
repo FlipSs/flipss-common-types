@@ -15,8 +15,11 @@ export class LazyValueFactoryWrapper<T> extends Observable implements IValueFact
         return this._lazyValue.value;
     }
 
-    public updateValue(): void {
+    public updateValue(silent?: boolean): void {
         this._lazyValue.reset();
-        this.next();
+
+        if (!silent) {
+            this.next();
+        }
     }
 }

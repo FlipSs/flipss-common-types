@@ -9,8 +9,8 @@ export class CachedValue<T> implements ICachedValue<T> {
         return this._valueFactoryWrapper.getValue();
     }
 
-    public reset(): void {
-        this._valueFactoryWrapper.updateValue();
+    public reset(silent?: boolean): void {
+        this._valueFactoryWrapper.updateValue(silent);
     }
 
     public dispose(): void {
