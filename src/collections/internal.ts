@@ -23,8 +23,9 @@ export * from './sorting/OrderedEnumerable';
 export * from './grouping/Grouping';
 export * from './grouping/IGrouping';
 
-export * from './IEqualityComparer';
-export * from './DefaultEqualityComparer';
+export * from './comparers/IEqualityComparer';
+export * from './comparers/DefaultEqualityComparer';
+export * from './comparers/IgnoreCaseStringComparer';
 export * from './helpers';
 export * from './sorting/DefaultComparer';
 export * from './sorting/IComparer';
