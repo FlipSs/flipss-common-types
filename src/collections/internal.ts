@@ -25,7 +25,7 @@ export * from './grouping/IGrouping';
 
 export * from './comparers/IEqualityComparer';
 export * from './comparers/DefaultEqualityComparer';
-export * from './comparers/IgnoreCaseStringComparer';
+export * from './comparers/IgnoreCaseStringEqualityComparer';
 export * from './helpers';
 export * from './sorting/DefaultComparer';
 export * from './sorting/IComparer';

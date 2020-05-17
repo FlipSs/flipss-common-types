@@ -1,10 +1,10 @@
-import {IgnoreCaseStringComparer} from "../../../src/collections/comparers/IgnoreCaseStringComparer";
+import {IgnoreCaseStringEqualityComparer} from "../../../src/collections/comparers/IgnoreCaseStringEqualityComparer";
 
-describe('IgnoreCaseStringComparer', () => {
-    let comparer: IgnoreCaseStringComparer;
+describe('IgnoreCaseStringEqualityComparer', () => {
+    let comparer: IgnoreCaseStringEqualityComparer;
 
     beforeEach(() => {
-        comparer = new IgnoreCaseStringComparer();
+        comparer = new IgnoreCaseStringEqualityComparer();
     });
 
     it('Should ignore string case', () => {

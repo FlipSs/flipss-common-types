@@ -11,7 +11,7 @@ export {
     IDictionary,
     List,
     DefaultEqualityComparer,
-    IgnoreCaseStringComparer,
+    IgnoreCaseStringEqualityComparer,
     Set,
     Dictionary,
     asEnumerable,
